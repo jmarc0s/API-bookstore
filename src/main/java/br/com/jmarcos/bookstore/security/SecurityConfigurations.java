@@ -1,0 +1,84 @@
+package br.com.jmarcos.bookstore.security;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+import br.com.jmarcos.bookstore.repository.PersonRepository;
+import br.com.jmarcos.bookstore.service.PersonService;
+
+@EnableWebSecurity
+@Configuration
+public class SecurityConfigurations {
+
+    @Autowired
+    private TokenService tokenService;
+
+    @Autowired
+    private PersonRepository personRepository;
+
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http
+                .authorizeHttpRequests((requests) -> {
+                    requests
+                            .requestMatchers(HttpMethod.GET, "/books").permitAll()
+                            .requestMatchers(HttpMethod.GET, "/books/**").permitAll()
+                            .requestMatchers(HttpMethod.DELETE, "/books/**").hasRole("ADMIN")
+                            .requestMatchers(HttpMethod.PUT, "/books/**").hasRole("ADMIN")
+                            .requestMatchers(HttpMethod.POST, "/books").hasRole("ADMIN")
+                            .requestMatchers(HttpMethod.POST, "/authors").hasRole("ADMIN")
+                            .requestMatchers(HttpMethod.DELETE, "/authors/**").hasRole("ADMIN")
+                            .requestMatchers(HttpMethod.PUT, "/authors/**").hasRole("ADMIN")
+                            .requestMatchers(HttpMethod.GET, "/authors").permitAll()
+                            .requestMatchers(HttpMethod.GET, "/authors/**").permitAll()
+                            .requestMatchers("/storehouses").hasRole("ADMIN")
+                            .requestMatchers("/storehouses/**").hasRole("ADMIN")
+                            .requestMatchers("/publishingCompanies").hasRole("ADMIN")
+                            .requestMatchers("/publishingCompanies/**").hasRole("ADMIN")
+                            .requestMatchers("/permissions").hasRole("ADMIN")
+                            .requestMatchers("/permissions/**").hasRole("ADMIN")
+                            .requestMatchers(HttpMethod.POST, "/persons").permitAll()
+                            .requestMatchers(HttpMethod.GET, "/persons").hasRole("ADMIN")
+                            .requestMatchers(HttpMethod.GET, "/persons/profile").authenticated()
+                            .requestMatchers(HttpMethod.PUT, "/persons/profile").authenticated()
+                            .requestMatchers(HttpMethod.DELETE, "/persons/profile").authenticated()
+                            .requestMatchers(HttpMethod.GET, "/persons/**").hasRole("ADMIN")
+                            .requestMatchers(HttpMethod.DELETE, "/persons/**").hasRole("ADMIN")
+                            .requestMatchers(HttpMethod.PATCH, "/persons/**").hasRole("ADMIN")
+                            .requestMatchers(HttpMethod.POST, "/auth").permitAll()
+                            .anyRequest().authenticated();
+                }).csrf().disable()
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and().addFilterBefore(new AuthenticateTokenFilter(tokenService, personRepository),
+                        UsernamePasswordAuthenticationFilter.class);
+
+        return http.build();
+    }
+
+    // classe necessaria para a injeção do atributo AuthenticationManager no
+    // AuthService
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
+        return configuration.getAuthenticationManager(); // chama o autenticacao service pois ela consegue identificar
+                                                         // quem implements UserDetailsService
+
+    }
+
+    // esse metodo é necessario para que o spring descriptografe a senha que está no
+    // banco de dados
+    @Bean
+    public BCryptPasswordEncoder bCryptPasswordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
+}
