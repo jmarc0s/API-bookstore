@@ -14,6 +14,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.config.EnableSpringDataWebSupport;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.web.context.annotation.ApplicationScope;
+import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 import br.com.jmarcos.bookstore.model.Address;
 import br.com.jmarcos.bookstore.model.Author;

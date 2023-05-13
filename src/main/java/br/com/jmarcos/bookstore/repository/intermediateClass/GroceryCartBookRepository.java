@@ -7,7 +7,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import br.com.jmarcos.bookstore.model.intermediateClass.GroceryCartBook;
-import br.com.jmarcos.bookstore.service.GroceryCartService;
 
 @Repository
 public interface GroceryCartBookRepository extends JpaRepository<GroceryCartBook, Long> {

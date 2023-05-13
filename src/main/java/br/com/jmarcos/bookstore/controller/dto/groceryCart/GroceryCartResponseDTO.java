@@ -3,7 +3,6 @@ package br.com.jmarcos.bookstore.controller.dto.groceryCart;
 import java.util.ArrayList;
 import java.util.List;
 
-import br.com.jmarcos.bookstore.model.Book;
 import br.com.jmarcos.bookstore.model.GroceryCart;
 import br.com.jmarcos.bookstore.model.intermediateClass.GroceryCartBook;
 import lombok.AllArgsConstructor;

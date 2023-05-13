@@ -1,8 +1,5 @@
 package br.com.jmarcos.bookstore.controller.dto.book;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import br.com.jmarcos.bookstore.model.Author;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

@@ -17,6 +17,8 @@ public class PersonLoginDTO {
     @NotEmpty
     @NotNull
     private String login;
+    @NotEmpty
+    @NotNull
     private String password;
 
     public UsernamePasswordAuthenticationToken convert() {

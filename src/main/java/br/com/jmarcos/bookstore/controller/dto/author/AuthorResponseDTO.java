@@ -1,7 +1,5 @@
 package br.com.jmarcos.bookstore.controller.dto.author;
 
-import java.util.List;
-
 import br.com.jmarcos.bookstore.controller.dto.address.AddressResponseDTO;
 import br.com.jmarcos.bookstore.model.Author;
 import lombok.AllArgsConstructor;
@@ -18,7 +16,7 @@ public class AuthorResponseDTO {
     private String name;
     private AddressResponseDTO address;
     private String url;
-    private List<String> books;
+    // private List<String> books;
 
     public AuthorResponseDTO(Author author) {
         this.id = author.getId();

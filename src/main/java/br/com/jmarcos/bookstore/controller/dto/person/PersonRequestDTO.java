@@ -21,6 +21,7 @@ public class PersonRequestDTO {
 
     @NotEmpty
     @NotNull
+    // @JsonProperty(value = "Person's name")
     private String name;
 
     @NotEmpty

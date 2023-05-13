@@ -14,7 +14,6 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import br.com.jmarcos.bookstore.repository.PersonRepository;
-import br.com.jmarcos.bookstore.service.PersonService;
 
 @EnableWebSecurity
 @Configuration
@@ -56,6 +55,11 @@ public class SecurityConfigurations {
                             .requestMatchers(HttpMethod.DELETE, "/persons/**").hasRole("ADMIN")
                             .requestMatchers(HttpMethod.PATCH, "/persons/**").hasRole("ADMIN")
                             .requestMatchers(HttpMethod.POST, "/auth").permitAll()
+                            .requestMatchers(HttpMethod.GET,
+                                    "/v3/api-docs/**",
+                                    "/swagger-ui/**",
+                                    "/swagger-ui.html")
+                            .permitAll()
                             .anyRequest().authenticated();
                 }).csrf().disable()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)

@@ -1,8 +1,5 @@
 package br.com.jmarcos.bookstore.controller.dto.person;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import br.com.jmarcos.bookstore.controller.dto.address.AddressResponseDTO;
 import br.com.jmarcos.bookstore.model.Person;
 import lombok.AllArgsConstructor;

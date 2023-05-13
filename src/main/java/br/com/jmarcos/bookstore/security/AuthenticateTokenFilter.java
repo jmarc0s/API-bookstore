@@ -5,7 +5,6 @@ import java.util.Optional;
 
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import br.com.jmarcos.bookstore.model.Person;
@@ -40,7 +39,7 @@ public class AuthenticateTokenFilter extends OncePerRequestFilter {
     }
 
     private String getToken(HttpServletRequest request) {
-        String token = request.getHeader("Authorization"); // capturu o valor do atributo Authorization do header da
+        String token = request.getHeader("Authorization"); // capturo o valor do atributo Authorization do header da
                                                            // requisição
         if (token == null || token.isEmpty() || !token.startsWith("Bearer ")) {
             return null;
