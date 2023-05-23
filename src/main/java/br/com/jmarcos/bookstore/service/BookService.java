@@ -19,6 +19,7 @@ import br.com.jmarcos.bookstore.repository.BookRepository;
 import br.com.jmarcos.bookstore.repository.PublishingCompanyRepository;
 import br.com.jmarcos.bookstore.repository.StorehouseRepository;
 import br.com.jmarcos.bookstore.repository.intermediateClass.StorehouseBookRepository;
+import br.com.jmarcos.bookstore.service.exceptions.ResourceNotFoundException;
 import jakarta.transaction.Transactional;
 
 @Service
@@ -88,9 +89,9 @@ public class BookService {
         return Optional.empty();
     }
 
-    public Optional<Book> findByid(Long id) {
-
-        return this.bookRepository.findById(id);
+    public Book findByid(Long id) {
+        return this.bookRepository.findById(id)
+            .orElseThrow(() -> new ResourceNotFoundException("Book not found in database with the specified id"));
     }
 
     @Transactional

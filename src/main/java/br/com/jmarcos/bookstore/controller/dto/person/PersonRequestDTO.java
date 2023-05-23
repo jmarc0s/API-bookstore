@@ -6,6 +6,7 @@ import br.com.jmarcos.bookstore.controller.dto.address.AddressRequestDTO;
 import br.com.jmarcos.bookstore.model.Permission;
 import br.com.jmarcos.bookstore.model.Person;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -26,6 +27,7 @@ public class PersonRequestDTO {
 
     @NotEmpty
     @NotNull
+    @Email
     private String email;
 
     @Valid
