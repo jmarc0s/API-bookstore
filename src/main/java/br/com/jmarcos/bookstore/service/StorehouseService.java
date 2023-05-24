@@ -10,6 +10,8 @@ import org.springframework.stereotype.Service;
 
 import br.com.jmarcos.bookstore.model.Storehouse;
 import br.com.jmarcos.bookstore.repository.StorehouseRepository;
+import br.com.jmarcos.bookstore.service.exceptions.ConflictException;
+import br.com.jmarcos.bookstore.service.exceptions.ResourceNotFoundException;
 import jakarta.transaction.Transactional;
 
 @Service
@@ -22,6 +24,11 @@ public class StorehouseService {
     }
 
     public Storehouse save(Storehouse storehouse) {
+        
+        if (this.existsByCode(storehouse.getCode())) {
+            throw new ConflictException("Storehouse code is already in use.");
+    }
+
         return storehouseRepository.save(storehouse);
     }
 
@@ -34,13 +41,14 @@ public class StorehouseService {
         return this.storehouseRepository.findAll(pageable);
     }
 
-    public Optional<Storehouse> searchByID(Long id) {
-        return this.storehouseRepository.findById(id);
+    public Storehouse searchByID(Long id) {
+        return this.storehouseRepository.findById(id)
+            .orElseThrow(() -> new ResourceNotFoundException("Storehouse not found with the given id"));
     }
 
     @Transactional
     public Boolean delete(Long id) {
-        Optional<Storehouse> storehouse = this.searchByID(id);
+        Optional<Storehouse> storehouse = this.storehouseRepository.findById(id);
 
         if (storehouse.isPresent()) {
             this.storehouseRepository.delete(storehouse.get());
@@ -50,12 +58,10 @@ public class StorehouseService {
         return false;
     }
 
-    public Optional<Storehouse> update(Storehouse newstorehouse) {
-        Optional<Storehouse> oldStorehouse = storehouseRepository.findById(newstorehouse.getId());
+    public Storehouse update(Storehouse newstorehouse) {
+        Storehouse oldStorehouse = this.searchByID(newstorehouse.getId());
 
-        return oldStorehouse.isPresent()
-                ? Optional.of(this.save(this.fillUpdateStorehouse(oldStorehouse.get(), newstorehouse)))
-                : Optional.empty();
+        return this.save(this.fillUpdateStorehouse(oldStorehouse, newstorehouse));
     }
 
     public Storehouse fillUpdateStorehouse(Storehouse oldStorehouse, Storehouse newStorehouse) {
@@ -64,8 +70,9 @@ public class StorehouseService {
         return oldStorehouse;
     }
 
-    public Optional<Storehouse> searchByCode(Integer code) {
-        return this.storehouseRepository.findByCode(code);
+    public Storehouse searchByCode(Integer code) {
+        return this.storehouseRepository.findByCode(code)
+            .orElseThrow(() -> new ResourceNotFoundException("Storehouse not found with the given code"));
     }
 
     public List<Storehouse> findStorehousesByAddress(String street, int number, String city, String state,

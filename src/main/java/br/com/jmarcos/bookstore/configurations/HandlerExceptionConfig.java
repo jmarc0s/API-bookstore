@@ -15,21 +15,21 @@ public class HandlerExceptionConfig {
 
     @ExceptionHandler(BadRequestException.class)
     public ResponseEntity<ExceptionDetails> handlerBadRequestException(BadRequestException exception){
-        ExceptionDetails details = new ExceptionDetails("Bad Request Exception, please, submit a valid request", exception.getMessage(), HttpStatus.BAD_REQUEST.value());
+        ExceptionDetails details = new ExceptionDetails("Bad Request Exception. Please, Submit a Valid Request", exception.getMessage(), HttpStatus.BAD_REQUEST.value());
         return new ResponseEntity<>(details, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<ExceptionDetails> handlerResourceNotFoundException(ResourceNotFoundException exception){
-        ExceptionDetails details = new ExceptionDetails("Resource not found in database", exception.getMessage(), HttpStatus.NOT_FOUND.value());
+        ExceptionDetails details = new ExceptionDetails("Resource Dot Found in Database", exception.getMessage(), HttpStatus.NOT_FOUND.value());
         return new ResponseEntity<>(details, HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(ConflictException.class)
     public ResponseEntity<ExceptionDetails> handlerConflictException(ConflictException exception) {
-        ExceptionDetails details = new ExceptionDetails("Resource not found in database", exception.getMessage(), HttpStatus.NOT_FOUND.value());
+        ExceptionDetails details = new ExceptionDetails("Data Conflict", exception.getMessage(), HttpStatus.NOT_FOUND.value());
         return new ResponseEntity<>(details, HttpStatus.NOT_FOUND);
     }
 
-    
+
 }

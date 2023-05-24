@@ -12,7 +12,7 @@ import lombok.Setter;
 public class ExceptionDetails {
     private String title;
 
-    private String detail;
+    private String details;
 
     private int status;
 }

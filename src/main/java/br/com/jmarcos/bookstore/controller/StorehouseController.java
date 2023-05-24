@@ -74,13 +74,8 @@ public class StorehouseController {
         @PostMapping
         public ResponseEntity<Object> save(@RequestBody @Valid StorehouseRequestDTO storehouseRequestDTO,
                         UriComponentsBuilder uriBuilder) {
-
-                if (storehouseService.existsByCode(storehouseRequestDTO.getCode())) {
-                        return ResponseEntity.status(HttpStatus.CONFLICT).body("Storehouse code is already in use.");
-                }
-
-                Storehouse storehouse = storehouseRequestDTO.toStorehouse();
-                this.storehouseService.save(storehouse);
+               
+                Storehouse storehouse = this.storehouseService.save(storehouseRequestDTO.toStorehouse());
                 URI uri = uriBuilder.path("/storehouse/{id}").buildAndExpand(storehouse.getId()).toUri();
                 return ResponseEntity.created(uri).body(new StorehouseResponseDTO(storehouse));
         }
@@ -126,12 +121,8 @@ public class StorehouseController {
 
         @GetMapping("/{id}")
         public ResponseEntity<Object> searchById(@PathVariable Long id) {
-                Optional<Storehouse> storehouse = this.storehouseService.searchByID(id);
-
-                return storehouse.isPresent()
-                                ? ResponseEntity.ok(new StorehouseResponseDTO(storehouse.get()))
-                                : ResponseEntity.status(HttpStatus.NOT_FOUND).body(
-                                                "Storehouse Not Found");
+                Storehouse storehouse = this.storehouseService.searchByID(id);
+                return ResponseEntity.ok(new StorehouseResponseDTO(storehouse));
         }
 
         @SecurityRequirement(name = "Authorization")
@@ -180,18 +171,11 @@ public class StorehouseController {
         @PutMapping("/{id}")
         public ResponseEntity<Object> update(@PathVariable Long id,
                         @RequestBody @Valid StorehouseUpdateDTO storehouseUpdateDTO) {
-                Optional<Storehouse> storehouse = this.storehouseService.searchByID(id);
-
-                if (storehouse.isEmpty()) {
-                        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
-                                        "Storehouse Not Found");
-                }
+                Storehouse storehouse = this.storehouseService.searchByID(id);
 
                 storehouse = this.storehouseService.update(storehouseUpdateDTO.toStorehouse(id));
-                return storehouse.isEmpty()
-                                ? ResponseEntity.status(HttpStatus.NOT_FOUND).body(
-                                                "Storehouse Not Found")
-                                : ResponseEntity.ok(new StorehouseResponseDTO(storehouse.get()));
+
+                return ResponseEntity.ok(new StorehouseResponseDTO(storehouse));
         }
 
         @SecurityRequirement(name = "Authorization")
@@ -219,12 +203,9 @@ public class StorehouseController {
 
         @RequestMapping(value = "/search_by_code", method = RequestMethod.GET)
         public ResponseEntity<Object> searchByCode(@RequestParam Integer code) {
-                Optional<Storehouse> storehouse = this.storehouseService.searchByCode(code);
+                Storehouse storehouse = this.storehouseService.searchByCode(code);
 
-                return storehouse.isPresent()
-                                ? ResponseEntity.ok(new StorehouseResponseDTO(storehouse.get()))
-                                : ResponseEntity.status(HttpStatus.NOT_FOUND).body(
-                                                "Storehouse Not Found");
+                return ResponseEntity.ok(new StorehouseResponseDTO(storehouse));
         }
 
         @SecurityRequirement(name = "Authorization")
