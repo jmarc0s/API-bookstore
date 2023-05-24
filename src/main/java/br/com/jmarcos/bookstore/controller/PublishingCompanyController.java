@@ -128,12 +128,9 @@ public class PublishingCompanyController {
 
         @GetMapping("/{id}")
         public ResponseEntity<Object> searchById(@PathVariable Long id) {
-                Optional<PublishingCompany> publishingCompany = this.publishingCompanyService.searchById(id);
+                PublishingCompany publishingCompany = this.publishingCompanyService.searchById(id);
 
-                return publishingCompany.isPresent()
-                                ? ResponseEntity.ok(new PublishingCompanyResponseDTO(publishingCompany.get()))
-                                : ResponseEntity.status(HttpStatus.NOT_FOUND).body(
-                                                "PublishingCompany Not Found");
+                return ResponseEntity.ok(new PublishingCompanyResponseDTO(publishingCompany));
         }
 
         @SecurityRequirement(name = "Authorization")
@@ -163,12 +160,10 @@ public class PublishingCompanyController {
 
         @RequestMapping(value = "/search_by_name", method = RequestMethod.GET)
         public ResponseEntity<Object> searchByname(@RequestParam String name) {
-                Optional<PublishingCompany> publishingCompany = this.publishingCompanyService.searchByName(name);
+                PublishingCompany publishingCompany = this.publishingCompanyService.searchByName(name);
 
-                return publishingCompany.isPresent()
-                                ? ResponseEntity.ok(new PublishingCompanyResponseDTO(publishingCompany.get()))
-                                : ResponseEntity.status(HttpStatus.NOT_FOUND).body(
-                                                "PublishingCompany Not Found");
+                return ResponseEntity.ok(new PublishingCompanyResponseDTO(publishingCompany));
+                               
         }
 
         @SecurityRequirement(name = "Authorization")
@@ -221,13 +216,9 @@ public class PublishingCompanyController {
         @PutMapping("/{id}")
         public ResponseEntity<Object> update(@RequestBody @Valid PublishingCompanyUpdateDTO publishingCompanyUpdateDTO,
                         @PathVariable Long id) {
-                Optional<PublishingCompany> publishingCompany = this.publishingCompanyService.searchById(id);
+                PublishingCompany publishingCompany = this.publishingCompanyService.searchById(id);
 
-                if (publishingCompany.isEmpty()) {
-                        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("PublishingCompany not found");
-                }
-
-                if (!Objects.equals(publishingCompany.get().getName(), publishingCompanyUpdateDTO.getName())
+                if (!Objects.equals(publishingCompany.getName(), publishingCompanyUpdateDTO.getName())
                                 && publishingCompanyService.existsByName(publishingCompanyUpdateDTO.getName())) {
 
                         return ResponseEntity.status(HttpStatus.CONFLICT)

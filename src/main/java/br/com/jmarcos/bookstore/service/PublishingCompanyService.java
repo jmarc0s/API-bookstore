@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import br.com.jmarcos.bookstore.model.Book;
 import br.com.jmarcos.bookstore.model.PublishingCompany;
 import br.com.jmarcos.bookstore.repository.PublishingCompanyRepository;
+import br.com.jmarcos.bookstore.service.exceptions.ResourceNotFoundException;
 import jakarta.transaction.Transactional;
 
 @Service
@@ -37,17 +38,19 @@ public class PublishingCompanyService {
         return exists.isPresent();
     }
 
-    public Optional<PublishingCompany> searchById(Long id) {
-        return publishingCompanyRepository.findById(id);
+    public PublishingCompany searchById(Long id) {
+        return publishingCompanyRepository.findById(id)
+            .orElseThrow(() -> new ResourceNotFoundException("PublishingCompany not found with the given id"));
     }
 
-    public Optional<PublishingCompany> searchByName(String name) {
-        return publishingCompanyRepository.findByName(name);
+    public PublishingCompany searchByName(String name) {
+        return publishingCompanyRepository.findByName(name)
+        .   orElseThrow(() -> new ResourceNotFoundException("PublishingCompany not found with the given name"));
     }
 
     @Transactional
     public boolean delete(Long id) {
-        Optional<PublishingCompany> publishingCompany = this.searchById(id);
+        Optional<PublishingCompany> publishingCompany = publishingCompanyRepository.findById(id);
 
         if (publishingCompany.isPresent()) {
 
