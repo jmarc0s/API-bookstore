@@ -25,6 +25,7 @@ import br.com.jmarcos.bookstore.model.Address;
 import br.com.jmarcos.bookstore.model.Storehouse;
 import br.com.jmarcos.bookstore.repository.StorehouseRepository;
 import br.com.jmarcos.bookstore.service.StorehouseService;
+import br.com.jmarcos.bookstore.service.exceptions.ConflictException;
 import br.com.jmarcos.bookstore.service.exceptions.ResourceNotFoundException;
 
 @ExtendWith(MockitoExtension.class)
@@ -54,6 +55,21 @@ public class StorehouseServiceTest {
         Assertions.assertEquals(storehouse.getAddress(), savedStorehouse.getAddress());
         Assertions.assertTrue(storehouse.getBookList().isEmpty());
         verify(storehouseRepository).save(storehouse);
+
+    }
+
+    @Test
+    void save_Throws_ConflictException_WhenStorehouseCodeIsAlreadyInUse() {
+        Storehouse storehouse = createStorehouse();
+        Storehouse newStorehouse = createStorehouse();
+        when(storehouseRepository.findByCode(anyInt())).thenReturn(Optional.of(storehouse));
+
+        ConflictException conflictExceptionException = Assertions
+                .assertThrows(ConflictException.class,
+                        () -> storehouseService.save(newStorehouse));
+
+        Assertions.assertTrue(conflictExceptionException.getMessage()
+                .contains("Storehouse code is already in use."));
 
     }
 
