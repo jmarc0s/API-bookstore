@@ -1,4 +1,4 @@
-package br.com.jmarcos.bookstore.controller.dto.Storehouse;
+package br.com.jmarcos.bookstore.controller.dto.storehouse;
 
 import br.com.jmarcos.bookstore.controller.dto.address.AddressResponseDTO;
 import br.com.jmarcos.bookstore.model.Storehouse;
