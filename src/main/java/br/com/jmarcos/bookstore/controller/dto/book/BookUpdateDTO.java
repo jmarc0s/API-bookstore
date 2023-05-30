@@ -7,8 +7,8 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-import br.com.jmarcos.bookstore.controller.dto.Storehouse.StorehouseRequestDTO;
 import br.com.jmarcos.bookstore.controller.dto.author.AuthorRequestDTO;
+import br.com.jmarcos.bookstore.controller.dto.storehouse.StorehouseRequestDTO;
 import br.com.jmarcos.bookstore.model.Author;
 import br.com.jmarcos.bookstore.model.Book;
 import br.com.jmarcos.bookstore.model.PublishingCompany;

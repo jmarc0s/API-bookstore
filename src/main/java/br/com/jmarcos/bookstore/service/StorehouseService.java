@@ -24,10 +24,10 @@ public class StorehouseService {
     }
 
     public Storehouse save(Storehouse storehouse) {
-        
+
         if (this.existsByCode(storehouse.getCode())) {
             throw new ConflictException("Storehouse code is already in use.");
-    }
+        }
 
         return storehouseRepository.save(storehouse);
     }
@@ -43,7 +43,7 @@ public class StorehouseService {
 
     public Storehouse searchByID(Long id) {
         return this.storehouseRepository.findById(id)
-            .orElseThrow(() -> new ResourceNotFoundException("Storehouse not found with the given id"));
+                .orElseThrow(() -> new ResourceNotFoundException("Storehouse not found with the given id"));
     }
 
     @Transactional
@@ -72,7 +72,7 @@ public class StorehouseService {
 
     public Storehouse searchByCode(Integer code) {
         return this.storehouseRepository.findByCode(code)
-            .orElseThrow(() -> new ResourceNotFoundException("Storehouse not found with the given code"));
+                .orElseThrow(() -> new ResourceNotFoundException("Storehouse not found with the given code"));
     }
 
     public List<Storehouse> findStorehousesByAddress(String street, int number, String city, String state,

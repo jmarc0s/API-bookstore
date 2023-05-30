@@ -29,9 +29,9 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import br.com.jmarcos.bookstore.controller.dto.Storehouse.StorehouseRequestDTO;
-import br.com.jmarcos.bookstore.controller.dto.Storehouse.StorehouseResponseDTO;
-import br.com.jmarcos.bookstore.controller.dto.Storehouse.StorehouseUpdateDTO;
+import br.com.jmarcos.bookstore.controller.dto.storehouse.StorehouseRequestDTO;
+import br.com.jmarcos.bookstore.controller.dto.storehouse.StorehouseResponseDTO;
+import br.com.jmarcos.bookstore.controller.dto.storehouse.StorehouseUpdateDTO;
 import br.com.jmarcos.bookstore.model.Storehouse;
 import br.com.jmarcos.bookstore.service.StorehouseService;
 import jakarta.validation.Valid;
@@ -74,7 +74,7 @@ public class StorehouseController {
         @PostMapping
         public ResponseEntity<Object> save(@RequestBody @Valid StorehouseRequestDTO storehouseRequestDTO,
                         UriComponentsBuilder uriBuilder) {
-               
+
                 Storehouse storehouse = this.storehouseService.save(storehouseRequestDTO.toStorehouse());
                 URI uri = uriBuilder.path("/storehouse/{id}").buildAndExpand(storehouse.getId()).toUri();
                 return ResponseEntity.created(uri).body(new StorehouseResponseDTO(storehouse));
