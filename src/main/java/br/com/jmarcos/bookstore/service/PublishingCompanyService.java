@@ -1,5 +1,6 @@
 package br.com.jmarcos.bookstore.service;
 
+import java.util.Objects;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Service;
 import br.com.jmarcos.bookstore.model.Book;
 import br.com.jmarcos.bookstore.model.PublishingCompany;
 import br.com.jmarcos.bookstore.repository.PublishingCompanyRepository;
+import br.com.jmarcos.bookstore.service.exceptions.ConflictException;
 import br.com.jmarcos.bookstore.service.exceptions.ResourceNotFoundException;
 import jakarta.transaction.Transactional;
 
@@ -29,6 +31,11 @@ public class PublishingCompanyService {
     }
 
     public PublishingCompany save(PublishingCompany publishingCompany) {
+
+        if (this.existsByName(publishingCompany.getName())) {
+            throw new ConflictException("PublishingCompany name is already in use");
+    }
+
         return publishingCompanyRepository.save(publishingCompany);
     }
 
@@ -49,26 +56,32 @@ public class PublishingCompanyService {
     }
 
     @Transactional
-    public boolean delete(Long id) {
-        Optional<PublishingCompany> publishingCompany = publishingCompanyRepository.findById(id);
+    public void delete(Long id) {
+        PublishingCompany publishingCompany = this.searchById(id);
 
-        if (publishingCompany.isPresent()) {
+        
 
             for (Book book : bookService.searchByPublishingCompany(id)) {
                 this.bookService.deleteStorehouseBook(book.getId());
             }
-            this.publishingCompanyRepository.delete(publishingCompany.get());
-            return true;
-        }
 
-        return false;
+            this.publishingCompanyRepository.delete(publishingCompany);
+             
     }
 
-    public Optional<PublishingCompany> update(PublishingCompany publishingCompanyUpdate, Long id) {
-        Optional<PublishingCompany> oldPublishingCompany = publishingCompanyRepository.findById(id);
-        PublishingCompany updattedPublishimgCompany = fillUpdate(oldPublishingCompany.get(), publishingCompanyUpdate);
+    public PublishingCompany update(PublishingCompany publishingCompanyUpdate, Long id) {
+        PublishingCompany oldPublishingCompany = this.searchById(id);
+
+        if(!Objects.equals(oldPublishingCompany.getName(), publishingCompanyUpdate.getName())
+            && this.existsByName(publishingCompanyUpdate.getName())){
+
+            throw new ConflictException("PublishingCompany name is already in use");
+        }
+
+        PublishingCompany updattedPublishimgCompany = fillUpdate(oldPublishingCompany, publishingCompanyUpdate);
         this.save(updattedPublishimgCompany);
-        return Optional.of(updattedPublishimgCompany);
+
+        return updattedPublishimgCompany;
     }
 
     private PublishingCompany fillUpdate(PublishingCompany oldPublishingCompany,

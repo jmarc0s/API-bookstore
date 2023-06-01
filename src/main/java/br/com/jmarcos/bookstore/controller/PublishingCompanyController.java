@@ -1,8 +1,6 @@
 package br.com.jmarcos.bookstore.controller;
 
 import java.net.URI;
-import java.util.Objects;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
@@ -90,13 +88,9 @@ public class PublishingCompanyController {
         public ResponseEntity<Object> save(@RequestBody @Valid PublishingCompanyRequestDTO publishingCompanyRequestDTO,
                         UriComponentsBuilder uriBuilder) {
 
-                if (publishingCompanyService.existsByName(publishingCompanyRequestDTO.getName())) {
-                        return ResponseEntity.status(HttpStatus.CONFLICT)
-                                        .body("publishingCompany name is already in use.");
-                }
-
                 PublishingCompany publishingCompany = publishingCompanyRequestDTO.toPublishingCompany();
                 this.publishingCompanyService.save(publishingCompany);
+                
                 URI uri = uriBuilder.path("/publishingCompany/{id}").buildAndExpand(publishingCompany.getId()).toUri();
                 return ResponseEntity.created(uri).body(new PublishingCompanyResponseDTO(publishingCompany));
         }
@@ -178,12 +172,10 @@ public class PublishingCompanyController {
 
         @DeleteMapping("/{id}")
         public ResponseEntity<Object> delete(@PathVariable Long id) {
-                boolean removed = this.publishingCompanyService.delete(id);
+                this.publishingCompanyService.delete(id);
 
-                return removed ? ResponseEntity.status(HttpStatus.OK).body(
-                                "publishingCompany was deleted")
-                                : ResponseEntity.status(HttpStatus.NOT_FOUND).body(
-                                                "storehouse Not Found");
+                return ResponseEntity.status(HttpStatus.OK).body("publishingCompany was deleted");
+                                
         }
 
         @SecurityRequirement(name = "Authorization")
@@ -216,21 +208,11 @@ public class PublishingCompanyController {
         @PutMapping("/{id}")
         public ResponseEntity<Object> update(@RequestBody @Valid PublishingCompanyUpdateDTO publishingCompanyUpdateDTO,
                         @PathVariable Long id) {
-                PublishingCompany publishingCompany = this.publishingCompanyService.searchById(id);
 
-                if (!Objects.equals(publishingCompany.getName(), publishingCompanyUpdateDTO.getName())
-                                && publishingCompanyService.existsByName(publishingCompanyUpdateDTO.getName())) {
-
-                        return ResponseEntity.status(HttpStatus.CONFLICT)
-                                        .body("PublishingCompany name is already in use");
-                }
-
-                Optional<PublishingCompany> updattedPublishimgCompany = this.publishingCompanyService
+                PublishingCompany updattedPublishimgCompany = this.publishingCompanyService
                                 .update(publishingCompanyUpdateDTO.toPublishingCompany(id), id);
 
-                return updattedPublishimgCompany.isPresent()
-                                ? ResponseEntity.ok(new PublishingCompanyResponseDTO(updattedPublishimgCompany.get()))
-                                : ResponseEntity.status(HttpStatus.NOT_FOUND).body("PublishingCompany not found");
+                return ResponseEntity.ok(new PublishingCompanyResponseDTO(updattedPublishimgCompany));
 
         }
 
