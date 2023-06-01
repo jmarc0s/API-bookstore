@@ -1,8 +1,6 @@
 package br.com.jmarcos.bookstore.controller;
 
 import java.net.URI;
-import java.util.Objects;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
@@ -87,9 +85,6 @@ public class AuthorController {
         @PostMapping
         public ResponseEntity<Object> save(@RequestBody @Valid AuthorRequestDTO authorRequestDTO,
                         UriComponentsBuilder uriBuilder) {
-                if (authorService.existsByName(authorRequestDTO.getName())) {
-                        return ResponseEntity.status(HttpStatus.CONFLICT).body("Author name is already in use");
-                }
 
                 Author author = this.authorService.save(authorRequestDTO.toAuthor());
 
@@ -122,11 +117,9 @@ public class AuthorController {
 
         @GetMapping("/{id}")
         public ResponseEntity<Object> searchById(@PathVariable Long id) {
-                Optional<Author> author = this.authorService.searchById(id);
+                Author author = this.authorService.searchById(id);
 
-                return author.isPresent()
-                                ? ResponseEntity.ok(new AuthorResponseDTO(author.get()))
-                                : ResponseEntity.status(HttpStatus.NOT_FOUND).body("Author not found");
+                return ResponseEntity.ok(new AuthorResponseDTO(author));
         }
 
         @SecurityRequirement(name = "Authorization")
@@ -154,11 +147,10 @@ public class AuthorController {
 
         @RequestMapping(value = "/search_by_name", method = RequestMethod.GET)
         public ResponseEntity<Object> searchByName(@RequestParam String name) {
-                Optional<Author> author = this.authorService.searchByName(name);
+                Author author = this.authorService.searchByName(name);
 
-                return author.isPresent()
-                                ? ResponseEntity.ok(new AuthorResponseDTO(author.get()))
-                                : ResponseEntity.status(HttpStatus.NOT_FOUND).body("Author not found");
+                return ResponseEntity.ok(new AuthorResponseDTO(author));
+
         }
 
         @SecurityRequirement(name = "Authorization")
@@ -172,11 +164,9 @@ public class AuthorController {
 
         @DeleteMapping("/{id}")
         public ResponseEntity<Object> deleteById(@PathVariable Long id) {
-                boolean removed = this.authorService.deleteById(id);
-                return removed ? ResponseEntity.status(HttpStatus.OK).body(
-                                "Author was deleted")
-                                : ResponseEntity.status(HttpStatus.NOT_FOUND).body(
-                                                "Author Not Found");
+                this.authorService.deleteById(id);
+
+                return  ResponseEntity.status(HttpStatus.OK).body("Author was deleted");
         }
 
         @SecurityRequirement(name = "Authorization")
@@ -207,19 +197,9 @@ public class AuthorController {
         @PutMapping("/{id}")
         public ResponseEntity<Object> update(@RequestBody @Valid AuthorUpdateDTO authorUpdateDTO,
                         @PathVariable Long id) {
-                Optional<Author> author = this.authorService.searchById(id);
-                if (author.isEmpty()) {
-                        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Author not found");
-                }
-                if (!Objects.equals(author.get().getName(), authorUpdateDTO.getName())
-                                && authorService.existsByName(authorUpdateDTO.getName())) {
-                        return ResponseEntity.status(HttpStatus.CONFLICT).body("Author name is already in use");
-                }
 
-                author = this.authorService.update(authorUpdateDTO.toAuthor(id));
+                Author author = this.authorService.update(authorUpdateDTO.toAuthor(id));
 
-                return author.isPresent()
-                                ? ResponseEntity.ok(new AuthorResponseDTO(author.get()))
-                                : ResponseEntity.status(HttpStatus.NOT_FOUND).body("Author not found");
+                return ResponseEntity.ok(new AuthorResponseDTO(author));
         }
 }

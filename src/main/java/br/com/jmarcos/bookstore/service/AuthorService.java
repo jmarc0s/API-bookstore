@@ -1,5 +1,6 @@
 package br.com.jmarcos.bookstore.service;
 
+import java.util.Objects;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +11,8 @@ import org.springframework.stereotype.Service;
 import br.com.jmarcos.bookstore.model.Author;
 import br.com.jmarcos.bookstore.model.Book;
 import br.com.jmarcos.bookstore.repository.AuthorRepository;
+import br.com.jmarcos.bookstore.service.exceptions.ConflictException;
+import br.com.jmarcos.bookstore.service.exceptions.ResourceNotFoundException;
 import jakarta.transaction.Transactional;
 
 @Service
@@ -34,38 +37,48 @@ public class AuthorService {
     }
 
     public Author save(Author author) {
+
+        if (this.existsByName(author.getName())) {
+            throw new ConflictException("Author name is already in use");
+        }
+
         return this.authorRepository.save(author);
     }
 
-    public Optional<Author> searchById(Long id) {
-        return this.authorRepository.findById(id);
+    public Author searchById(Long id) {
+        return this.authorRepository.findById(id)
+            .orElseThrow(() -> new ResourceNotFoundException("Author not found with the given id"));
     }
 
-    public Optional<Author> searchByName(String name) {
-        return this.authorRepository.findByName(name);
+    public Author searchByName(String name) {
+        return this.authorRepository.findByName(name)
+            .orElseThrow(() -> new ResourceNotFoundException("Author not found with the given name"));
     }
 
     @Transactional
-    public boolean deleteById(Long id) {
-        Optional<Author> exists = this.authorRepository.findById(id);
-        if (exists.isPresent()) {
+    public void deleteById(Long id) {
+        Author exists = this.searchById(id);
+        
 
-            for (Book book : exists.get().getBookList()) {
-                this.bookService.deleteStorehouseBook(book.getId());
-            }
-            this.authorRepository.deleteById(id);
-            return true;
+        for (Book book : exists.getBookList()) {
+            this.bookService.deleteStorehouseBook(book.getId());
         }
 
-        return false;
+        this.authorRepository.deleteById(id);
+      
     }
 
-    public Optional<Author> update(Author newAuthor) {
-        Optional<Author> oldAuthor = this.authorRepository.findById(newAuthor.getId());
+    public Author update(Author newAuthor) {
+        Author oldAuthor = this.searchById(newAuthor.getId());
 
-        return oldAuthor.isPresent()
-                ? Optional.of(this.save(this.fillUpdate(oldAuthor.get(), newAuthor)))
-                : Optional.empty();
+        if (!Objects.equals(oldAuthor.getName(), newAuthor.getName())
+            && this.existsByName(newAuthor.getName())){
+
+                throw new ConflictException("Author name is already in use");
+
+            }
+
+        return this.save(this.fillUpdate(oldAuthor, newAuthor));
     }
 
     private Author fillUpdate(Author oldAuthor, Author newAuthor) {
