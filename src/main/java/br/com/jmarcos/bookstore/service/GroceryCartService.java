@@ -15,6 +15,7 @@ import br.com.jmarcos.bookstore.repository.BookRepository;
 import br.com.jmarcos.bookstore.repository.GroceryCartRepository;
 import br.com.jmarcos.bookstore.repository.PersonRepository;
 import br.com.jmarcos.bookstore.repository.intermediateClass.GroceryCartBookRepository;
+import br.com.jmarcos.bookstore.service.exceptions.ResourceNotFoundException;
 import jakarta.transaction.Transactional;
 
 @Service
@@ -39,19 +40,17 @@ public class GroceryCartService {
     }
 
     @Transactional
-    public boolean deleteByIdAndPersonId(Long id, Long personId) {
-        Optional<GroceryCart> exists = this.groceryCartRepository.findByIdAndPersonId(id, personId);
-        if (exists.isPresent()) {
-            this.groceryCartBookRepository.deleteAllByGroceryCartId(id);
-            this.groceryCartRepository.deleteById(id);
-            return true;
-        }
+    public void deleteByIdAndPersonId(Long id, Long personId) {
+        GroceryCart exists = this.searchByIdAndPersonId(id, personId);
 
-        return false;
+            this.groceryCartBookRepository.deleteAllByGroceryCartId(exists.getId());
+            this.groceryCartRepository.deleteById(exists.getId());
+
     }
 
-    public Optional<GroceryCart> searchByIdAndPersonId(Long id, Long personId) {
-        return this.groceryCartRepository.findByIdAndPersonId(id, personId);
+    public GroceryCart searchByIdAndPersonId(Long id, Long personId) {
+        return this.groceryCartRepository.findByIdAndPersonId(id, personId)
+            .orElseThrow(() -> new ResourceNotFoundException("GroceryCart not found with the iven id"));
     }
 
     public Optional<GroceryCart> save(GroceryCart groceryCart, List<Integer> quantities) {
@@ -69,12 +68,14 @@ public class GroceryCartService {
 
     }
 
-    public Optional<GroceryCart> save(Long personId) {
+    public GroceryCart save(Long personId) {
         GroceryCart groceryCart = new GroceryCart();
         Optional<Person> person = this.personRepository.findById(personId);
+
         groceryCart.setPerson(person.get());
+
         this.groceryCartRepository.save(groceryCart);
-        return Optional.of(groceryCart);
+        return groceryCart;
     }
 
     private List<Book> searchBooks(GroceryCart groceryCart) {

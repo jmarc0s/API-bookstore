@@ -100,16 +100,13 @@ public class GroceryCartController {
         })
 
         @GetMapping("/{id}")
-        public ResponseEntity<Object> searchByid(@PathVariable Long id, @AuthenticationPrincipal Person person) {
-                Optional<GroceryCart> groceryCart = this.groceryCartService.searchByIdAndPersonId(id, person.getId());
+        public ResponseEntity<Object> searchById(@PathVariable Long id, @AuthenticationPrincipal Person person) {
+                GroceryCart groceryCart = this.groceryCartService.searchByIdAndPersonId(id, person.getId());
+        
+                List<GroceryCartBook> groceryCartBook = this.groceryCartService.listGroceryCartBook(groceryCart);
 
-                if (groceryCart.isPresent()) {
-                        List<GroceryCartBook> groceryCartBook = this.groceryCartService
-                                        .listGroceryCartBook(groceryCart.get());
-                        return ResponseEntity.ok(new GroceryCartResponseDTO(groceryCart.get(), groceryCartBook));
-                }
-
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("groceryCart not found");
+                return ResponseEntity.ok(new GroceryCartResponseDTO(groceryCart, groceryCartBook));
+                
         }
 
         @SecurityRequirement(name = "Authorization")
@@ -123,11 +120,10 @@ public class GroceryCartController {
 
         @DeleteMapping("/{id}")
         public ResponseEntity<Object> delete(@PathVariable Long id, @AuthenticationPrincipal Person person) {
-                boolean removed = this.groceryCartService.deleteByIdAndPersonId(id, person.getId());
-                return removed ? ResponseEntity.status(HttpStatus.OK).body(
-                                "GroceryCart was deleted")
-                                : ResponseEntity.status(HttpStatus.NOT_FOUND).body(
-                                                "GroceryCart Not Found");
+                this.groceryCartService.deleteByIdAndPersonId(id, person.getId());
+
+                return ResponseEntity.status(HttpStatus.OK).body( "GroceryCart was deleted");
+                               
         }
 
         @SecurityRequirement(name = "Authorization")
@@ -165,25 +161,25 @@ public class GroceryCartController {
                         @AuthenticationPrincipal Person person) {
                 Optional<GroceryCart> groceryCart;
 
-                if (groceryCartRequestDTO != null) {
-                        if (!groceryCartRequestDTO.verifyCompatibility()) {
-                                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                                                .body("The number of quantities should match the number of book ids.");
-                        }
-                        groceryCart = this.groceryCartService.save(groceryCartRequestDTO.toGroceryCart(person.getId()),
-                                        groceryCartRequestDTO.getQuantities());
-                } else {
-                        groceryCart = this.groceryCartService.save(person.getId());
-                }
+                // if (groceryCartRequestDTO != null) {
+                //         if (!groceryCartRequestDTO.verifyCompatibility()) {
+                //                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                //                                 .body("The number of quantities should match the number of book ids.");
+                //         }
+                //         groceryCart = this.groceryCartService.save(groceryCartRequestDTO.toGroceryCart(person.getId()),
+                //                         groceryCartRequestDTO.getQuantities());
+                // } else {
+                //         GroceryCart groceryCarts = this.groceryCartService.save(person.getId());
+                // }
 
-                if (groceryCart.isPresent()) {
-                        List<GroceryCartBook> groceryCartBook = this.groceryCartService
-                                        .listGroceryCartBook(groceryCart.get());
-                        URI uri = uriBuilder.path("/grocery_cart/{id}").buildAndExpand(groceryCart.get().getId())
-                                        .toUri();
-                        return ResponseEntity.created(uri)
-                                        .body(new GroceryCartResponseDTO(groceryCart.get(), groceryCartBook));
-                }
+                // if (groceryCart.isPresent()) {
+                //         List<GroceryCartBook> groceryCartBook = this.groceryCartService
+                //                         .listGroceryCartBook(groceryCart.get());
+                //         URI uri = uriBuilder.path("/grocery_cart/{id}").buildAndExpand(groceryCart.get().getId())
+                //                         .toUri();
+                //         return ResponseEntity.created(uri)
+                //                         .body(new GroceryCartResponseDTO(groceryCart.get(), groceryCartBook));
+                // }
 
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Books not found in database");
 
