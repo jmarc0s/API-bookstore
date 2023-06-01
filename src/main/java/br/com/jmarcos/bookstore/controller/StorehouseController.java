@@ -2,7 +2,6 @@ package br.com.jmarcos.bookstore.controller;
 
 import java.net.URI;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;

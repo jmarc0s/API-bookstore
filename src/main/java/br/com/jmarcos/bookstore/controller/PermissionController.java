@@ -2,8 +2,6 @@ package br.com.jmarcos.bookstore.controller;
 
 import java.net.URI;
 import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +14,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -41,7 +41,7 @@ public class PermissionController {
   }
 
   @SecurityRequirement(name = "Authorization")
-  @Operation(summary = "record a new book", description = "save a new book in database", responses = {
+  @Operation(summary = "record a new permission", description = "save a new book in database", responses = {
       @ApiResponse(responseCode = "500", ref = "InternalServerError"),
       @ApiResponse(responseCode = "200", description = "Permission saved", content = @Content(mediaType = "application/json", examples = {
           @ExampleObject(value = "{"
@@ -58,14 +58,12 @@ public class PermissionController {
   @PostMapping
   public ResponseEntity<Object> save(@RequestBody @Valid PermissionRequestDTO permissionRequestDTO,
       UriComponentsBuilder uriBuilder) {
-    Optional<Permission> permission = this.permissionService.searchByname(permissionRequestDTO.getName());
-    if (permission.isEmpty()) {
-      permission = this.permissionService.save(permissionRequestDTO.toPermission());
-      URI uri = uriBuilder.path("/permissions/{id}").buildAndExpand(permission.get().getId()).toUri();
-      return ResponseEntity.created(uri).body(new PermissionResponseDTO(permission.get()));
-    }
 
-    return ResponseEntity.status(HttpStatus.CONFLICT).body("permission name is already in use");
+      Permission permission = this.permissionService.save(permissionRequestDTO.toPermission());
+
+      URI uri = uriBuilder.path("/permissions/{id}").buildAndExpand(permission.getId()).toUri();
+      return ResponseEntity.created(uri).body(new PermissionResponseDTO(permission));
+
   }
 
   @SecurityRequirement(name = "Authorization")
@@ -101,11 +99,33 @@ public class PermissionController {
 
   @GetMapping("/{id}")
   public ResponseEntity<Object> searchById(@PathVariable Long id) {
-    Optional<Permission> permission = this.permissionService.searchByID(id);
+    Permission permission = this.permissionService.searchByID(id);
 
-    return permission.isPresent()
-        ? ResponseEntity.ok(new PermissionResponseDTO(permission.get()))
-        : ResponseEntity.status(HttpStatus.NOT_FOUND).body("permission not found");
+    return ResponseEntity.ok(new PermissionResponseDTO(permission));
+        
+  }
+
+
+  @SecurityRequirement(name = "Authorization")
+  @Operation(summary = "returns a permission by name", description = "returns permission by the specified name", responses = {
+      @ApiResponse(responseCode = "500", ref = "InternalServerError"),
+      @ApiResponse(responseCode = "200", description = "Successful request", content = @Content(mediaType = "application/json", examples = {
+          @ExampleObject(value = "{"
+              + "\"id\": 123,"
+              + "\"name\": \"ADMIN\","
+              + "}")
+      })),
+      @ApiResponse(responseCode = "400", description = "bad request, you may have filled something wrong"),
+      @ApiResponse(responseCode = "403", ref = "permissionDenied"),
+      @ApiResponse(responseCode = "404", description = "permision not found in database")
+  })
+
+  @RequestMapping(value = "/search_by_name", method = RequestMethod.GET)
+  public ResponseEntity<Object> searchByName(@RequestParam String name) {
+    Permission permission = this.permissionService.searchByname(name);
+
+    return ResponseEntity.ok(new PermissionResponseDTO(permission));
+        
   }
 
   @SecurityRequirement(name = "Authorization")
@@ -119,16 +139,15 @@ public class PermissionController {
 
   @DeleteMapping("/{id}")
   public ResponseEntity<Object> delete(@PathVariable Long id) {
-    boolean removed = this.permissionService.delete(id);
+    this.permissionService.delete(id);
 
-    return removed
-        ? ResponseEntity.ok().build()
-        : ResponseEntity.status(HttpStatus.NOT_FOUND).body("permission not found");
+    return ResponseEntity.status(HttpStatus.OK).body("Permission deleted");
+
 
   }
 
   @SecurityRequirement(name = "Authorization")
-  @Operation(summary = "update a book", description = "update a permission name", responses = {
+  @Operation(summary = "update a permission", description = "update a permission name", responses = {
       @ApiResponse(responseCode = "500", ref = "InternalServerError"),
       @ApiResponse(responseCode = "200", description = "permission updated", content = @Content(mediaType = "application/json", examples = {
           @ExampleObject(value = "{"
@@ -145,18 +164,10 @@ public class PermissionController {
   @PutMapping("/{id}")
   public ResponseEntity<Object> update(@PathVariable Long id,
       @RequestBody @Valid PermissionRequestDTO permissionRequestDTO) {
-    Optional<Permission> permission = this.permissionService.searchByID(id);
-    if (permission.isEmpty()) {
-      return ResponseEntity.status(HttpStatus.NOT_FOUND).body("permission not found");
-    }
 
-    if (!Objects.equals(permissionRequestDTO.getName(), permission.get().getName())
-        && this.permissionService.existsByname(permissionRequestDTO.getName())) {
-      return ResponseEntity.status(HttpStatus.CONFLICT).body("permission name is already in use");
-    }
-    permission = this.permissionService.update(permissionRequestDTO.toPermission(id));
+    Permission upatedPermission = this.permissionService.update(permissionRequestDTO.toPermission(id));
 
-    return ResponseEntity.ok(new PermissionResponseDTO(permission.get()));
+    return ResponseEntity.ok(new PermissionResponseDTO(upatedPermission));
 
   }
 }

@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 import br.com.jmarcos.bookstore.model.GroceryCart;
 import br.com.jmarcos.bookstore.model.Permission;
 import br.com.jmarcos.bookstore.model.Person;
-import br.com.jmarcos.bookstore.repository.GroceryCartRepository;
 import br.com.jmarcos.bookstore.repository.PermissionRepository;
 import br.com.jmarcos.bookstore.repository.PersonRepository;
 import br.com.jmarcos.bookstore.repository.intermediateClass.GroceryCartBookRepository;
@@ -35,9 +34,7 @@ public class PersonService {
 
     public boolean existsByEmail(String email) {
         Optional<Person> exist = this.personRepository.findByEmail(email);
-        if (exist.isPresent())
-            return true;
-        return false;
+        return exist.isPresent();
     }
 
     public Person save(Person person) {
