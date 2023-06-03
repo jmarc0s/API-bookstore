@@ -161,16 +161,12 @@ public class GroceryCartController {
                         @AuthenticationPrincipal Person person) {
                 Optional<GroceryCart> groceryCart;
 
-                // if (groceryCartRequestDTO != null) {
-                //         if (!groceryCartRequestDTO.verifyCompatibility()) {
-                //                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                //                                 .body("The number of quantities should match the number of book ids.");
-                //         }
-                //         groceryCart = this.groceryCartService.save(groceryCartRequestDTO.toGroceryCart(person.getId()),
-                //                         groceryCartRequestDTO.getQuantities());
-                // } else {
-                //         GroceryCart groceryCarts = this.groceryCartService.save(person.getId());
-                // }
+                if (groceryCartRequestDTO != null) {
+                        groceryCart = this.groceryCartService.save(groceryCartRequestDTO.toGroceryCart(person.getId()),
+                                        groceryCartRequestDTO.getQuantities());
+                } else {
+                        GroceryCart groceryCarts = this.groceryCartService.save(person.getId());
+                }
 
                 // if (groceryCart.isPresent()) {
                 //         List<GroceryCartBook> groceryCartBook = this.groceryCartService

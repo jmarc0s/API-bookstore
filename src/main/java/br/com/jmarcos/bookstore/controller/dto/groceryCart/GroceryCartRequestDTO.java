@@ -9,6 +9,8 @@ import br.com.jmarcos.bookstore.controller.dto.book.BookRequestDTO;
 import br.com.jmarcos.bookstore.model.Book;
 import br.com.jmarcos.bookstore.model.GroceryCart;
 import br.com.jmarcos.bookstore.model.Person;
+import br.com.jmarcos.bookstore.validation.constraints.NotRepeat;
+import br.com.jmarcos.bookstore.validation.constraints.SameSize;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,9 +19,11 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
+@SameSize(firstList = "bookIdListArray", secondList = "quantities")
 public class GroceryCartRequestDTO {
     @NotEmpty
-    private List<Long> bookIdListarray = new ArrayList<>();
+    @NotRepeat
+    private List<Long> bookIdListArray = new ArrayList<>();
     @NotEmpty
     private List<Integer> quantities = new ArrayList<>();
     private Set<Long> bookIdListlinked;
@@ -27,7 +31,7 @@ public class GroceryCartRequestDTO {
     public GroceryCart toGroceryCart(Long personId) {
         GroceryCart groceryCart = new GroceryCart();
 
-        for (Long bookId : bookIdListlinked) {
+        for (Long bookId : bookIdListArray) {
             Book book = BookRequestDTO.toBook(bookId);
             groceryCart.getBooks().add(book);
         }
@@ -37,7 +41,7 @@ public class GroceryCartRequestDTO {
     }
 
     public Boolean verifyCompatibility() {
-        this.bookIdListlinked = new LinkedHashSet<>(bookIdListarray);
+        this.bookIdListlinked = new LinkedHashSet<>(bookIdListArray);
         if (quantities.size() != bookIdListlinked.size()) {
             return false;
         }
