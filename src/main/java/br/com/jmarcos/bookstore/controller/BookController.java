@@ -62,8 +62,7 @@ public class BookController {
                         @PageableDefault(sort = "id", direction = Direction.ASC, page = 0, size = 10) Pageable pageable) {
                 return this.bookService
                                 .search(pageable)
-                                .map(BookResponseDTO::new)
-                ;
+                                .map(BookResponseDTO::new);
         }
 
         @Operation(summary = "returns a book by id", description = "returns book by the specified id", responses = {
@@ -102,7 +101,7 @@ public class BookController {
         })
         @GetMapping("/{id}")
         public ResponseEntity<Object> searchById(@PathVariable Long id) {
-                Book book = this.bookService.findByid(id);
+                Book book = this.bookService.findById(id);
 
                 return ResponseEntity.ok(new BookResponseDTO(book));
         }
@@ -150,7 +149,6 @@ public class BookController {
                                 ? ResponseEntity.ok(new BookResponseDTO(book.get()))
                                 : ResponseEntity.status(HttpStatus.NOT_FOUND).body("Book not found");
         }
-
 
         @Operation(summary = "returns a list of books by author name", description = "returns a list of books by the specified author name", responses = {
                         @ApiResponse(responseCode = "500", ref = "InternalServerError"),
@@ -292,7 +290,7 @@ public class BookController {
         @PutMapping("/{id}")
         public ResponseEntity<Object> update(@PathVariable Long id, @RequestBody @Valid BookUpdateDTO bookUpdateDTO) {
 
-                Optional<Book> book = Optional.of(this.bookService.findByid(id));
+                Optional<Book> book = Optional.of(this.bookService.findById(id));
                 if (book.isEmpty()) {
                         return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Book not found");
                 }

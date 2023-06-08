@@ -89,9 +89,9 @@ public class BookService {
         return Optional.empty();
     }
 
-    public Book findByid(Long id) {
+    public Book findById(Long id) {
         return this.bookRepository.findById(id)
-            .orElseThrow(() -> new ResourceNotFoundException("Book not found in database with the specified id"));
+                .orElseThrow(() -> new ResourceNotFoundException("Book not found in database with the specified id"));
     }
 
     @Transactional
