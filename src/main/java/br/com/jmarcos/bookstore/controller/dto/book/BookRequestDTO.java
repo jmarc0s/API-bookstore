@@ -3,7 +3,6 @@ package br.com.jmarcos.bookstore.controller.dto.book;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -13,6 +12,9 @@ import br.com.jmarcos.bookstore.model.Author;
 import br.com.jmarcos.bookstore.model.Book;
 import br.com.jmarcos.bookstore.model.PublishingCompany;
 import br.com.jmarcos.bookstore.model.Storehouse;
+import br.com.jmarcos.bookstore.validation.constraints.NotRepeat;
+import br.com.jmarcos.bookstore.validation.constraints.SameSize;
+import jakarta.persistence.ElementCollection;
 import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -24,7 +26,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Getter
 @Setter
-
+@SameSize(firstList = "storehouseIdList", secondList = "quantityInStorehouse")
 public class BookRequestDTO {
 
     @NotEmpty
@@ -46,18 +48,21 @@ public class BookRequestDTO {
     @NotNull
     private Long publishingCompanyId;
 
+    @ElementCollection
     @NotEmpty
     private Set<Long> authorIdList = new HashSet();
 
     @NotEmpty
+    @NotRepeat
+    @ElementCollection
     private List<Long> storehouseIdList = new ArrayList<>();
+
     @NotEmpty
     private List<Integer> quantityInStorehouse = new ArrayList<>();
 
-    private Set<Long> storehouseIdListLinked;
-
     public Book toBook() {
         Book book = new Book();
+
         book.setTitle(title);
         book.setYear(year);
         book.setPrice(price);
@@ -68,7 +73,7 @@ public class BookRequestDTO {
             book.getAuthorList().add(author);
         }
 
-        for (Long storehouseId : storehouseIdListLinked) {
+        for (Long storehouseId : storehouseIdList) {
             Storehouse storehouse = StorehouseRequestDTO.toStorehouse(storehouseId);
             book.getStorehouseList().add(storehouse);
 
@@ -83,12 +88,4 @@ public class BookRequestDTO {
         return book;
     }
 
-    public Boolean verifyCompatibility() {
-        this.storehouseIdListLinked = new LinkedHashSet<>(storehouseIdList);
-        if (quantityInStorehouse.size() != storehouseIdListLinked.size()) {
-            return false;
-        }
-
-        return true;
-    }
 }

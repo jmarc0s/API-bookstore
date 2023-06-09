@@ -1,9 +1,7 @@
 package br.com.jmarcos.bookstore.controller.dto.groceryCart;
 
 import java.util.ArrayList;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
 
 import br.com.jmarcos.bookstore.controller.dto.book.BookRequestDTO;
 import br.com.jmarcos.bookstore.model.Book;
@@ -26,7 +24,6 @@ public class GroceryCartRequestDTO {
     private List<Long> bookIdListArray = new ArrayList<>();
     @NotEmpty
     private List<Integer> quantities = new ArrayList<>();
-    private Set<Long> bookIdListlinked;
 
     public GroceryCart toGroceryCart(Long personId) {
         GroceryCart groceryCart = new GroceryCart();
@@ -40,12 +37,4 @@ public class GroceryCartRequestDTO {
         return groceryCart;
     }
 
-    public Boolean verifyCompatibility() {
-        this.bookIdListlinked = new LinkedHashSet<>(bookIdListArray);
-        if (quantities.size() != bookIdListlinked.size()) {
-            return false;
-        }
-
-        return true;
-    }
 }

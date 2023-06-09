@@ -13,6 +13,8 @@ import br.com.jmarcos.bookstore.model.Author;
 import br.com.jmarcos.bookstore.model.Book;
 import br.com.jmarcos.bookstore.model.PublishingCompany;
 import br.com.jmarcos.bookstore.model.Storehouse;
+import br.com.jmarcos.bookstore.validation.constraints.NotRepeat;
+import br.com.jmarcos.bookstore.validation.constraints.SameSize;
 import jakarta.persistence.ElementCollection;
 import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.NotEmpty;
@@ -27,6 +29,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@SameSize(firstList = "storehouseIdList", secondList = "quantityInStorehouse")
 public class BookUpdateDTO {
 
     private Long id;
@@ -56,9 +59,9 @@ public class BookUpdateDTO {
 
     @ElementCollection
     @NotNull
-    private Set<Long> storehouseIdList = new LinkedHashSet();
+    @NotRepeat
+    private List<Long> storehouseIdList = new ArrayList();
 
-    @ElementCollection
     @NotNull
     private List<Integer> quantityInStorehouse = new ArrayList<>();
 

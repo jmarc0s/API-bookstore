@@ -68,14 +68,11 @@ public class PersonService {
     }
 
     @Transactional
-    public boolean deleteByid(Long id) {
+    public void deleteByid(Long id) {
         Person person = this.searchById(id);
 
         this.deleteGroceryCartBooks(person);
         this.personRepository.deleteById(id);
-
-        return true;
-
     }
 
     public Person update(Person personInDataBase, Person newPerson) {

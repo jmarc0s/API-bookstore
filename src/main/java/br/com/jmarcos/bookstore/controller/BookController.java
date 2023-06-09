@@ -2,8 +2,6 @@ package br.com.jmarcos.bookstore.controller;
 
 import java.net.URI;
 import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -143,11 +141,9 @@ public class BookController {
 
         @RequestMapping(value = "/search_by_title", method = RequestMethod.GET)
         public ResponseEntity<Object> searchByTitle(@RequestParam String title) {
-                Optional<Book> book = this.bookService.findByTitle(title);
+                Book book = this.bookService.findByTitle(title);
 
-                return book.isPresent()
-                                ? ResponseEntity.ok(new BookResponseDTO(book.get()))
-                                : ResponseEntity.status(HttpStatus.NOT_FOUND).body("Book not found");
+                return ResponseEntity.ok(new BookResponseDTO(book));
         }
 
         @Operation(summary = "returns a list of books by author name", description = "returns a list of books by the specified author name", responses = {
@@ -209,26 +205,10 @@ public class BookController {
         @PostMapping
         public ResponseEntity<Object> save(@RequestBody @Valid BookRequestDTO bookRequestDTO,
                         UriComponentsBuilder uriBuilder) {
+                Book book = this.bookService.save(bookRequestDTO.toBook(), bookRequestDTO.getQuantityInStorehouse());
 
-                Boolean exists = this.bookService.existsByTitle(bookRequestDTO.getTitle());
-
-                if (exists) {
-                        return ResponseEntity.status(HttpStatus.CONFLICT).body("Book title is already in use");
-                }
-
-                if (!bookRequestDTO.verifyCompatibility()) {
-                        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                                        .body("The number of quantities should match the number of storehouse ids.");
-                }
-
-                Optional<Book> book = this.bookService.save(bookRequestDTO.toBook(),
-                                bookRequestDTO.getQuantityInStorehouse());
-                if (book.isPresent()) {
-                        URI uri = uriBuilder.path("/storehouse/{id}").buildAndExpand(book.get().getId()).toUri();
-                        return ResponseEntity.created(uri).body(new BookResponseDTO(book.get()));
-                }
-
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Entities not found in database");
+                URI uri = uriBuilder.path("/storehouse/{id}").buildAndExpand(book.getId()).toUri();
+                return ResponseEntity.created(uri).body(new BookResponseDTO(book));
 
         }
 
@@ -243,10 +223,9 @@ public class BookController {
 
         @DeleteMapping("/{id}")
         public ResponseEntity<Object> deleteById(@PathVariable Long id) {
-                boolean removed = this.bookService.deleteByid(id);
+                this.bookService.deleteByid(id);
 
-                return removed ? ResponseEntity.status(HttpStatus.OK).body("Book was deleted")
-                                : ResponseEntity.status(HttpStatus.NOT_FOUND).body("Book not found");
+                return ResponseEntity.status(HttpStatus.OK).body("Book was deleted");
         }
 
         @SecurityRequirement(name = "Authorization")
@@ -289,26 +268,11 @@ public class BookController {
         @CacheEvict(value = "BookList", allEntries = true)
         @PutMapping("/{id}")
         public ResponseEntity<Object> update(@PathVariable Long id, @RequestBody @Valid BookUpdateDTO bookUpdateDTO) {
-
-                Optional<Book> book = Optional.of(this.bookService.findById(id));
-                if (book.isEmpty()) {
-                        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Book not found");
-                }
-
-                if (bookUpdateDTO.getStorehouseIdList().size() != bookUpdateDTO.getQuantityInStorehouse().size()) {
-                        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                                        .body("The number of quantities should match the number of storehouse ids.");
-                }
-
-                if (!Objects.equals(book.get().getTitle(), bookUpdateDTO.getTitle())
-                                && bookService.existsByTitle(bookUpdateDTO.getTitle())) {
-                        return ResponseEntity.status(HttpStatus.CONFLICT).body("Book title is already in use.");
-                }
+                Book book = this.bookService.findById(id);
 
                 book = this.bookService.updateBook(bookUpdateDTO.toBook(id), bookUpdateDTO.getQuantityInStorehouse());
-                return book.isPresent()
-                                ? ResponseEntity.ok(new BookResponseDTO(book.get()))
-                                : ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Entities not found in database");
+
+                return ResponseEntity.ok(new BookResponseDTO(book));
         }
 
 }
