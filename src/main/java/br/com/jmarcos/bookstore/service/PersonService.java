@@ -2,6 +2,7 @@ package br.com.jmarcos.bookstore.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,23 +13,24 @@ import org.springframework.stereotype.Service;
 import br.com.jmarcos.bookstore.model.GroceryCart;
 import br.com.jmarcos.bookstore.model.Permission;
 import br.com.jmarcos.bookstore.model.Person;
-import br.com.jmarcos.bookstore.repository.PermissionRepository;
 import br.com.jmarcos.bookstore.repository.PersonRepository;
 import br.com.jmarcos.bookstore.repository.intermediateClass.GroceryCartBookRepository;
+import br.com.jmarcos.bookstore.service.exceptions.ConflictException;
+import br.com.jmarcos.bookstore.service.exceptions.ResourceNotFoundException;
 import jakarta.transaction.Transactional;
 
 @Service
 public class PersonService {
 
     private final PersonRepository personRepository;
-    private final PermissionRepository perissionRepository;
+    private final PermissionService permissionService;
     private final GroceryCartBookRepository groceryCartBookRepository;
 
     @Autowired
-    public PersonService(PersonRepository personRepository, PermissionRepository perissionRepository,
+    public PersonService(PersonRepository personRepository, PermissionService permissionService,
             GroceryCartBookRepository groceryCartBookRepository) {
         this.personRepository = personRepository;
-        this.perissionRepository = perissionRepository;
+        this.permissionService = permissionService;
         this.groceryCartBookRepository = groceryCartBookRepository;
     }
 
@@ -38,6 +40,10 @@ public class PersonService {
     }
 
     public Person save(Person person) {
+        if (this.existsByEmail(person.getEmail())) {
+            throw new ConflictException("Email is already in use");
+        }
+
         List<Permission> permissions = this.findPermissions(person.getPermission());
         person.setPermission(permissions);
         return this.personRepository.save(person);
@@ -51,34 +57,57 @@ public class PersonService {
         return this.personRepository.findAll();
     }
 
-    private List<Permission> findPermissions(List<Permission> permissions) {
-        List<Permission> permissionsList = new ArrayList<>();
-
-        for (Permission permission : permissions) {
-            Optional<Permission> permissionExist = this.perissionRepository.findByName(permission.getName());
-            permissionsList.add(permissionExist.get());
-
-        }
-        return permissionsList;
+    public Person searchById(Long id) {
+        return this.personRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Person not found with the given id"));
     }
 
-    public Optional<Person> searchById(Long id) {
-        return this.personRepository.findById(id);
-    }
-
-    public Optional<Person> searchByEmail(String email) {
-        return this.personRepository.findByEmail(email);
+    public Person searchByEmail(String email) {
+        return this.personRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("Person not found with the given email"));
     }
 
     @Transactional
     public boolean deleteByid(Long id) {
-        Optional<Person> person = this.personRepository.findById(id);
-        if (person.isPresent()) {
-            this.deleteGroceryCartBooks(person.get());
-            this.personRepository.deleteById(id);
-            return true;
+        Person person = this.searchById(id);
+
+        this.deleteGroceryCartBooks(person);
+        this.personRepository.deleteById(id);
+
+        return true;
+
+    }
+
+    public Person update(Person personInDataBase, Person newPerson) {
+
+        if (!Objects.equals(personInDataBase.getEmail(), newPerson.getEmail())
+                && this.existsByEmail(newPerson.getEmail())) {
+            throw new ResourceNotFoundException("email is already in use.");
         }
-        return false;
+
+        Person updatedPerson = this.fillUpdatePerson(personInDataBase, newPerson);
+
+        return this.personRepository.save(updatedPerson);
+    }
+
+    public Person fillUpdatePerson(Person personInDataBase, Person newPerson) {
+        personInDataBase.setName(newPerson.getName());
+        personInDataBase.setEmail(newPerson.getEmail());
+        personInDataBase.setAddress(newPerson.getAddress());
+        personInDataBase.setPhone(newPerson.getPhone());
+
+        return personInDataBase;
+    }
+
+    private List<Permission> findPermissions(List<Permission> permissions) {
+        List<Permission> permissionsList = new ArrayList<>();
+
+        for (Permission permission : permissions) {
+            Permission permissionExist = this.permissionService.searchByname(permission.getName());
+            permissionsList.add(permissionExist);
+
+        }
+        return permissionsList;
     }
 
     private void deleteGroceryCartBooks(Person person) {
@@ -89,22 +118,13 @@ public class PersonService {
 
     }
 
-    public Optional<Person> addPermission(Person person, String permission) {
-        Optional<Permission> permissionExist = this.perissionRepository.findByName(permission);
-        if (permissionExist.isPresent()) {
-            person.getPermission().add(permissionExist.get());
-            return Optional.of(this.personRepository.save(person));
-        }
+    public Person addPermission(Person person, String permission) {
+        Permission permissionExist = this.permissionService.searchByname(permission);
 
-        return Optional.empty();
-    }
+        person.getPermission().add(permissionExist);
 
-    public Optional<Person> update(Person personInDataBase, Person newPerson) {
-        personInDataBase.setName(newPerson.getName());
-        personInDataBase.setEmail(newPerson.getEmail());
-        personInDataBase.setAddress(newPerson.getAddress());
-        personInDataBase.setPhone(newPerson.getPhone());
-        return Optional.of(this.personRepository.save(personInDataBase));
+        return this.personRepository.save(person);
+
     }
 
 }

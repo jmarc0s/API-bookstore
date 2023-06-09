@@ -1,8 +1,6 @@
 package br.com.jmarcos.bookstore.controller;
 
 import java.net.URI;
-import java.util.Optional;
-import java.util.Objects;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -79,12 +77,9 @@ public class PersonController {
         @PostMapping
         public ResponseEntity<Object> save(@RequestBody @Valid PersonRequestDTO personRequestDTO,
                         UriComponentsBuilder uriBuilder) {
-                if (this.personService.existsByEmail(personRequestDTO.getEmail())) {
-                        return ResponseEntity.status(HttpStatus.CONFLICT).body("Email is already in use");
-                }
 
                 Person person = personRequestDTO.toPerson();
-                this.personService.save(person);
+                person = this.personService.save(person);
                 URI uri = uriBuilder.path("/publishingCompany/{id}").buildAndExpand(person.getId()).toUri();
                 return ResponseEntity.created(uri).body(new PersonResponseDTO(person));
         }
@@ -117,18 +112,10 @@ public class PersonController {
         @PutMapping("/profile")
         public ResponseEntity<Object> updateProfile(@RequestBody PersonUpdateDTO personUpdateDTO,
                         @AuthenticationPrincipal Person personRequest) {
-                Optional<Person> person = this.personService.searchById(personRequest.getId());
+                Person person = this.personService.searchById(personRequest.getId());
 
-                if (!Objects.equals(person.get().getEmail(), personUpdateDTO.getEmail())
-                                && personService.existsByEmail(personUpdateDTO.getEmail())) {
-                        return ResponseEntity.status(HttpStatus.CONFLICT).body("email is already in use.");
-                }
-
-                person = this.personService.update(person.get(), personUpdateDTO.toPerson());
-                return person.isPresent()
-                                ? ResponseEntity.ok(new PersonResponseDTO(person.get()))
-                                : ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                                                .body("Error: something went wrong, profile was not deleted");
+                person = this.personService.update(person, personUpdateDTO.toPerson());
+                return ResponseEntity.ok(new PersonResponseDTO(person));
         }
 
         @SecurityRequirement(name = "Authorization")
@@ -141,11 +128,10 @@ public class PersonController {
 
         @DeleteMapping("/profile")
         public ResponseEntity<Object> deleteProfile(@AuthenticationPrincipal Person person) {
-                boolean removed = this.personService.deleteByid(person.getId());
+                this.personService.deleteByid(person.getId());
 
-                return removed ? ResponseEntity.status(HttpStatus.OK).body("profile was deleted")
-                                : ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                                                .body("Error: something went wrong, profile was not deleted");
+                return ResponseEntity.status(HttpStatus.OK).body("profile was deleted");
+
         }
 
         @SecurityRequirement(name = "Authorization")
@@ -173,8 +159,8 @@ public class PersonController {
 
         @GetMapping("/profile")
         public ResponseEntity<PersonResponseDTO> getProfileData(@AuthenticationPrincipal Person person) {
-                Optional<Person> user = this.personService.searchById(person.getId());
-                return ResponseEntity.ok(new PersonResponseDTO(user.get()));
+                Person user = this.personService.searchById(person.getId());
+                return ResponseEntity.ok(new PersonResponseDTO(user));
         }
 
         // ADMIN TOOLS //
@@ -219,11 +205,10 @@ public class PersonController {
         })
         @GetMapping("/{id}")
         public ResponseEntity<Object> searchById(@PathVariable Long id) {
-                Optional<Person> person = this.personService.searchById(id);
+                Person person = this.personService.searchById(id);
 
-                return person.isPresent()
-                                ? ResponseEntity.ok(new PersonResponseDTO(person.get()))
-                                : ResponseEntity.status(HttpStatus.NOT_FOUND).body("person not found");
+                return ResponseEntity.ok(new PersonResponseDTO(person));
+
         }
 
         @SecurityRequirement(name = "Authorization")
@@ -252,11 +237,10 @@ public class PersonController {
 
         @RequestMapping(value = "/search_by_email", method = RequestMethod.GET)
         public ResponseEntity<Object> searchByEmail(@RequestParam String email) {
-                Optional<Person> person = this.personService.searchByEmail(email);
+                Person person = this.personService.searchByEmail(email);
 
-                return person.isPresent()
-                                ? ResponseEntity.ok(new PersonResponseDTO(person.get()))
-                                : ResponseEntity.status(HttpStatus.NOT_FOUND).body("person not found");
+                return ResponseEntity.ok(new PersonResponseDTO(person));
+
         }
 
         @SecurityRequirement(name = "Authorization")
@@ -270,10 +254,9 @@ public class PersonController {
 
         @DeleteMapping("/{id}")
         public ResponseEntity<Object> deleteById(@PathVariable Long id) {
-                boolean removed = this.personService.deleteByid(id);
+                this.personService.deleteByid(id);
 
-                return removed ? ResponseEntity.status(HttpStatus.OK).body("Person was deleted")
-                                : ResponseEntity.status(HttpStatus.NOT_FOUND).body("Person not found");
+                return ResponseEntity.status(HttpStatus.OK).body("Person was deleted");
         }
 
         @SecurityRequirement(name = "Authorization")
@@ -287,14 +270,11 @@ public class PersonController {
 
         @PatchMapping("/{personId}")
         public ResponseEntity<Object> setPermission(@PathVariable Long personId, @RequestParam String permission) {
-                Optional<Person> person = this.personService.searchById(personId);
+                Person person = this.personService.searchById(personId);
 
-                if (person.isPresent()) {
-                        person = this.personService.addPermission(person.get(), permission);
-                        return person.isPresent()
-                                        ? ResponseEntity.ok(new PersonResponseDTO(person.get()))
-                                        : ResponseEntity.status(HttpStatus.BAD_REQUEST).body("permission not found");
-                }
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Person not found");
+                person = this.personService.addPermission(person, permission);
+
+                return ResponseEntity.ok(new PersonResponseDTO(person));
+
         }
 }
