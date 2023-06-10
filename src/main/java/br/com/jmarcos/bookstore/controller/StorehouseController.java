@@ -135,12 +135,9 @@ public class StorehouseController {
 
         @DeleteMapping("/{id}")
         public ResponseEntity<Object> delete(@PathVariable Long id) {
-                boolean removed = this.storehouseService.delete(id);
+                this.storehouseService.delete(id);
 
-                return removed ? ResponseEntity.status(HttpStatus.OK).body(
-                                "storehouse was deleted")
-                                : ResponseEntity.status(HttpStatus.NOT_FOUND).body(
-                                                "storehouse Not Found");
+                return ResponseEntity.status(HttpStatus.OK).body("storehouse was deleted");
         }
 
         @SecurityRequirement(name = "Authorization")

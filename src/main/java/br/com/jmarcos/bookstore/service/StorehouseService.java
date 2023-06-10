@@ -47,21 +47,17 @@ public class StorehouseService {
     }
 
     @Transactional
-    public Boolean delete(Long id) {
-        Optional<Storehouse> storehouse = this.storehouseRepository.findById(id);
+    public void delete(Long id) {
+        Storehouse storehouse = this.searchByID(id);
 
-        if (storehouse.isPresent()) {
-            this.storehouseRepository.delete(storehouse.get());
-            return true;
-        }
+        this.storehouseRepository.delete(storehouse);
 
-        return false;
     }
 
     public Storehouse update(Storehouse newstorehouse) {
         Storehouse oldStorehouse = this.searchByID(newstorehouse.getId());
 
-        return this.save(this.fillUpdateStorehouse(oldStorehouse, newstorehouse));
+        return this.storehouseRepository.save(this.fillUpdateStorehouse(oldStorehouse, newstorehouse));
     }
 
     public Storehouse fillUpdateStorehouse(Storehouse oldStorehouse, Storehouse newStorehouse) {

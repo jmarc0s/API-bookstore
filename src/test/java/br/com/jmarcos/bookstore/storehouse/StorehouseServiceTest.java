@@ -3,7 +3,6 @@ package br.com.jmarcos.bookstore.storehouse;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -64,11 +63,11 @@ public class StorehouseServiceTest {
         Storehouse newStorehouse = createStorehouse();
         when(storehouseRepository.findByCode(anyInt())).thenReturn(Optional.of(storehouse));
 
-        ConflictException conflictExceptionException = Assertions
+        ConflictException conflictException = Assertions
                 .assertThrows(ConflictException.class,
                         () -> storehouseService.save(newStorehouse));
 
-        Assertions.assertTrue(conflictExceptionException.getMessage()
+        Assertions.assertTrue(conflictException.getMessage()
                 .contains("Storehouse code is already in use."));
 
     }
@@ -140,26 +139,28 @@ public class StorehouseServiceTest {
     }
 
     @Test
-    void delete_returns_True_WhenSuccessful() {
+    void delete_deletesAStorehouse_WhenSuccessful() {
         Storehouse storehouse = createStorehouse();
         when(storehouseRepository.findById(anyLong())).thenReturn(Optional.of(storehouse));
 
-        boolean result = this.storehouseService.delete(storehouse.getId());
+        this.storehouseService.delete(storehouse.getId());
 
-        Assertions.assertTrue(result);
         verify(storehouseRepository).delete(storehouse);
         verify(storehouseRepository).findById(storehouse.getId());
     }
 
     @Test
-    void delete_returns_False_WhenStorehouseNotFound() {
+    void delete_Throws_ResourceNotFoundException_WhenPublishingCompanyNotFound() {
         when(storehouseRepository.findById(anyLong())).thenReturn(Optional.empty());
 
-        boolean result = this.storehouseService.delete(1L);
+        ResourceNotFoundException resourceNotFoundException = Assertions
+                .assertThrows(ResourceNotFoundException.class,
+                        () -> storehouseService.delete(anyLong()));
 
-        Assertions.assertFalse(result);
-        verify(storehouseRepository, never()).delete(any(Storehouse.class));
-        verify(storehouseRepository).findById(1L);
+
+            Assertions.assertTrue(resourceNotFoundException.getMessage()
+                .contains("Storehouse not found with the given id"));
+        
     }
 
     @Test

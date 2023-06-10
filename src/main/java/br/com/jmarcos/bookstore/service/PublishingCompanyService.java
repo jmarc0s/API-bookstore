@@ -34,7 +34,7 @@ public class PublishingCompanyService {
 
         if (this.existsByName(publishingCompany.getName())) {
             throw new ConflictException("PublishingCompany name is already in use");
-    }
+        }
 
         return publishingCompanyRepository.save(publishingCompany);
     }
@@ -47,41 +47,38 @@ public class PublishingCompanyService {
 
     public PublishingCompany searchById(Long id) {
         return publishingCompanyRepository.findById(id)
-            .orElseThrow(() -> new ResourceNotFoundException("PublishingCompany not found with the given id"));
+                .orElseThrow(() -> new ResourceNotFoundException("PublishingCompany not found with the given id"));
     }
 
     public PublishingCompany searchByName(String name) {
         return publishingCompanyRepository.findByName(name)
-        .   orElseThrow(() -> new ResourceNotFoundException("PublishingCompany not found with the given name"));
+                .orElseThrow(() -> new ResourceNotFoundException("PublishingCompany not found with the given name"));
     }
 
     @Transactional
     public void delete(Long id) {
         PublishingCompany publishingCompany = this.searchById(id);
 
-        
+        for (Book book : bookService.searchByPublishingCompany(id)) {
+            this.bookService.deleteStorehouseBook(book.getId());
+        }
 
-            for (Book book : bookService.searchByPublishingCompany(id)) {
-                this.bookService.deleteStorehouseBook(book.getId());
-            }
+        this.publishingCompanyRepository.delete(publishingCompany);
 
-            this.publishingCompanyRepository.delete(publishingCompany);
-             
     }
 
     public PublishingCompany update(PublishingCompany publishingCompanyUpdate, Long id) {
         PublishingCompany oldPublishingCompany = this.searchById(id);
 
-        if(!Objects.equals(oldPublishingCompany.getName(), publishingCompanyUpdate.getName())
-            && this.existsByName(publishingCompanyUpdate.getName())){
+        if (!Objects.equals(oldPublishingCompany.getName(), publishingCompanyUpdate.getName())
+                && this.existsByName(publishingCompanyUpdate.getName())) {
 
             throw new ConflictException("PublishingCompany name is already in use");
         }
 
         PublishingCompany updattedPublishimgCompany = fillUpdate(oldPublishingCompany, publishingCompanyUpdate);
-        this.save(updattedPublishimgCompany);
 
-        return updattedPublishimgCompany;
+        return this.publishingCompanyRepository.save(updattedPublishimgCompany);
     }
 
     private PublishingCompany fillUpdate(PublishingCompany oldPublishingCompany,

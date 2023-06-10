@@ -3,7 +3,6 @@ package br.com.jmarcos.bookstore.controller.dto.book;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
