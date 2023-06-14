@@ -22,7 +22,7 @@ public class PublishingCompanyRequestDTO {
 
     @NotEmpty
     @NotNull
-    private String email;
+    private String url;
     @Valid
     @NotNull
     private AddressRequestDTO address;
@@ -32,6 +32,6 @@ public class PublishingCompanyRequestDTO {
     private String phone;
 
     public PublishingCompany toPublishingCompany() {
-        return new PublishingCompany(name, email, address.toAddress(), phone);
+        return new PublishingCompany(name, url, address.toAddress(), phone);
     }
 }

@@ -30,6 +30,7 @@ public class PublishingCompanyUpdateDTO {
 
     public PublishingCompany toPublishingCompany(Long id) {
         PublishingCompany publishingCompany = new PublishingCompany();
+        
         publishingCompany.setName(name);
         publishingCompany.setUrl(url);
         publishingCompany.setAddress(address.toAddress());

@@ -173,7 +173,7 @@ public class PublishingCompanyServiceTest {
     }
 
     @Test
-    void delete_deletesAStorehouse_WhenSuccessful() {
+    void delete_deletesAPublishingCompanyWhenSuccessful() {
         PublishingCompany publishingCompany = createPublishingCompany();
         when(publishingCompanyRepository.findById(anyLong())).thenReturn(Optional.of(publishingCompany));
         when(bookService.searchByPublishingCompany(anyLong())).thenReturn(publishingCompany.getBookList());
@@ -206,15 +206,15 @@ public class PublishingCompanyServiceTest {
         when(publishingCompanyRepository.save(publishingCompany)).thenReturn(publishingCompany);
         when(publishingCompanyRepository.findById(anyLong())).thenReturn(Optional.of(publishingCompany));
 
-        PublishingCompany updatedStorehouse = publishingCompanyService
+        PublishingCompany updatedPublishingCompany = publishingCompanyService
                 .update(publishingCompanyUpdateDTO.toPublishingCompany(1L), publishingCompany.getId());
 
-        Assertions.assertNotNull(updatedStorehouse);
-        Assertions.assertEquals(publishingCompany.getId(), updatedStorehouse.getId());
-        Assertions.assertEquals(publishingCompany.getName(), updatedStorehouse.getName());
-        Assertions.assertEquals(publishingCompany.getPhone(), updatedStorehouse.getPhone());
-        Assertions.assertEquals(publishingCompany.getUrl(), updatedStorehouse.getUrl());
-        Assertions.assertEquals(publishingCompany.getAddress(), updatedStorehouse.getAddress());
+        Assertions.assertNotNull(updatedPublishingCompany);
+        Assertions.assertEquals(publishingCompany.getId(), updatedPublishingCompany.getId());
+        Assertions.assertEquals(publishingCompany.getName(), updatedPublishingCompany.getName());
+        Assertions.assertEquals(publishingCompany.getPhone(), updatedPublishingCompany.getPhone());
+        Assertions.assertEquals(publishingCompany.getUrl(), updatedPublishingCompany.getUrl());
+        Assertions.assertEquals(publishingCompany.getAddress(), updatedPublishingCompany.getAddress());
         verify(publishingCompanyRepository).save(publishingCompany);
 
     }

@@ -78,7 +78,7 @@ public class AuthorService {
 
             }
 
-        return this.save(this.fillUpdate(oldAuthor, newAuthor));
+        return this.authorRepository.save(this.fillUpdate(oldAuthor, newAuthor));
     }
 
     private Author fillUpdate(Author oldAuthor, Author newAuthor) {

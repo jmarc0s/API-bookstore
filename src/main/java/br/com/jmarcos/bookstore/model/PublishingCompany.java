@@ -48,11 +48,11 @@ public class PublishingCompany {
     @OneToMany(mappedBy = "publishingCompany", cascade = CascadeType.REMOVE)
     private List<Book> bookList = new ArrayList<>();
 
-    public PublishingCompany(String requestname, String requestemail, Address requestaddress, String requestphone) {
-        this.name = requestname;
-        this.url = requestemail;
-        this.address = requestaddress;
-        this.phone = requestphone;
+    public PublishingCompany(String requestName, String requestUrl, Address requestAddress, String requestPhone) {
+        this.name = requestName;
+        this.url = requestUrl;
+        this.address = requestAddress;
+        this.phone = requestPhone;
     }
 
     public PublishingCompany(Long id) {
