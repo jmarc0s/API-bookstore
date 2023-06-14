@@ -100,7 +100,7 @@ public class PersonService {
         List<Permission> permissionsList = new ArrayList<>();
 
         for (Permission permission : permissions) {
-            Permission permissionExist = this.permissionService.searchByname(permission.getName());
+            Permission permissionExist = this.permissionService.searchByName(permission.getName());
             permissionsList.add(permissionExist);
 
         }
@@ -116,7 +116,7 @@ public class PersonService {
     }
 
     public Person addPermission(Person person, String permission) {
-        Permission permissionExist = this.permissionService.searchByname(permission);
+        Permission permissionExist = this.permissionService.searchByName(permission);
 
         person.getPermission().add(permissionExist);
 

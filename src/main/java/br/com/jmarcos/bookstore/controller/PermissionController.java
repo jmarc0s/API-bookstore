@@ -99,7 +99,7 @@ public class PermissionController {
 
   @GetMapping("/{id}")
   public ResponseEntity<Object> searchById(@PathVariable Long id) {
-    Permission permission = this.permissionService.searchByID(id);
+    Permission permission = this.permissionService.searchById(id);
 
     return ResponseEntity.ok(new PermissionResponseDTO(permission));
         
@@ -122,7 +122,7 @@ public class PermissionController {
 
   @RequestMapping(value = "/search_by_name", method = RequestMethod.GET)
   public ResponseEntity<Object> searchByName(@RequestParam String name) {
-    Permission permission = this.permissionService.searchByname(name);
+    Permission permission = this.permissionService.searchByName(name);
 
     return ResponseEntity.ok(new PermissionResponseDTO(permission));
         

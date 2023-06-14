@@ -22,7 +22,7 @@ public class PermissionService {
         this.permissionRepository = permissionRepository;
     }
 
-    public Permission searchByname(String name) {
+    public Permission searchByName(String name) {
         return this.permissionRepository.findByName(name)
             .orElseThrow(() -> new ResourceNotFoundException("Permission not found with the given name"));
     }
@@ -31,19 +31,19 @@ public class PermissionService {
         return this.permissionRepository.findAll();
     }
 
-    public Permission searchByID(Long id) {
+    public Permission searchById(Long id) {
         return this.permissionRepository.findById(id)
             .orElseThrow(() -> new ResourceNotFoundException("Permission not find with the given id"));
     }
 
     public void delete(Long id) {
-        Permission permission = this.searchByID(id);
+        Permission permission = this.searchById(id);
         this.permissionRepository.deleteById(permission.getId());
 
     }
 
     public Permission update(Permission newPermission) {
-        Permission oldPermission = this.searchByID(newPermission.getId());
+        Permission oldPermission = this.searchById(newPermission.getId());
 
         if (!Objects.equals(newPermission.getName(), oldPermission.getName())
             && this.existsByname(newPermission.getName())) {
