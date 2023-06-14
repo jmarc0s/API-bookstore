@@ -173,7 +173,7 @@ public class PublishingCompanyServiceTest {
     }
 
     @Test
-    void delete_deletesAPublishingCompanyWhenSuccessful() {
+    void delete_deletesAPublishingCompany_WhenSuccessful() {
         PublishingCompany publishingCompany = createPublishingCompany();
         when(publishingCompanyRepository.findById(anyLong())).thenReturn(Optional.of(publishingCompany));
         when(bookService.searchByPublishingCompany(anyLong())).thenReturn(publishingCompany.getBookList());

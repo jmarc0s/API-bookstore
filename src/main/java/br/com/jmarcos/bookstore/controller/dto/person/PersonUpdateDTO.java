@@ -32,8 +32,16 @@ public class PersonUpdateDTO {
     @NotNull
     private String phone;
 
-    public Person toPerson() {
-        return new Person(name, email, address.toAddress(), phone);
+    public Person toPerson(Long id) {
+        Person person = new Person();
+
+        person.setId(id);
+        person.setName(name);
+        person.setEmail(email);
+        person.setAddress(address.toAddress());
+        person.setPhone(phone);
+        
+        return person;
 
     }
 }

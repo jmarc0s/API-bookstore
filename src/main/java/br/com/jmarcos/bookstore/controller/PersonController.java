@@ -114,7 +114,8 @@ public class PersonController {
                         @AuthenticationPrincipal Person personRequest) {
                 Person person = this.personService.searchById(personRequest.getId());
 
-                person = this.personService.update(person, personUpdateDTO.toPerson());
+                person = this.personService.update(personUpdateDTO.toPerson(person.getId()));
+                
                 return ResponseEntity.ok(new PersonResponseDTO(person));
         }
 
@@ -128,7 +129,7 @@ public class PersonController {
 
         @DeleteMapping("/profile")
         public ResponseEntity<Object> deleteProfile(@AuthenticationPrincipal Person person) {
-                this.personService.deleteByid(person.getId());
+                this.personService.deleteById(person.getId());
 
                 return ResponseEntity.status(HttpStatus.OK).body("profile was deleted");
 
@@ -254,7 +255,7 @@ public class PersonController {
 
         @DeleteMapping("/{id}")
         public ResponseEntity<Object> deleteById(@PathVariable Long id) {
-                this.personService.deleteByid(id);
+                this.personService.deleteById(id);
 
                 return ResponseEntity.status(HttpStatus.OK).body("Person was deleted");
         }

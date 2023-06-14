@@ -68,23 +68,35 @@ public class PersonService {
     }
 
     @Transactional
-    public void deleteByid(Long id) {
+    public void deleteById(Long id) {
         Person person = this.searchById(id);
 
         this.deleteGroceryCartBooks(person);
         this.personRepository.deleteById(id);
     }
 
-    public Person update(Person personInDataBase, Person newPerson) {
+    public Person update(Person newPerson) {
+        Person personInDataBase = this.searchById(newPerson.getId());
 
         if (!Objects.equals(personInDataBase.getEmail(), newPerson.getEmail())
-                && this.existsByEmail(newPerson.getEmail())) {
-            throw new ResourceNotFoundException("email is already in use.");
+                && this.existsByEmail(newPerson.getEmail())) {                  
+            throw new ConflictException("email is already in use.");
+
         }
 
         Person updatedPerson = this.fillUpdatePerson(personInDataBase, newPerson);
 
         return this.personRepository.save(updatedPerson);
+    }
+
+
+    public Person addPermission(Person person, String permission) {
+        Permission permissionExist = this.permissionService.searchByName(permission);
+
+        person.getPermission().add(permissionExist);
+
+        return this.personRepository.save(person);
+
     }
 
     public Person fillUpdatePerson(Person personInDataBase, Person newPerson) {
@@ -112,15 +124,6 @@ public class PersonService {
         for (GroceryCart groceryCart : groceryCarts) {
             this.groceryCartBookRepository.deleteAllByGroceryCartId(groceryCart.getId());
         }
-
-    }
-
-    public Person addPermission(Person person, String permission) {
-        Permission permissionExist = this.permissionService.searchByName(permission);
-
-        person.getPermission().add(permissionExist);
-
-        return this.personRepository.save(person);
 
     }
 
