@@ -108,7 +108,7 @@ public class PermissionServiceTest {
 
     @Test
     void delete_deletesAStorehouse_WhenSuccessful() {
-      Permission permission = createPermission();
+        Permission permission = createPermission();
         when(permissionRepository.findById(anyLong())).thenReturn(Optional.of(permission));
 
         this.permissionService.delete(permission.getId());

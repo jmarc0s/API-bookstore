@@ -55,7 +55,7 @@ public class GroceryCartController {
 
         @GetMapping
         public List<GroceryCartResponseDTO> search(@AuthenticationPrincipal Person person) {
-                List<GroceryCart> groceryCarts = this.groceryCartService.searchPersonId(person.getId());
+                List<GroceryCart> groceryCarts = this.groceryCartService.searchByPersonId(person.getId());
                 List<GroceryCartResponseDTO> groceryCartsResponse = new ArrayList<>();
 
                 for (GroceryCart groceryCart : groceryCarts) {
