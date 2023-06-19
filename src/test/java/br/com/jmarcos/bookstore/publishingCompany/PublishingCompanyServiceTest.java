@@ -44,11 +44,6 @@ public class PublishingCompanyServiceTest {
     private BookService bookService;
 
     @Test
-    void test() {
-        Assertions.assertTrue(true);
-    }
-
-    @Test
     void search_returns_AllPublishingCompanies_WhenSuccessful() {
         PageRequest pageable = PageRequest.of(0, 5);
         List<PublishingCompany> publishingCompanyList = List.of(createPublishingCompany());

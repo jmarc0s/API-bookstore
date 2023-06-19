@@ -43,10 +43,6 @@ public class AuthorServiceTest {
     @Mock
     private BookService bookService;
 
-    @Test
-    void test() {
-        Assertions.assertTrue(true);
-    }
 
     @Test
     void search_returns_AllAuthores_WhenSuccessful() {

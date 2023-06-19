@@ -36,11 +36,6 @@ public class StorehouseServiceTest {
     private StorehouseRepository storehouseRepository;
 
     @Test
-    void test() {
-        Assertions.assertTrue(true);
-    }
-
-    @Test
     void save_returns_ASavedStorehouse_WhenSuccessful() {
         Storehouse storehouse = createStorehouse();
         when(storehouseRepository.save(any(Storehouse.class))).thenReturn(storehouse);

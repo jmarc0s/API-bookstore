@@ -33,11 +33,6 @@ public class PermissionServiceTest {
     private PermissionRepository permissionRepository;
 
     @Test
-    void test() {
-        Assertions.assertTrue(true);
-    }
-
-    @Test
     void searchByName_returns_APermissionheGivenName_WhenSuccessful() {
         Permission permission = createPermission();
         when(permissionRepository.findByName(anyString())).thenReturn(Optional.of(permission));

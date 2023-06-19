@@ -49,12 +49,6 @@ public class PersonServiceTest {
     @Mock
     private GroceryCartBookRepository groceryCartBookRepository;
 
-
-    @Test
-    void test() {
-        Assertions.assertTrue(true);
-    }
-
     @Test
     void search_returns_AllPersons_WhenSuccessful() {
         PageRequest pageable = PageRequest.of(0, 5);

@@ -46,10 +46,6 @@ public class GroceryCartServiceTest {
     @Mock
     private GroceryCartBookRepository groceryCartBookRepository;
 
-    @Test
-    void test() {
-        Assertions.assertTrue(true);
-    }
 
     @Test
     void searchByPersonId_returns_AllGroceryCartsByPersonId_WhenSuccessful() {

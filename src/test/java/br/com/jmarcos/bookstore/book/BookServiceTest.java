@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import org.checkerframework.checker.units.qual.t;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -26,10 +25,8 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 
 import br.com.jmarcos.bookstore.controller.dto.book.BookUpdateDTO;
-import br.com.jmarcos.bookstore.controller.dto.person.PersonUpdateDTO;
 import br.com.jmarcos.bookstore.model.Author;
 import br.com.jmarcos.bookstore.model.Book;
-import br.com.jmarcos.bookstore.model.Person;
 import br.com.jmarcos.bookstore.model.PublishingCompany;
 import br.com.jmarcos.bookstore.model.Storehouse;
 import br.com.jmarcos.bookstore.model.intermediateClass.StorehouseBook;
@@ -62,11 +59,6 @@ public class BookServiceTest {
 
     @Mock
     private StorehouseBookRepository storehouseBookRepository;
-
-    @Test
-    void test(){
-         Assertions.assertTrue(true);
-    }
 
     @Test
     void search_returns_AllBooks_WhenSuccessful() {
