@@ -88,7 +88,7 @@ public class BookService {
     }
 
     @Transactional
-    public void deleteByid(Long id) {
+    public void deleteById(Long id) {
         Book book = this.findById(id);
 
         this.deleteStorehouseBook(book.getId());
