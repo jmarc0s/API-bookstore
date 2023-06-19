@@ -91,7 +91,7 @@ public class BookService {
     public void deleteById(Long id) {
         Book book = this.findById(id);
 
-        this.deleteStorehouseBook(book.getId());
+        this.storehouseBookRepository.deleteAllByBookId(book.getId());
         this.bookRepository.deleteById(book.getId());
     }
 
@@ -155,10 +155,6 @@ public class BookService {
 
     }
 
-    public void deleteStorehouseBook(Long id) {
-        this.storehouseBookRepository.deleteAllByBookId(id);
-    }
-
     @Transactional
     public void updateStorehouseBook(Book book, List<Integer> quantityList) {
         List<StorehouseBook> storehouseBookList = this.storehouseBookRepository.findAllByBookId(book.getId());
@@ -180,10 +176,6 @@ public class BookService {
         oldBook.setStorehouseList(newBook.getStorehouseList());
 
         return oldBook;
-    }
-
-    public List<Book> searchByPublishingCompany(Long id) {
-        return this.bookRepository.findAllByPublishingCompanyId(id);
     }
 
 }

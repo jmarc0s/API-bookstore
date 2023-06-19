@@ -26,8 +26,8 @@ import br.com.jmarcos.bookstore.model.Address;
 import br.com.jmarcos.bookstore.model.Author;
 import br.com.jmarcos.bookstore.model.Book;
 import br.com.jmarcos.bookstore.repository.AuthorRepository;
+import br.com.jmarcos.bookstore.repository.intermediateClass.StorehouseBookRepository;
 import br.com.jmarcos.bookstore.service.AuthorService;
-import br.com.jmarcos.bookstore.service.BookService;
 import br.com.jmarcos.bookstore.service.exceptions.ConflictException;
 import br.com.jmarcos.bookstore.service.exceptions.ResourceNotFoundException;
 
@@ -41,7 +41,7 @@ public class AuthorServiceTest {
     private AuthorRepository authorRepository;
 
     @Mock
-    private BookService bookService;
+    private StorehouseBookRepository storehouseBookRepository;
 
 
     @Test
@@ -172,7 +172,7 @@ public class AuthorServiceTest {
         this.authorService.deleteById(author.getId());
 
         verify(authorRepository).deleteById(author.getId());
-        verify(bookService).deleteStorehouseBook(anyLong());
+        verify(storehouseBookRepository).deleteAllByBookId(anyLong());
         verify(authorRepository).findById(author.getId());
     }
 

@@ -25,8 +25,9 @@ import br.com.jmarcos.bookstore.controller.dto.publishinCompany.PublishingCompan
 import br.com.jmarcos.bookstore.model.Address;
 import br.com.jmarcos.bookstore.model.Book;
 import br.com.jmarcos.bookstore.model.PublishingCompany;
+import br.com.jmarcos.bookstore.repository.BookRepository;
 import br.com.jmarcos.bookstore.repository.PublishingCompanyRepository;
-import br.com.jmarcos.bookstore.service.BookService;
+import br.com.jmarcos.bookstore.repository.intermediateClass.StorehouseBookRepository;
 import br.com.jmarcos.bookstore.service.PublishingCompanyService;
 import br.com.jmarcos.bookstore.service.exceptions.ConflictException;
 import br.com.jmarcos.bookstore.service.exceptions.ResourceNotFoundException;
@@ -41,7 +42,10 @@ public class PublishingCompanyServiceTest {
     private PublishingCompanyRepository publishingCompanyRepository;
 
     @Mock
-    private BookService bookService;
+    private BookRepository bookRepository;
+
+    @Mock
+    private StorehouseBookRepository storehouseBookRepository;
 
     @Test
     void search_returns_AllPublishingCompanies_WhenSuccessful() {
@@ -171,12 +175,12 @@ public class PublishingCompanyServiceTest {
     void delete_deletesAPublishingCompany_WhenSuccessful() {
         PublishingCompany publishingCompany = createPublishingCompany();
         when(publishingCompanyRepository.findById(anyLong())).thenReturn(Optional.of(publishingCompany));
-        when(bookService.searchByPublishingCompany(anyLong())).thenReturn(publishingCompany.getBookList());
+        when(bookRepository.findAllByPublishingCompanyId(anyLong())).thenReturn(publishingCompany.getBookList());
 
         this.publishingCompanyService.delete(publishingCompany.getId());
 
         verify(publishingCompanyRepository).delete(publishingCompany);
-        verify(bookService).deleteStorehouseBook(anyLong());
+        verify(storehouseBookRepository).deleteAllByBookId(anyLong());
         verify(publishingCompanyRepository).findById(publishingCompany.getId());
     }
 

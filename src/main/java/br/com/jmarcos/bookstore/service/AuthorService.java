@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import br.com.jmarcos.bookstore.model.Author;
 import br.com.jmarcos.bookstore.model.Book;
 import br.com.jmarcos.bookstore.repository.AuthorRepository;
+import br.com.jmarcos.bookstore.repository.intermediateClass.StorehouseBookRepository;
 import br.com.jmarcos.bookstore.service.exceptions.ConflictException;
 import br.com.jmarcos.bookstore.service.exceptions.ResourceNotFoundException;
 import jakarta.transaction.Transactional;
@@ -18,12 +19,12 @@ import jakarta.transaction.Transactional;
 @Service
 public class AuthorService {
     private final AuthorRepository authorRepository;
-    private final BookService bookService;
+    private final StorehouseBookRepository storehouseBookRepository;
 
     @Autowired
-    public AuthorService(AuthorRepository authorRepository, BookService bookService) {
+    public AuthorService(AuthorRepository authorRepository, StorehouseBookRepository storehouseBookRepository) {
         this.authorRepository = authorRepository;
-        this.bookService = bookService;
+        this.storehouseBookRepository = storehouseBookRepository;
     }
 
     public Page<Author> search(Pageable pageable) {
@@ -61,7 +62,7 @@ public class AuthorService {
         
 
         for (Book book : exists.getBookList()) {
-            this.bookService.deleteStorehouseBook(book.getId());
+            this.storehouseBookRepository.deleteAllByBookId(book.getId());
         }
 
         this.authorRepository.deleteById(id);

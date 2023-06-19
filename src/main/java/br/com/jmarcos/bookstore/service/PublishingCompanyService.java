@@ -10,7 +10,9 @@ import org.springframework.stereotype.Service;
 
 import br.com.jmarcos.bookstore.model.Book;
 import br.com.jmarcos.bookstore.model.PublishingCompany;
+import br.com.jmarcos.bookstore.repository.BookRepository;
 import br.com.jmarcos.bookstore.repository.PublishingCompanyRepository;
+import br.com.jmarcos.bookstore.repository.intermediateClass.StorehouseBookRepository;
 import br.com.jmarcos.bookstore.service.exceptions.ConflictException;
 import br.com.jmarcos.bookstore.service.exceptions.ResourceNotFoundException;
 import jakarta.transaction.Transactional;
@@ -18,12 +20,15 @@ import jakarta.transaction.Transactional;
 @Service
 public class PublishingCompanyService {
     private final PublishingCompanyRepository publishingCompanyRepository;
-    private final BookService bookService;
+    private final BookRepository bookRepository;
+    private final StorehouseBookRepository storehouseBookRepository;
 
     @Autowired
-    public PublishingCompanyService(PublishingCompanyRepository publishingCompanyRepository, BookService bookService) {
+    public PublishingCompanyService(PublishingCompanyRepository publishingCompanyRepository, BookRepository bookRepository,
+        StorehouseBookRepository storehouseBookRepository) {
         this.publishingCompanyRepository = publishingCompanyRepository;
-        this.bookService = bookService;
+        this.bookRepository = bookRepository;
+        this.storehouseBookRepository = storehouseBookRepository;
     }
 
     public Page<PublishingCompany> search(Pageable pageable) {
@@ -59,8 +64,8 @@ public class PublishingCompanyService {
     public void delete(Long id) {
         PublishingCompany publishingCompany = this.searchById(id);
 
-        for (Book book : bookService.searchByPublishingCompany(id)) {
-            this.bookService.deleteStorehouseBook(book.getId());
+        for (Book book : bookRepository.findAllByPublishingCompanyId(id)) {
+            this.storehouseBookRepository.deleteAllByBookId(book.getId());
         }
 
         this.publishingCompanyRepository.delete(publishingCompany);
