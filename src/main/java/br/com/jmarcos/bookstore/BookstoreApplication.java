@@ -20,6 +20,7 @@ import br.com.jmarcos.bookstore.model.Permission;
 import br.com.jmarcos.bookstore.model.Person;
 import br.com.jmarcos.bookstore.model.PublishingCompany;
 import br.com.jmarcos.bookstore.model.Storehouse;
+import br.com.jmarcos.bookstore.model.intermediateClass.StorehouseBook;
 import br.com.jmarcos.bookstore.service.AuthorService;
 import br.com.jmarcos.bookstore.service.BookService;
 import br.com.jmarcos.bookstore.service.PermissionService;
@@ -143,7 +144,7 @@ public class BookstoreApplication implements CommandLineRunner {
 			Page<Book> pageResulBook = this.bookService.search(PageRequest.of(0, 10));
 			List<Book> bookList = pageResulBook.getContent();
 			Integer cem = 100;
-			List<Integer> quantites = new ArrayList();
+			List<Integer> quantites = new ArrayList<>();
 			for (int i = 1; i <= 10; i++) {
 				quantites.add(cem);
 			}
@@ -161,7 +162,9 @@ public class BookstoreApplication implements CommandLineRunner {
 					for (int index = 1; index <= 10; index++) {
 					book.getStorehouseList().add(this.storehouseService.searchByCode(index));
 					}
-					this.bookService.save(book, quantites);
+
+					List<StorehouseBook> storehouseBooks = new ArrayList<>();
+					this.bookService.save(book, storehouseBooks);
 				}
 			
 			}

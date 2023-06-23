@@ -63,21 +63,15 @@ public class BookService {
         return this.bookRepository.findAllByAuthorListName(authorName);
     }
 
-    public Book save(Book book, List<Integer> quantityList) {
+    public Book save(Book book, List<StorehouseBook> storehouseBooks) {
         if (this.existsByTitle(book.getTitle())) {
             throw new ConflictException("Book title is already in use");
         }
 
-        PublishingCompany publishingCompany = this.findPublisgingCompany(book);
-        List<Author> authors = this.findAuthorsList(book);
-        List<Storehouse> storehouses = this.findStorehousesList(book);
-
-        book.setPublishingCompany(publishingCompany);
-        book.setAuthorList(authors);
-        book.setStorehouseList(storehouses);
+        book = this.prepareBook(book, storehouseBooks);
 
         book = this.bookRepository.save(book);
-        this.createStorehouseBook(book, quantityList);
+        this.createStorehouseBook(book, storehouseBooks);
 
         return book;
     }
@@ -95,18 +89,19 @@ public class BookService {
         this.bookRepository.deleteById(book.getId());
     }
 
-    public Book updateBook(Book newbook, List<Integer> quantityList) {
+    public Book updateBook(Book newbook,List<StorehouseBook> storehouseBooks) {
         Book oldBook = this.findById(newbook.getId());
-
         if (!Objects.equals(oldBook.getTitle(), newbook.getTitle())
                 && this.existsByTitle(newbook.getTitle())) {
             throw new ConflictException("Book title is already in use.");
 
         }
+        
+        newbook = this.prepareBook(newbook, storehouseBooks);
+        this.updateStorehouseBook(newbook, storehouseBooks);
 
-        this.updateStorehouseBook(newbook, quantityList);
-
-        Book book = this.save(this.fillUpdate(oldBook, newbook), quantityList);
+        Book book = this.bookRepository.save(this.fillUpdate(oldBook, newbook));
+        this.createStorehouseBook(book, storehouseBooks);
 
         return book;
     }
@@ -129,11 +124,12 @@ public class BookService {
         return authors;
     }
 
-    public List<Storehouse> findStorehousesList(Book book) {
+    public List<Storehouse> findStorehousesList(List<StorehouseBook> storehouseBooks) {
         List<Storehouse> storehouses = new ArrayList<>();
 
-        for (Storehouse storehouse : book.getStorehouseList()) {
-            Storehouse storehouseExist = this.storehouseService.searchByID(storehouse.getId());
+        for (StorehouseBook storehouseBook : storehouseBooks) {
+            Storehouse storehouseExist = this.storehouseService.searchByID(storehouseBook.getStorehouse().getId());
+            storehouseBook.setStorehouse(storehouseExist);
             storehouses.add(storehouseExist);
 
         }
@@ -141,28 +137,18 @@ public class BookService {
         return storehouses;
     }
 
-    public void createStorehouseBook(Book book, List<Integer> quantityList) {
-        int index = 0;
-
-        for (Storehouse storehouse : book.getStorehouseList()) {
-            StorehouseBook storehouseBook = new StorehouseBook();
-            storehouseBook.setStorehouse(storehouse);
+    public void createStorehouseBook(Book book, List<StorehouseBook> storehouseBooks) {
+        for (StorehouseBook storehouseBook : storehouseBooks) {
             storehouseBook.setBook(book);
-            storehouseBook.setQuantity(quantityList.get(index));
-            index++;
             storehouseBookRepository.save(storehouseBook);
         }
 
     }
 
     @Transactional
-    public void updateStorehouseBook(Book book, List<Integer> quantityList) {
+    public void updateStorehouseBook(Book book, List<StorehouseBook> storehouseBooks) {
         List<StorehouseBook> storehouseBookList = this.storehouseBookRepository.findAllByBookId(book.getId());
-
-        PublishingCompany publishingCompany = this.findPublisgingCompany(book);
-        List<Author> authors = this.findAuthorsList(book);
-        List<Storehouse> storehouses = this.findStorehousesList(book);
-
+        
         this.storehouseBookRepository.deleteAll(storehouseBookList);
 
     }
@@ -176,6 +162,18 @@ public class BookService {
         oldBook.setStorehouseList(newBook.getStorehouseList());
 
         return oldBook;
+    }
+
+    private Book prepareBook(Book book, List<StorehouseBook> storehouseBooks){
+        PublishingCompany publishingCompany = this.findPublisgingCompany(book);
+        List<Author> authors = this.findAuthorsList(book);
+        List<Storehouse> storehouses = this.findStorehousesList(storehouseBooks);
+
+        book.setPublishingCompany(publishingCompany);
+        book.setAuthorList(authors);
+        book.setStorehouseList(storehouses);
+
+        return book;
     }
 
 }

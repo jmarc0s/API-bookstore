@@ -4,7 +4,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -13,6 +12,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -25,6 +25,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 
 import br.com.jmarcos.bookstore.controller.dto.book.BookUpdateDTO;
+import br.com.jmarcos.bookstore.controller.dto.storehouseBookDTO.StorehouseBookDTO;
 import br.com.jmarcos.bookstore.model.Author;
 import br.com.jmarcos.bookstore.model.Book;
 import br.com.jmarcos.bookstore.model.PublishingCompany;
@@ -144,7 +145,10 @@ public class BookServiceTest {
         when(storehouseService.searchByID(anyLong())).thenReturn(book.getStorehouseList().get(0));
         when(bookRepository.save(any(Book.class))).thenReturn(book);
 
-        Book savedBook = this.bookService.save(book, List.of(10));
+        Book savedBook = this.bookService.save(book, createStorehouseBookDTOs()
+            .stream()
+            .map(storehouseBookDTO -> storehouseBookDTO.toStorehouseBook())
+            .collect(Collectors.toList()));
 
         Assertions.assertNotNull(savedBook);
         Assertions.assertEquals(book.getTitle(), savedBook.getTitle());
@@ -170,7 +174,10 @@ public class BookServiceTest {
 
         ConflictException conflictException = Assertions
                 .assertThrows(ConflictException.class,
-                        () -> bookService.save(newbook, List.of(10)));
+                        () -> bookService.save(newbook,  createStorehouseBookDTOs()
+                                .stream()
+                                .map(storehouseBookDTO -> storehouseBookDTO.toStorehouseBook())
+                                .collect(Collectors.toList())));
 
         Assertions.assertTrue(conflictException.getMessage()
                 .contains("Book title is already in use"));
@@ -247,7 +254,10 @@ public class BookServiceTest {
         when(storehouseService.searchByID(anyLong())).thenReturn(updateBook.getStorehouseList().get(0));
         when(bookRepository.save(any(Book.class))).thenReturn(book);
 
-        Book updatedBook = this.bookService.updateBook(updateBook, bookUpdateDTO.getQuantityInStorehouse());
+        Book updatedBook = this.bookService.updateBook(updateBook, createStorehouseBookDTOs()
+            .stream()
+            .map(storehouseBookDTO -> storehouseBookDTO.toStorehouseBook())
+            .collect(Collectors.toList()));
 
         Assertions.assertNotNull(updatedBook);
         Assertions.assertEquals(updateBook.getTitle(), updatedBook.getTitle());
@@ -260,9 +270,9 @@ public class BookServiceTest {
 
         verify(storehouseBookRepository).deleteAll(anyList());
         verify(bookRepository).save(book);
-        verify(publishingCompanyService, times(2)).searchById(updateBook.getPublishingCompany().getId());
-        verify(authorService, times(2)).searchById(updateBook.getAuthorList().get(0).getId());
-        verify(storehouseService, times(2)).searchByID(updateBook.getStorehouseList().get(0).getId());
+        verify(publishingCompanyService).searchById(updateBook.getPublishingCompany().getId());
+        verify(authorService).searchById(updateBook.getAuthorList().get(0).getId());
+        verify(storehouseService).searchByID(updateBook.getStorehouseList().get(0).getId());
         verify(storehouseBookRepository).save(any(StorehouseBook.class));
 
     }
@@ -277,7 +287,10 @@ public class BookServiceTest {
 
         ConflictException conflictException = Assertions
                 .assertThrows(ConflictException.class,
-                        () -> bookService.updateBook(updateBook, bookUpdateDTO.getQuantityInStorehouse()));
+                        () -> bookService.updateBook(updateBook,  createStorehouseBookDTOs()
+                                .stream()
+                                .map(storehouseBookDTO -> storehouseBookDTO.toStorehouseBook())
+                                .collect(Collectors.toList())));
 
         Assertions.assertTrue(conflictException.getMessage()
                 .contains("Book title is already in use."));
@@ -301,17 +314,16 @@ public class BookServiceTest {
 
     BookUpdateDTO createBookUpdateDTO(){
         BookUpdateDTO bookUpdateDTO = new BookUpdateDTO();
-        Set<Long> authorIdList = new HashSet();
+        Set<Long> authorIdList = new HashSet<>();
         authorIdList.add(2L);
 
         bookUpdateDTO.setId(1L);
         bookUpdateDTO.setPrice(new BigDecimal(60.00));
         bookUpdateDTO.setTitle("Livro nem tão legal");
         bookUpdateDTO.setYear(2005);
-        bookUpdateDTO.setStorehouseIdList(List.of(2L));
         bookUpdateDTO.setPublishingCompanyId(2L);
         bookUpdateDTO.setAuthorIdList(authorIdList);
-        bookUpdateDTO.setQuantityInStorehouse(List.of(20));
+        bookUpdateDTO.setStorehouseBookDTOs(createStorehouseBookDTOs());
         
         return bookUpdateDTO;
 
@@ -322,6 +334,14 @@ public class BookServiceTest {
         storehouse.setId(1L);
 
         return List.of(storehouse);
+    }
+
+    Set<StorehouseBookDTO> createStorehouseBookDTOs(){
+        StorehouseBookDTO storehouseBook = new StorehouseBookDTO();
+        storehouseBook.setStorehouseId(1L);
+        storehouseBook.setQuantity(10);
+
+        return Set.of(storehouseBook);
     }
 
     List<Author> createAuthorList(){

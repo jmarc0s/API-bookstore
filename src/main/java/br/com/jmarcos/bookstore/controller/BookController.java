@@ -205,7 +205,11 @@ public class BookController {
         @PostMapping
         public ResponseEntity<Object> save(@RequestBody @Valid BookRequestDTO bookRequestDTO,
                         UriComponentsBuilder uriBuilder) {
-                Book book = this.bookService.save(bookRequestDTO.toBook(), bookRequestDTO.getQuantityInStorehouse());
+                Book book = this.bookService.save(bookRequestDTO.toBook(), 
+                        bookRequestDTO.getStorehouseBookDTOs()
+                        .stream()
+                        .map(storehouseBookDTO -> storehouseBookDTO.toStorehouseBook())
+                        .collect(Collectors.toList()));
 
                 URI uri = uriBuilder.path("/storehouse/{id}").buildAndExpand(book.getId()).toUri();
                 return ResponseEntity.created(uri).body(new BookResponseDTO(book));
@@ -270,7 +274,11 @@ public class BookController {
         public ResponseEntity<Object> update(@PathVariable Long id, @RequestBody @Valid BookUpdateDTO bookUpdateDTO) {
                 Book book = this.bookService.findById(id);
 
-                book = this.bookService.updateBook(bookUpdateDTO.toBook(id), bookUpdateDTO.getQuantityInStorehouse());
+                book = this.bookService.updateBook(bookUpdateDTO.toBook(id), 
+                        bookUpdateDTO.getStorehouseBookDTOs()
+                        .stream()
+                        .map(storehouseBookDTO -> storehouseBookDTO.toStorehouseBook())
+                        .collect(Collectors.toList()));
 
                 return ResponseEntity.ok(new BookResponseDTO(book));
         }
