@@ -25,6 +25,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
+
 import br.com.jmarcos.bookstore.controller.dto.groceryCart.GroceryCartAddbookDTO;
 import br.com.jmarcos.bookstore.controller.dto.groceryCart.GroceryCartRequestDTO;
 import br.com.jmarcos.bookstore.controller.dto.groceryCart.GroceryCartResponseDTO;
@@ -162,7 +163,10 @@ public class GroceryCartController {
 
                 if (groceryCartRequestDTO != null) {
                         groceryCart = this.groceryCartService.save(groceryCartRequestDTO.toGroceryCart(person.getId()),
-                                        groceryCartRequestDTO.getQuantities());
+                                        groceryCartRequestDTO.getBooks()
+                                        .stream()
+                                        .map(groceryCartBookDTO -> groceryCartBookDTO.toGroceryCart())
+                                        .collect(Collectors.toList()));
                 } else {
                         groceryCart = this.groceryCartService.save(person.getId());
                 }

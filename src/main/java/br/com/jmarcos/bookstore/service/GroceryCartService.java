@@ -52,15 +52,15 @@ public class GroceryCartService {
                 .orElseThrow(() -> new ResourceNotFoundException("GroceryCart not found with the given id"));
     }
 
-    public GroceryCart save(GroceryCart groceryCart, List<Integer> quantities) {
-        List<Book> books = this.searchBooks(groceryCart);
+    public GroceryCart save(GroceryCart groceryCart, List<GroceryCartBook> groceryCartBooks) {
+        List<Book> books = this.searchBooks(groceryCartBooks);
         Person person = this.personService.searchById(groceryCart.getPerson().getId());
 
         groceryCart.setPerson(person);
         groceryCart.setBooks(books);
 
         GroceryCart savedGroceryCart = this.groceryCartRepository.save(groceryCart);
-        this.createGroceryCartBook(savedGroceryCart, quantities);
+        this.createGroceryCartBook(savedGroceryCart, groceryCartBooks);
 
         return savedGroceryCart;
 
@@ -132,20 +132,8 @@ public class GroceryCartService {
         this.groceryCartBookRepository.deleteByGroceryCartIdAndBookId(groceryCart.getId(), book.getId());
     }
 
-    private void createGroceryCartBook(GroceryCart groceryCart, List<Integer> quantities) {
-        List<GroceryCartBook> groceryCartBooks = new ArrayList<>();
-        int index = 0;
-        for (Book book : groceryCart.getBooks()) {
-
-            GroceryCartBook groceryCartBook = new GroceryCartBook();
-            groceryCartBook.setGroceryCart(groceryCart);
-            groceryCartBook.setBook(book);
-            groceryCartBook.setQuantity(quantities.get(index));
-
-            groceryCartBooks.add(groceryCartBook);
-
-            index++;
-        }
+    private void createGroceryCartBook(GroceryCart groceryCart, List<GroceryCartBook> groceryCartBooks) {
+        groceryCartBooks.forEach(groceryCartBook -> groceryCartBook.setGroceryCart(groceryCart));
 
         this.groceryCartBookRepository.saveAll(groceryCartBooks);
     }
@@ -163,12 +151,13 @@ public class GroceryCartService {
     }
 
 
-    private List<Book> searchBooks(GroceryCart groceryCart) {
+    private List<Book> searchBooks(List<GroceryCartBook> groceryCartBooks) {
         List<Book> books = new ArrayList<>();
 
-        for (Book book : groceryCart.getBooks()) {
+        for (GroceryCartBook groceryCartBook : groceryCartBooks) {
 
-            Book bookExists = this.bookService.findById(book.getId());
+            Book bookExists = this.bookService.findById(groceryCartBook.getBook().getId());
+            groceryCartBook.setBook(bookExists);
             books.add(bookExists);
 
         }

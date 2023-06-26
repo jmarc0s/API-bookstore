@@ -113,12 +113,12 @@ public class GroceryCartServiceTest {
     void save_withBooks_returns_ASavedGroceryCart_WhenSuccessful(){
         GroceryCart groceryCart = createGroceryCart();
         groceryCart.setBooks(creeateBookList());
-        List<Integer> bookQuanntities = List.of(10);
+        List<GroceryCartBook> groceryCartBooks = createGroceryCartBookList(groceryCart.getBooks().get(0).getId(), 20);
         when(groceryCartRepository.save(any(GroceryCart.class))).thenReturn(groceryCart);
         when(personService.searchById(anyLong())).thenReturn(groceryCart.getPerson());
         when(bookService.findById(anyLong())).thenReturn(groceryCart.getBooks().get(0));
 
-        GroceryCart savedGroceryCart = this.groceryCartService.save(groceryCart, bookQuanntities);
+        GroceryCart savedGroceryCart = this.groceryCartService.save(groceryCart, groceryCartBooks);
 
 
         Assertions.assertNotNull(savedGroceryCart);
@@ -275,14 +275,25 @@ public class GroceryCartServiceTest {
         return person;
     }
 
-    GroceryCartBook createGroceryCartBook(GroceryCart groceryCart, Book book){
+    List<GroceryCartBook> createGroceryCartBookList(Long bookId, Integer quantity){
         GroceryCartBook groceryCartBook = new GroceryCartBook();
-
-        groceryCartBook.setId(1L);
+        Book book = new Book();
+        book.setId(bookId);
         groceryCartBook.setBook(book);
+        groceryCartBook.setQuantity(quantity);
+
+        return List.of(groceryCartBook);
+    }
+
+    GroceryCartBook createGroceryCartBook(GroceryCart groceryCart, Book book) {
+        GroceryCartBook groceryCartBook = new GroceryCartBook();
+        
+        groceryCart.setId(1L);
         groceryCartBook.setGroceryCart(groceryCart);
+        groceryCartBook.setBook(book);
         groceryCartBook.setQuantity(10);
 
         return groceryCartBook;
     }
+
 }
