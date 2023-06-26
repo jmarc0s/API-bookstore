@@ -13,6 +13,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.web.config.EnableSpringDataWebSupport;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
+import br.com.jmarcos.bookstore.controller.dto.author.AuthorRequestDTO;
 import br.com.jmarcos.bookstore.model.Address;
 import br.com.jmarcos.bookstore.model.Author;
 import br.com.jmarcos.bookstore.model.Book;
@@ -90,15 +91,14 @@ public class BookstoreApplication implements CommandLineRunner {
 		  
 		}
 		Page<Author> pageResultAuthor = this.authorService.search(PageRequest.of(0,10));
-		List<Author> authorList = pageResultAuthor.getContent();
 		  
-		if (authorList.isEmpty()) {
+		if (pageResultAuthor.isEmpty()) {
 			for (int i = 1; i <= 10; i++) {
 				Address address = new Address("Rua das Flores", 1234, "São Paulo", "SP" + i,
 				"01234-567");
 				Author author = new Author();
 				author.setName("Autor " + i);
-				author.setUrl("autor alguma coisa" + i);
+				author.setUrl("autor alguma coisa" + i + ".com");
 				author.setAddress(address);
 				authorService.save(author);
 
@@ -108,10 +108,8 @@ public class BookstoreApplication implements CommandLineRunner {
 		  
 		Page<PublishingCompany> pageResultPublishingCompany =
 		this.publhService.search(PageRequest.of(0, 10));
-		List<PublishingCompany> publishingCompanyList =
-		pageResultPublishingCompany.getContent();
 
-		if (publishingCompanyList.isEmpty()) {		  
+		if (pageResultPublishingCompany.isEmpty()) {		  
 			for (int i = 1; i <= 10; i++) {
 				Address address = new Address("Rua das dores" + i, 1234, "São Paulo", "SP",
 				"01234-567");
@@ -127,8 +125,7 @@ public class BookstoreApplication implements CommandLineRunner {
 		  
 		Page<Storehouse> pageResulStorehouse =
 		this.storehouseService.search(PageRequest.of(0, 10));
-		List<Storehouse> storehouseList = pageResulStorehouse.getContent();
-		if (storehouseList.isEmpty()) {
+		if (pageResulStorehouse.isEmpty()) {
 		  
 			for (int i = 1; i <= 10; i++) {
 				Address address = new Address("Rua das freiras", 1234, "São Paulo" + i, "SP",
@@ -142,28 +139,31 @@ public class BookstoreApplication implements CommandLineRunner {
 		  	}
 		  
 			Page<Book> pageResulBook = this.bookService.search(PageRequest.of(0, 10));
-			List<Book> bookList = pageResulBook.getContent();
 			Integer cem = 100;
 			List<Integer> quantites = new ArrayList<>();
 			for (int i = 1; i <= 10; i++) {
 				quantites.add(cem);
 			}
 			
-			if (bookList.isEmpty()) {
-			
+			if (pageResulBook.isEmpty()) {
 				for (int i = 1; i <= 10; i++) {
+					List<StorehouseBook> storehouseBooks = new ArrayList<>();
 					Book book = new Book();
-					String authorName = "Autor " + i;
-					book.getAuthorList().add(this.authorService.searchByName(authorName));
+					book.getAuthorList().add(AuthorRequestDTO.toAuthor(Long.valueOf(i)));
 					book.setTitle("Book " + i);
 					book.setPrice(new BigDecimal(50.00));
-					book.setYear(2020);
-					book.setPublishingCompany(this.publhService.searchById(Long.valueOf(i)));
+					book.setYear(2020 - i);
+					book.setPublishingCompany(new PublishingCompany(Long.valueOf(i)));
 					for (int index = 1; index <= 10; index++) {
-					book.getStorehouseList().add(this.storehouseService.searchByCode(index));
+						
+						StorehouseBook storehouseBook = new StorehouseBook();
+						storehouseBook.setQuantity(100);
+						storehouseBook.setStorehouse(this.storehouseService.searchByCode(index));
+						book.getStorehouseList().add(storehouseBook.getStorehouse());
+
+						storehouseBooks.add(storehouseBook);
 					}
 
-					List<StorehouseBook> storehouseBooks = new ArrayList<>();
 					this.bookService.save(book, storehouseBooks);
 				}
 			
