@@ -3,8 +3,9 @@ package br.com.jmarcos.bookstore.controller.dto.publishinCompany;
 import br.com.jmarcos.bookstore.controller.dto.address.AddressUpdateDTO;
 import br.com.jmarcos.bookstore.model.PublishingCompany;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,17 +16,21 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class PublishingCompanyUpdateDTO {
-    @NotEmpty
-    @NotNull
+
+    @NotBlank (message = "must not be blank")
+    @NotNull (message = "must not be null")
     private String name;
-    @NotEmpty
-    @NotNull
+
+    @NotBlank (message = "must not be blank")
+    @NotNull (message = "must not be null")
     private String url;
+
     @Valid
-    @NotNull
+    @NotNull (message = "must not be null")
     private AddressUpdateDTO address;
-    @NotEmpty
+
     @NotNull
+    @Pattern (regexp = "\\+?\\d{2}\\s?\\d{4,5}[-\\s]?\\d{4}", message = "Invalid phone")
     private String phone;
 
     public PublishingCompany toPublishingCompany(Long id) {

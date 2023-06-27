@@ -1,7 +1,7 @@
 package br.com.jmarcos.bookstore.controller.dto.permission;
 
 import br.com.jmarcos.bookstore.model.Permission;
-import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -13,8 +13,9 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PermissionRequestDTO {
-    @NotEmpty
-    @NotNull
+
+    @NotBlank (message = "must not be blank")
+    @NotNull (message = "must not be null")
     private String name;
 
     public Permission toPermission() {

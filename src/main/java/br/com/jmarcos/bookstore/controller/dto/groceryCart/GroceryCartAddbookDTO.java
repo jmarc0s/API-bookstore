@@ -12,9 +12,11 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class GroceryCartAddbookDTO {
-    @NotNull
+
+    @NotNull (message = "must not be null")
     private Long bookId;
-    @NotNull
-    @Positive
+    
+    @NotNull (message = "must not be null")
+    @Positive (message = "must be greater than 0")
     private int quantity;
 }

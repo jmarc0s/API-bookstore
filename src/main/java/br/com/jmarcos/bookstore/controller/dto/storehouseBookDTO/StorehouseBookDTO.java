@@ -17,12 +17,11 @@ import lombok.Setter;
 @AllArgsConstructor
 public class StorehouseBookDTO {
     
-    @NotNull
-    @Positive
+    @NotNull (message = "must not be null")
     private Long storehouseId;
 
-    @NotNull
-    @Positive
+    @NotNull (message = "must not be null")
+    @Positive (message = "must be greater than 0")
     private Integer quantity;
 
     public StorehouseBook toStorehouseBook(){

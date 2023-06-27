@@ -7,8 +7,10 @@ import br.com.jmarcos.bookstore.model.Permission;
 import br.com.jmarcos.bookstore.model.Person;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,26 +22,26 @@ import lombok.Setter;
 @NoArgsConstructor
 public class PersonRequestDTO {
 
-    @NotEmpty
-    @NotNull
+    @NotBlank (message = "must not be blank")
+    @NotNull (message = "must not be null")
     // @JsonProperty(value = "Person's name")
     private String name;
 
-    @NotEmpty
-    @NotNull
-    @Email
+    @NotNull (message = "must not be null")
+    @Email  (message = "Invalid email")
+    @NotEmpty (message = "must not be empty")
     private String email;
 
     @Valid
-    @NotNull
+    @NotNull (message = "must not be null")
     private AddressRequestDTO address;
 
-    @NotEmpty
     @NotNull
+    @Pattern (regexp = "\\+?\\d{2}\\s?\\d{4,5}[-\\s]?\\d{4}", message = "Invalid phone")
     private String phone;
 
-    @NotEmpty
-    @NotNull
+    @NotEmpty (message = "must not be empty")
+    @NotNull (message = "must not be null")
     private String password;
 
     public Person toPerson() {

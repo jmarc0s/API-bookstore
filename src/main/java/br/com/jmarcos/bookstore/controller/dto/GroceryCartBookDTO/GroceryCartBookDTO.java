@@ -13,12 +13,11 @@ import lombok.Setter;
 @Setter
 public class GroceryCartBookDTO {
     
-    @NotNull
-    @Positive
+    @NotNull (message = "must not be null")
     private Long bookId;
 
-    @NotNull
-    @Positive
+    @NotNull (message = "must not be null")
+    @Positive (message = "must be greater than 0")
     private Integer quantity;
 
     public GroceryCartBook toGroceryCart(){

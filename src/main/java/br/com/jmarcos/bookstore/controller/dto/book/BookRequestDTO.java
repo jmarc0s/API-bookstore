@@ -11,9 +11,8 @@ import br.com.jmarcos.bookstore.model.Author;
 import br.com.jmarcos.bookstore.model.Book;
 import br.com.jmarcos.bookstore.model.PublishingCompany;
 import br.com.jmarcos.bookstore.model.Storehouse;
-import jakarta.persistence.ElementCollection;
-import jakarta.validation.Valid;
 import jakarta.validation.constraints.Digits;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -26,27 +25,27 @@ import lombok.Setter;
 @Setter
 public class BookRequestDTO {
 
-    @NotEmpty
-    @NotNull
+    @NotBlank (message = "must not be blank")
+    @NotNull (message = "must not be null")
     private String title;
 
-    @NotNull
-    @Positive
-    @Digits(integer = 4, fraction = 0)
+    @NotNull (message = "must not be null")
+    @Positive (message = "must be greater than 0")
+    @Digits(integer = 4, fraction = 0, message = "Invalid year")
     private Integer year;
 
-    @NotNull
+    @NotNull (message = "must not be null")
     private BigDecimal price;
 
-    @NotNull
+    @NotNull (message = "must not be null")
     private Long publishingCompanyId;
 
-    @ElementCollection
-    @NotEmpty
+    @NotNull (message = "must not be null")
+    @NotEmpty (message = "must not be empty")
     private Set<Long> authorIdList = new HashSet<>();
 
-    @Valid
-    @NotEmpty
+    @NotEmpty (message = "must not be empty")
+    @NotNull (message = "must not be null")
     private Set<StorehouseBookDTO> storehouseBookDTOs = new HashSet<>();
 
     public Book toBook() {

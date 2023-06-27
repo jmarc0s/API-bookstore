@@ -3,7 +3,7 @@ package br.com.jmarcos.bookstore.controller.dto.author;
 import br.com.jmarcos.bookstore.controller.dto.address.AddressRequestDTO;
 import br.com.jmarcos.bookstore.model.Author;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -16,14 +16,16 @@ import lombok.Setter;
 @NoArgsConstructor
 public class AuthorRequestDTO {
 
-    @NotEmpty
-    @NotNull
+    @NotBlank (message = "must not be blank")
+    @NotNull (message = "must not be null")
     private String name;
+
     @Valid
-    @NotNull
+    @NotNull (message = "must not be null")
     private AddressRequestDTO address;
-    @NotEmpty
-    @NotNull
+
+    @NotBlank (message = "must not be blank")
+    @NotNull (message = "must not be null")
     private String url;
 
     public Author toAuthor() {
