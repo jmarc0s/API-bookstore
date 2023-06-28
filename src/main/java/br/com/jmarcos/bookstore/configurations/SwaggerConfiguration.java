@@ -19,58 +19,33 @@ public class SwaggerConfiguration {
         @Bean
         public OpenAPI basOpenAPI() {
 
-                ApiResponse InternalServerError = new ApiResponse().description("Internal Server Error");
-
-                // caso eu tenha alguma resposta em json para minhas respostas http, basta eu
-                // adicionar esse pequeno trecho de codigo entre new ApiResponse() e
-                // .description (é preciso fazer as alterações necessarias para que a repsoata
-                // se adapte a minha resposta)
-                /*
-                 * .content(
-                 * new Content().addMediaType(MediaType.APPLICATION_JSON_VALUE,
-                 * new io.swagger.v3.oas.models.media.MediaType().addExamples("default",
-                 * new Example().value(
-                 * "{\"code\" : 500, \"Status\" : \"Internal Server Error\", \"Message\" :\"Something went wrong, please try again in a few minutes\" }"
-                 * ))))
-                 */
+                ApiResponse internalServerError = new ApiResponse().description("Internal Server Error");
 
                 ApiResponse badRequest = new ApiResponse()
                                 .description("Bad Request");
 
                 ApiResponse permissionDenied = new ApiResponse()
-                                .description("Permission denied");
+                                .description("Permission Denied");
 
                 ApiResponse conflict = new ApiResponse()
                                 .description("Data Conflict");
 
                 ApiResponse ok = new ApiResponse()
-                                .description("Successful request");
+                                .description("Successful Request");
 
+                ApiResponse ResourceNotFound = new ApiResponse().description("Resource Not Found");
                 Components component = new Components();
 
-                // essas repostas que eu adiono ao component são repostas que serão usadas como
-                // exemplo das minhas repostas dos meus endpoints
-                component.addResponses("InternalServerError", InternalServerError);
+                component.addResponses("InternalServerError", internalServerError);
                 component.addResponses("badRequest", badRequest);
                 component.addResponses("permissionDenied", permissionDenied);
                 component.addResponses("conflict", conflict);
                 component.addResponses("ok", ok);
+                component.addResponses("ResourceNotFound", ResourceNotFound);
                 return new OpenAPI()
                                 .components(component)
-                                .info(new Info().title("Bookstore API Documentation").version("1.0.0")
+                                .info(new Info().title("Bookstore API Documentation").version("2.0.1")
                                                 .description("a simple API for a bookstore"));
         }
-
-        /*
-         * @Bean
-         * public Docket api() {
-         * return new Docket(DocumentationType.SWAGGER_2)
-         * .apiInfo(getInfo())
-         * .select()
-         * .apis(RequestHandlerSelectors.any())
-         * .paths(PathSelectors.any())
-         * .build()
-         * }
-         */
 
 }

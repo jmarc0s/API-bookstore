@@ -20,8 +20,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import br.com.jmarcos.bookstore.controller.dto.permission.PermissionRequestDTO;
@@ -42,17 +40,11 @@ public class PermissionController {
 
   @SecurityRequirement(name = "Authorization")
   @Operation(summary = "record a new permission", description = "save a new book in database", responses = {
-      @ApiResponse(responseCode = "500", ref = "InternalServerError"),
-      @ApiResponse(responseCode = "200", description = "Permission saved", content = @Content(mediaType = "application/json", examples = {
-          @ExampleObject(value = "{"
-              + "\"id\": 123,"
-              + "\"name\": \"ADMIN\","
-              + "}")
-      })),
-      @ApiResponse(responseCode = "400", description = "bad request, you may have filled something wrong"),
+      @ApiResponse(responseCode = "200", ref = "ok"),
+      @ApiResponse(responseCode = "400", ref = "badRequest"),
       @ApiResponse(responseCode = "403", ref = "permissionDenied"),
-      @ApiResponse(responseCode = "404", description = "permision not found in database"),
-      @ApiResponse(responseCode = "409", description = "permission name is already in use by other permission in database")
+      @ApiResponse(responseCode = "404", ref = "ResourceNotFound"),
+      @ApiResponse(responseCode = "409", ref = "conflict")
   })
 
   @PostMapping
@@ -85,16 +77,10 @@ public class PermissionController {
 
   @SecurityRequirement(name = "Authorization")
   @Operation(summary = "returns a permission by id", description = "returns permission by the specified id", responses = {
-      @ApiResponse(responseCode = "500", ref = "InternalServerError"),
-      @ApiResponse(responseCode = "200", description = "Successful request", content = @Content(mediaType = "application/json", examples = {
-          @ExampleObject(value = "{"
-              + "\"id\": 123,"
-              + "\"name\": \"ADMIN\","
-              + "}")
-      })),
-      @ApiResponse(responseCode = "400", description = "bad request, you may have filled something wrong"),
+      @ApiResponse(responseCode = "200", ref = "ok"),
+      @ApiResponse(responseCode = "400", ref = "badRequest"),
       @ApiResponse(responseCode = "403", ref = "permissionDenied"),
-      @ApiResponse(responseCode = "404", description = "permision not found in database")
+      @ApiResponse(responseCode = "404", ref = "ResourceNotFound")
   })
 
   @GetMapping("/{id}")
@@ -108,16 +94,10 @@ public class PermissionController {
 
   @SecurityRequirement(name = "Authorization")
   @Operation(summary = "returns a permission by name", description = "returns permission by the specified name", responses = {
-      @ApiResponse(responseCode = "500", ref = "InternalServerError"),
-      @ApiResponse(responseCode = "200", description = "Successful request", content = @Content(mediaType = "application/json", examples = {
-          @ExampleObject(value = "{"
-              + "\"id\": 123,"
-              + "\"name\": \"ADMIN\","
-              + "}")
-      })),
-      @ApiResponse(responseCode = "400", description = "bad request, you may have filled something wrong"),
+      @ApiResponse(responseCode = "200", ref = "ok"),
+      @ApiResponse(responseCode = "400", ref = "badRequest"),
       @ApiResponse(responseCode = "403", ref = "permissionDenied"),
-      @ApiResponse(responseCode = "404", description = "permision not found in database")
+      @ApiResponse(responseCode = "404", ref = "ResourceNotFound")
   })
 
   @RequestMapping(value = "/search_by_name", method = RequestMethod.GET)
@@ -130,11 +110,10 @@ public class PermissionController {
 
   @SecurityRequirement(name = "Authorization")
   @Operation(summary = "delete a permision by id", description = "delete a permision by the specified id from database", responses = {
-      @ApiResponse(responseCode = "500", ref = "InternalServerError"),
       @ApiResponse(responseCode = "200", ref = "ok"),
-      @ApiResponse(responseCode = "400", description = "bad request, you may have filled something wrong"),
+      @ApiResponse(responseCode = "400", ref = "badRequest"),
       @ApiResponse(responseCode = "403", ref = "permissionDenied"),
-      @ApiResponse(responseCode = "404", description = "permission not found in database")
+      @ApiResponse(responseCode = "404", ref = "ResourceNotFound")
   })
 
   @DeleteMapping("/{id}")
@@ -148,17 +127,11 @@ public class PermissionController {
 
   @SecurityRequirement(name = "Authorization")
   @Operation(summary = "update a permission", description = "update a permission name", responses = {
-      @ApiResponse(responseCode = "500", ref = "InternalServerError"),
-      @ApiResponse(responseCode = "200", description = "permission updated", content = @Content(mediaType = "application/json", examples = {
-          @ExampleObject(value = "{"
-              + "\"id\": 123,"
-              + "\"name\": \"ADMIN\","
-              + "}")
-      })),
-      @ApiResponse(responseCode = "400", description = "bad request, you may have filled something wrong"),
+      @ApiResponse(responseCode = "200", ref = "ok"),
+      @ApiResponse(responseCode = "400", ref = "badRequest"),
       @ApiResponse(responseCode = "403", ref = "permissionDenied"),
-      @ApiResponse(responseCode = "404", description = "permision not found in database"),
-      @ApiResponse(responseCode = "409", description = "permission name is already in use by other permission in database")
+      @ApiResponse(responseCode = "404", ref = "ResourceNotFound"),
+      @ApiResponse(responseCode = "409", ref = "conflict")
   })
 
   @PutMapping("/{id}")

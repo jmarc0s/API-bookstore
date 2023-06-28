@@ -22,8 +22,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import br.com.jmarcos.bookstore.controller.dto.author.AuthorRequestDTO;
@@ -45,7 +43,6 @@ public class AuthorController {
 
         @SecurityRequirement(name = "Authorization")
         @Operation(summary = "Returns a list of Authors", description = "Returns a list of all authors in database", responses = {
-                        @ApiResponse(responseCode = "500", ref = "InternalServerError"),
                         @ApiResponse(responseCode = "200", ref = "ok"),
                         @ApiResponse(responseCode = "403", ref = "permissionDenied"),
 
@@ -60,25 +57,10 @@ public class AuthorController {
 
         @SecurityRequirement(name = "Authorization")
         @Operation(summary = "record a new Author", description = "save a author in database", responses = {
-                        @ApiResponse(responseCode = "500", ref = "InternalServerError"),
-                        @ApiResponse(responseCode = "200", description = "author saved", content = @Content(mediaType = "application/json", examples = {
-                                        @ExampleObject(value = "{"
-                                                        + "\"id\": 123,"
-                                                        + "\"name\": \"J. K. Rowling\","
-                                                        + "\"address\": {"
-                                                        + "\"id\": \"123\","
-                                                        + "\"street\": \"123 Main St\","
-                                                        + "\"number\": \"123\","
-                                                        + "\"city\": \"Anytown\","
-                                                        + "\"state\": \"CA\","
-                                                        + "\"zip\": \"12345\""
-                                                        + "},"
-                                                        + "\"url\": \"jk.com\""
-                                                        + "}")
-                        })),
-                        @ApiResponse(responseCode = "400", description = "bad request, you may have filled something wrong"),
+                        @ApiResponse(responseCode = "200", ref = "ok"),
+                        @ApiResponse(responseCode = "400", ref = "badRequest"),
                         @ApiResponse(responseCode = "403", ref = "permissionDenied"),
-                        @ApiResponse(responseCode = "409", description = "author name is already in use by other Storehouse in database")
+                        @ApiResponse(responseCode = "409", ref = "conflict")
         })
 
         @CacheEvict(value = "AuthorList", allEntries = true)
@@ -94,25 +76,10 @@ public class AuthorController {
 
         @SecurityRequirement(name = "Authorization")
         @Operation(summary = "returns an author by id", description = "returns an author by the specified id", responses = {
-                        @ApiResponse(responseCode = "500", ref = "InternalServerError"),
-                        @ApiResponse(responseCode = "200", description = "Successful request", content = @Content(mediaType = "application/json", examples = {
-                                        @ExampleObject(value = "{"
-                                                        + "\"id\": 123,"
-                                                        + "\"name\": \"J. K. Rowling\","
-                                                        + "\"address\": {"
-                                                        + "\"id\": \"123\","
-                                                        + "\"street\": \"123 Main St\","
-                                                        + "\"number\": \"123\","
-                                                        + "\"city\": \"Anytown\","
-                                                        + "\"state\": \"CA\","
-                                                        + "\"zip\": \"12345\""
-                                                        + "},"
-                                                        + "\"url\": \"jk.com\""
-                                                        + "}")
-                        })),
-                        @ApiResponse(responseCode = "400", description = "bad request, you may have filled something wrong"),
+                        @ApiResponse(responseCode = "200", ref = "ok"),
+                        @ApiResponse(responseCode = "400", ref = "badRequest"),
                         @ApiResponse(responseCode = "403", ref = "permissionDenied"),
-                        @ApiResponse(responseCode = "404", description = "author not found")
+                        @ApiResponse(responseCode = "404", ref = "ResourceNotFound")
         })
 
         @GetMapping("/{id}")
@@ -124,25 +91,10 @@ public class AuthorController {
 
         @SecurityRequirement(name = "Authorization")
         @Operation(summary = "returns an author by name", description = "returns an author by the specified name", responses = {
-                        @ApiResponse(responseCode = "500", ref = "InternalServerError"),
-                        @ApiResponse(responseCode = "200", description = "Successful request", content = @Content(mediaType = "application/json", examples = {
-                                        @ExampleObject(value = "{"
-                                                        + "\"id\": 123,"
-                                                        + "\"name\": \"J. K. Rowling\","
-                                                        + "\"address\": {"
-                                                        + "\"id\": \"123\","
-                                                        + "\"street\": \"123 Main St\","
-                                                        + "\"number\": \"123\","
-                                                        + "\"city\": \"Anytown\","
-                                                        + "\"state\": \"CA\","
-                                                        + "\"zip\": \"12345\""
-                                                        + "},"
-                                                        + "\"url\": \"jk.com\""
-                                                        + "}")
-                        })),
-                        @ApiResponse(responseCode = "400", description = "bad request, you may have filled something wrong"),
+                        @ApiResponse(responseCode = "200", ref = "ok"),
+                        @ApiResponse(responseCode = "400", ref = "badRequest"),
                         @ApiResponse(responseCode = "403", ref = "permissionDenied"),
-                        @ApiResponse(responseCode = "404", description = "author not found in database")
+                        @ApiResponse(responseCode = "404", ref = "ResourceNotFound")
         })
 
         @RequestMapping(value = "/search_by_name", method = RequestMethod.GET)
@@ -155,11 +107,10 @@ public class AuthorController {
 
         @SecurityRequirement(name = "Authorization")
         @Operation(summary = "delete an author by id", description = "delete a author by the specified id from database", responses = {
-                        @ApiResponse(responseCode = "500", ref = "InternalServerError"),
                         @ApiResponse(responseCode = "200", ref = "ok"),
-                        @ApiResponse(responseCode = "400", description = "bad request, you may have filled something wrong"),
+                        @ApiResponse(responseCode = "400", ref = "badRequest"),
                         @ApiResponse(responseCode = "403", ref = "permissionDenied"),
-                        @ApiResponse(responseCode = "404", description = "author not found in database")
+                        @ApiResponse(responseCode = "404", ref = "ResourceNotFound")
         })
 
         @DeleteMapping("/{id}")
@@ -171,26 +122,11 @@ public class AuthorController {
 
         @SecurityRequirement(name = "Authorization")
         @Operation(summary = "update an author", description = "update data like name, url, etc", responses = {
-                        @ApiResponse(responseCode = "500", ref = "InternalServerError"),
-                        @ApiResponse(responseCode = "200", description = "author updated", content = @Content(mediaType = "application/json", examples = {
-                                        @ExampleObject(value = "{"
-                                                        + "\"id\": 123,"
-                                                        + "\"name\": \"J. K. Rowling\","
-                                                        + "\"address\": {"
-                                                        + "\"id\": \"123\","
-                                                        + "\"street\": \"123 Main St\","
-                                                        + "\"number\": \"123\","
-                                                        + "\"city\": \"Anytown\","
-                                                        + "\"state\": \"CA\","
-                                                        + "\"zip\": \"12345\""
-                                                        + "},"
-                                                        + "\"url\": \"jk.com\""
-                                                        + "}")
-                        })),
-                        @ApiResponse(responseCode = "400", description = "bad request, you may have filled something wrong"),
+                        @ApiResponse(responseCode = "200", ref = "ok"),
+                        @ApiResponse(responseCode = "400", ref = "badRequest"),
                         @ApiResponse(responseCode = "403", ref = "permissionDenied"),
-                        @ApiResponse(responseCode = "404", description = "author not found"),
-                        @ApiResponse(responseCode = "409", description = "author name is already in use by other Author in database")
+                        @ApiResponse(responseCode = "404", ref = "ResourceNotFound"),
+                        @ApiResponse(responseCode = "409", ref = "conflict")
         })
 
         @CacheEvict(value = "AuthorList", allEntries = true)

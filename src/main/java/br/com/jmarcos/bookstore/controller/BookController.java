@@ -26,8 +26,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import br.com.jmarcos.bookstore.controller.dto.book.BookRequestDTO;
@@ -48,7 +46,6 @@ public class BookController {
         }
 
         @Operation(summary = "Returns a list of Books", description = "Returns a list of all books in database", responses = {
-                        @ApiResponse(responseCode = "500", ref = "InternalServerError"),
                         @ApiResponse(responseCode = "200", ref = "ok"),
                         @ApiResponse(responseCode = "403", ref = "permissionDenied"),
 
@@ -64,38 +61,10 @@ public class BookController {
         }
 
         @Operation(summary = "returns a book by id", description = "returns book by the specified id", responses = {
-                        @ApiResponse(responseCode = "500", ref = "InternalServerError"),
-                        @ApiResponse(responseCode = "200", description = "Successful request", content = @Content(mediaType = "application/json", examples = {
-                                        @ExampleObject(value = "{"
-                                                        + "\"id\": 123,"
-                                                        + "\"title\": \"The Hitchhiker's Guide to the Galaxy\","
-                                                        + "\"year\": 1979,"
-                                                        + "\"price\": 42.0,"
-                                                        + "\"PublishingCompany\": {"
-                                                        + "\"publishingCompanyId\": 1,"
-                                                        + "\"publishingCompanyName\": \"Megadodo Publications\""
-                                                        + "},"
-                                                        + "\"authors\": ["
-                                                        + "{"
-                                                        + "\"authorId\": 1,"
-                                                        + "\"authorName\": \"Douglas Adams\""
-                                                        + "}"
-                                                        + "],"
-                                                        + "\"storehouses\": ["
-                                                        + "{"
-                                                        + "\"storehouseId\": 1,"
-                                                        + "\"storehouseCode\": \"321\""
-                                                        + "},"
-                                                        + "{"
-                                                        + "\"storehouseId\": 2,"
-                                                        + "\"storehouseCode\": \"123\""
-                                                        + "}"
-                                                        + "]"
-                                                        + "}")
-                        })),
-                        @ApiResponse(responseCode = "400", description = "bad request, you may have filled something wrong"),
+                        @ApiResponse(responseCode = "200", ref = "ok"),
+                        @ApiResponse(responseCode = "400", ref = "badRequest"),
                         @ApiResponse(responseCode = "403", ref = "permissionDenied"),
-                        @ApiResponse(responseCode = "404", description = "book not found in database")
+                        @ApiResponse(responseCode = "404", ref = "ResourceNotFound")
         })
         @GetMapping("/{id}")
         public ResponseEntity<Object> searchById(@PathVariable Long id) {
@@ -105,38 +74,10 @@ public class BookController {
         }
 
         @Operation(summary = "returns a book by title", description = "returns book by the specified title", responses = {
-                        @ApiResponse(responseCode = "500", ref = "InternalServerError"),
-                        @ApiResponse(responseCode = "200", description = "Successful request", content = @Content(mediaType = "application/json", examples = {
-                                        @ExampleObject(value = "{"
-                                                        + "\"id\": 123,"
-                                                        + "\"title\": \"The Hitchhiker's Guide to the Galaxy\","
-                                                        + "\"year\": 1979,"
-                                                        + "\"price\": 42.0,"
-                                                        + "\"PublishingCompany\": {"
-                                                        + "\"publishingCompanyId\": 1,"
-                                                        + "\"publishingCompanyName\": \"Megadodo Publications\""
-                                                        + "},"
-                                                        + "\"authors\": ["
-                                                        + "{"
-                                                        + "\"authorId\": 1,"
-                                                        + "\"authorName\": \"Douglas Adams\""
-                                                        + "}"
-                                                        + "],"
-                                                        + "\"storehouses\": ["
-                                                        + "{"
-                                                        + "\"storehouseId\": 1,"
-                                                        + "\"storehouseCode\": \"321\""
-                                                        + "},"
-                                                        + "{"
-                                                        + "\"storehouseId\": 2,"
-                                                        + "\"storehouseCode\": \"123\""
-                                                        + "}"
-                                                        + "]"
-                                                        + "}")
-                        })),
-                        @ApiResponse(responseCode = "400", description = "bad request, you may have filled something wrong"),
+                        @ApiResponse(responseCode = "200", ref = "ok"),
+                        @ApiResponse(responseCode = "400", ref = "badRequest"),
                         @ApiResponse(responseCode = "403", ref = "permissionDenied"),
-                        @ApiResponse(responseCode = "404", description = "book not found in database")
+                        @ApiResponse(responseCode = "404", ref = "ResourceNotFound")
         })
 
         @RequestMapping(value = "/search_by_title", method = RequestMethod.GET)
@@ -147,11 +88,9 @@ public class BookController {
         }
 
         @Operation(summary = "returns a list of books by author name", description = "returns a list of books by the specified author name", responses = {
-                        @ApiResponse(responseCode = "500", ref = "InternalServerError"),
-                        @ApiResponse(responseCode = "200", description = "Successful request"),
-                        @ApiResponse(responseCode = "400", description = "bad request, you may have filled something wrong"),
+                        @ApiResponse(responseCode = "200", ref = "ok"),
+                        @ApiResponse(responseCode = "400", ref = "badRequest"),
                         @ApiResponse(responseCode = "403", ref = "permissionDenied"),
-                        @ApiResponse(responseCode = "404", description = "book not found in database")
         })
 
         @RequestMapping(value = "/search_by_author_name", method = RequestMethod.GET)
@@ -166,39 +105,11 @@ public class BookController {
 
         @SecurityRequirement(name = "Authorization")
         @Operation(summary = "record a new book", description = "save a new book in database", responses = {
-                        @ApiResponse(responseCode = "500", ref = "InternalServerError"),
-                        @ApiResponse(responseCode = "200", description = "Book saved", content = @Content(mediaType = "application/json", examples = {
-                                        @ExampleObject(value = "{"
-                                                        + "\"id\": 123,"
-                                                        + "\"title\": \"The Hitchhiker's Guide to the Galaxy\","
-                                                        + "\"year\": 1979,"
-                                                        + "\"price\": 42.0,"
-                                                        + "\"PublishingCompany\": {"
-                                                        + "\"publishingCompanyId\": 1,"
-                                                        + "\"publishingCompanyName\": \"Megadodo Publications\""
-                                                        + "},"
-                                                        + "\"authors\": ["
-                                                        + "{"
-                                                        + "\"authorId\": 1,"
-                                                        + "\"authorName\": \"Douglas Adams\""
-                                                        + "}"
-                                                        + "],"
-                                                        + "\"storehouses\": ["
-                                                        + "{"
-                                                        + "\"storehouseId\": 1,"
-                                                        + "\"storehouseCode\": \"321\""
-                                                        + "},"
-                                                        + "{"
-                                                        + "\"storehouseId\": 2,"
-                                                        + "\"storehouseCode\": \"123\""
-                                                        + "}"
-                                                        + "]"
-                                                        + "}")
-                        })),
-                        @ApiResponse(responseCode = "400", description = "bad request, you may have filled something wrong"),
+                        @ApiResponse(responseCode = "200", ref = "ok"),
+                        @ApiResponse(responseCode = "400", ref = "badRequest"),
                         @ApiResponse(responseCode = "403", ref = "permissionDenied"),
-                        @ApiResponse(responseCode = "404", description = "book not found in database"),
-                        @ApiResponse(responseCode = "409", description = "book title is already in use by other book in database")
+                        @ApiResponse(responseCode = "404", ref = "ResourceNotFound"),
+                        @ApiResponse(responseCode = "409", ref = "conflict")
         })
 
         @CacheEvict(value = "BookList", allEntries = true)
@@ -218,11 +129,10 @@ public class BookController {
 
         @SecurityRequirement(name = "Authorization")
         @Operation(summary = "delete a book by id", description = "delete a book by the specified id from database", responses = {
-                        @ApiResponse(responseCode = "500", ref = "InternalServerError"),
                         @ApiResponse(responseCode = "200", ref = "ok"),
-                        @ApiResponse(responseCode = "400", description = "bad request, you may have filled something wrong"),
+                        @ApiResponse(responseCode = "400", ref = "badRequest"),
                         @ApiResponse(responseCode = "403", ref = "permissionDenied"),
-                        @ApiResponse(responseCode = "404", description = "book not found in database")
+                        @ApiResponse(responseCode = "404", ref = "ResourceNotFound")
         })
 
         @DeleteMapping("/{id}")
@@ -234,39 +144,11 @@ public class BookController {
 
         @SecurityRequirement(name = "Authorization")
         @Operation(summary = "updates a book", description = "updates data like title, author, year, etc", responses = {
-                        @ApiResponse(responseCode = "500", ref = "InternalServerError"),
-                        @ApiResponse(responseCode = "200", description = "Book updated", content = @Content(mediaType = "application/json", examples = {
-                                        @ExampleObject(value = "{"
-                                                        + "\"id\": 123,"
-                                                        + "\"title\": \"The Hitchhiker's Guide to the Galaxy\","
-                                                        + "\"year\": 1979,"
-                                                        + "\"price\": 42.0,"
-                                                        + "\"PublishingCompany\": {"
-                                                        + "\"publishingCompanyId\": 1,"
-                                                        + "\"publishingCompanyName\": \"Megadodo Publications\""
-                                                        + "},"
-                                                        + "\"authors\": ["
-                                                        + "{"
-                                                        + "\"authorId\": 1,"
-                                                        + "\"authorName\": \"Douglas Adams\""
-                                                        + "}"
-                                                        + "],"
-                                                        + "\"storehouses\": ["
-                                                        + "{"
-                                                        + "\"storehouseId\": 1,"
-                                                        + "\"storehouseCode\": \"321\""
-                                                        + "},"
-                                                        + "{"
-                                                        + "\"storehouseId\": 2,"
-                                                        + "\"storehouseCode\": \"123\""
-                                                        + "}"
-                                                        + "]"
-                                                        + "}")
-                        })),
-                        @ApiResponse(responseCode = "400", description = "bad request, you may have filled something wrong"),
+                        @ApiResponse(responseCode = "200", ref = "ok"),
+                        @ApiResponse(responseCode = "400", ref = "badRequest"),
                         @ApiResponse(responseCode = "403", ref = "permissionDenied"),
-                        @ApiResponse(responseCode = "404", description = "book not found in database"),
-                        @ApiResponse(responseCode = "409", description = "book title is already in use by other book in database")
+                        @ApiResponse(responseCode = "404", ref = "ResourceNotFound"),
+                        @ApiResponse(responseCode = "409", ref = "conflict")
         })
 
         @CacheEvict(value = "BookList", allEntries = true)

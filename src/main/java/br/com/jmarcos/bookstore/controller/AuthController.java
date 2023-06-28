@@ -26,24 +26,15 @@ import jakarta.validation.Valid;
 @RequestMapping("/auth")
 public class AuthController {
 
-    // para que esse atributo seja injetado corretamente, é necessario ter o metodo
-    // AuthenticationManager anotadocom @Bean na classe de configuração do spring
-    // security
     @Autowired
     private AuthenticationManager authenticationManager;
     @Autowired
     private TokenService tokenService;
 
     @Operation(summary = "Login in the system", description = "login to access more features", responses = {
-            @ApiResponse(responseCode = "500", ref = "InternalServerError"),
-            @ApiResponse(responseCode = "200", description = "Successful request", content = @Content(mediaType = "application/json", examples = {
-                    @ExampleObject(value = "{"
-                            + "\"token\": \"jkalq48yqlfdu2p823wdjwb\","
-                            + "\"type\": \"Bearer\""
-                            + "}")
-            })),
-            @ApiResponse(responseCode = "400", description = "bad request, you may have filled something wrong"),
-            @ApiResponse(responseCode = "401", description = "invalide user")
+            @ApiResponse(responseCode = "200", ref = "ok"),
+            @ApiResponse(responseCode = "400", ref = "badRequest"),
+            @ApiResponse(responseCode = "401", description = "invalid user")
     })
     @PostMapping
     public ResponseEntity<Object> Login(

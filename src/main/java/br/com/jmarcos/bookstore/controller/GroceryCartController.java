@@ -18,8 +18,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 
@@ -48,7 +46,6 @@ public class GroceryCartController {
 
         @SecurityRequirement(name = "Authorization")
         @Operation(summary = "Returns a list of Grocery carts", description = "Returns a list of all of your Grocery Carts  in database", responses = {
-                        @ApiResponse(responseCode = "500", ref = "InternalServerError"),
                         @ApiResponse(responseCode = "200", ref = "ok"),
                         @ApiResponse(responseCode = "403", ref = "permissionDenied")
 
@@ -73,30 +70,10 @@ public class GroceryCartController {
 
         @SecurityRequirement(name = "Authorization")
         @Operation(summary = "returns a grocery cart by id", description = "returns grocery cart by the specified id", responses = {
-                        @ApiResponse(responseCode = "500", ref = "InternalServerError"),
-                        @ApiResponse(responseCode = "200", description = "Successful request", content = @Content(mediaType = "application/json", examples = {
-                                        @ExampleObject(value = "{"
-                                                        + "\"id\": 123,"
-                                                        + "\"person_id\": 456,"
-                                                        + "\"books\": ["
-                                                        + "{"
-                                                        + "\"bookId\": 1,"
-                                                        + "\"bookTitle\": \"The Hitchhiker's Guide to the Galaxy\","
-                                                        + "\"quantity\": 2,"
-                                                        + "\"bookPrice\": 42.0"
-                                                        + "},"
-                                                        + "{"
-                                                        + "\"bookId\": 2,"
-                                                        + "\"bookTitle\": \"1984\","
-                                                        + "\"quantity\": 2,"
-                                                        + "\"bookPrice\": 12.99"
-                                                        + "}"
-                                                        + "]"
-                                                        + "}")
-                        })),
-                        @ApiResponse(responseCode = "400", description = "bad request, you may have filled something wrong"),
+                        @ApiResponse(responseCode = "200", ref = "ok"),
+                        @ApiResponse(responseCode = "400", ref = "badRequest"),
                         @ApiResponse(responseCode = "403", ref = "permissionDenied"),
-                        @ApiResponse(responseCode = "404", description = "grocery cart not found in database")
+                        @ApiResponse(responseCode = "404", ref = "ResourceNotFound")
         })
 
         @GetMapping("/{id}")
@@ -111,11 +88,10 @@ public class GroceryCartController {
 
         @SecurityRequirement(name = "Authorization")
         @Operation(summary = "delete a grocery cart by id", description = "delete a grocery cart by the specified id from database", responses = {
-                        @ApiResponse(responseCode = "500", ref = "InternalServerError"),
-                        @ApiResponse(responseCode = "200", description = "grocery cart deleted"),
-                        @ApiResponse(responseCode = "400", description = "bad request, you may have filled something wrong"),
+                        @ApiResponse(responseCode = "200", ref = "ok"),
+                        @ApiResponse(responseCode = "400", ref = "badRequest"),
                         @ApiResponse(responseCode = "403", ref = "permissionDenied"),
-                        @ApiResponse(responseCode = "404", description = "grocery cart not found in database")
+                        @ApiResponse(responseCode = "404", ref = "ResourceNotFound")
         })
 
         @DeleteMapping("/{id}")
@@ -128,30 +104,10 @@ public class GroceryCartController {
 
         @SecurityRequirement(name = "Authorization")
         @Operation(summary = "create a new grocery cart", description = "add a new grocery cart in database", responses = {
-                        @ApiResponse(responseCode = "500", ref = "InternalServerError"),
-                        @ApiResponse(responseCode = "200", description = "grocery cart saved", content = @Content(mediaType = "application/json", examples = {
-                                        @ExampleObject(value = "{"
-                                                        + "\"id\": 123,"
-                                                        + "\"person_id\": 456,"
-                                                        + "\"books\": ["
-                                                        + "{"
-                                                        + "\"bookId\": 1,"
-                                                        + "\"bookTitle\": \"The Hitchhiker's Guide to the Galaxy\","
-                                                        + "\"quantity\": 2,"
-                                                        + "\"bookPrice\": 42.0"
-                                                        + "},"
-                                                        + "{"
-                                                        + "\"bookId\": 2,"
-                                                        + "\"bookTitle\": \"1984\","
-                                                        + "\"quantity\": 2,"
-                                                        + "\"bookPrice\": 12.99"
-                                                        + "}"
-                                                        + "]"
-                                                        + "}")
-                        })),
-                        @ApiResponse(responseCode = "400", description = "bad request, you may have filled a non-existent book id or The number of quantities don't match the number of book ids."),
+                        @ApiResponse(responseCode = "200", ref = "ok"),
+                        @ApiResponse(responseCode = "400", ref = "badRequest"),
                         @ApiResponse(responseCode = "403", ref = "permissionDenied"),
-                        @ApiResponse(responseCode = "404", description = "grocery cart not found in database")
+                        @ApiResponse(responseCode = "404", ref = "ResourceNotFound")
         })
 
         @PostMapping
@@ -180,30 +136,10 @@ public class GroceryCartController {
 
         @SecurityRequirement(name = "Authorization")
         @Operation(summary = "add a new book on your grocery cart", description = "add a new book on your grocery cart", responses = {
-                        @ApiResponse(responseCode = "500", ref = "InternalServerError"),
-                        @ApiResponse(responseCode = "200", description = "book added", content = @Content(mediaType = "application/json", examples = {
-                                        @ExampleObject(value = "{"
-                                                        + "\"id\": 123,"
-                                                        + "\"person_id\": 456,"
-                                                        + "\"books\": ["
-                                                        + "{"
-                                                        + "\"bookId\": 1,"
-                                                        + "\"bookTitle\": \"The Hitchhiker's Guide to the Galaxy\","
-                                                        + "\"quantity\": 2,"
-                                                        + "\"bookPrice\": 42.0"
-                                                        + "},"
-                                                        + "{"
-                                                        + "\"bookId\": 2,"
-                                                        + "\"bookTitle\": \"1984\","
-                                                        + "\"quantity\": 2,"
-                                                        + "\"bookPrice\": 12.99"
-                                                        + "}"
-                                                        + "]"
-                                                        + "}")
-                        })),
-                        @ApiResponse(responseCode = "400", description = "bad request, you may have filled a non-existent book id "),
+                        @ApiResponse(responseCode = "200", ref = "ok"),
+                        @ApiResponse(responseCode = "400", ref = "badRequest"),
                         @ApiResponse(responseCode = "403", ref = "permissionDenied"),
-                        @ApiResponse(responseCode = "404", description = "grocery cart not found in database")
+                        @ApiResponse(responseCode = "404", ref = "ResourceNotFound")
         })
 
         @PostMapping("/{id}/books")
@@ -222,11 +158,10 @@ public class GroceryCartController {
 
         @SecurityRequirement(name = "Authorization")
         @Operation(summary = "delete a book by book id", description = "delete a book of your grocery cart by book id", responses = {
-                        @ApiResponse(responseCode = "500", ref = "InternalServerError"),
-                        @ApiResponse(responseCode = "200", description = "book deleted"),
-                        @ApiResponse(responseCode = "400", description = "bad request, you may have filled a non-existent book id "),
+                        @ApiResponse(responseCode = "200", ref = "ok"),
+                        @ApiResponse(responseCode = "400", ref = "badRequest"),
                         @ApiResponse(responseCode = "403", ref = "permissionDenied"),
-                        @ApiResponse(responseCode = "404", description = "grocery cart not found in database")
+                        @ApiResponse(responseCode = "404", ref = "ResourceNotFound")
         })
         @DeleteMapping("/{id}/books/{bookId}")
         public ResponseEntity<Object> deleteBook(@PathVariable Long id, @PathVariable Long bookId,
@@ -242,30 +177,10 @@ public class GroceryCartController {
 
         @SecurityRequirement(name = "Authorization")
         @Operation(summary = "update a book by id", description = "update data like book quantity on your grocery cart", responses = {
-                        @ApiResponse(responseCode = "500", ref = "InternalServerError"),
-                        @ApiResponse(responseCode = "200", description = "book updated", content = @Content(mediaType = "application/json", examples = {
-                                        @ExampleObject(value = "{"
-                                                        + "\"id\": 123,"
-                                                        + "\"person_id\": 456,"
-                                                        + "\"books\": ["
-                                                        + "{"
-                                                        + "\"bookId\": 1,"
-                                                        + "\"bookTitle\": \"The Hitchhiker's Guide to the Galaxy\","
-                                                        + "\"quantity\": 2,"
-                                                        + "\"bookPrice\": 42.0"
-                                                        + "},"
-                                                        + "{"
-                                                        + "\"bookId\": 2,"
-                                                        + "\"bookTitle\": \"1984\","
-                                                        + "\"quantity\": 2,"
-                                                        + "\"bookPrice\": 12.99"
-                                                        + "}"
-                                                        + "]"
-                                                        + "}")
-                        })),
-                        @ApiResponse(responseCode = "400", description = "bad request, you may have filled a non-existent book id "),
+                        @ApiResponse(responseCode = "200", ref = "ok"),
+                        @ApiResponse(responseCode = "400", ref = "badRequest"),
                         @ApiResponse(responseCode = "403", ref = "permissionDenied"),
-                        @ApiResponse(responseCode = "404", description = "grocery cart not found in database")
+                        @ApiResponse(responseCode = "404", ref = "ResourceNotFound")
         })
         @PutMapping("/{id}/books")
         public ResponseEntity<Object> updateBook(@PathVariable Long id,

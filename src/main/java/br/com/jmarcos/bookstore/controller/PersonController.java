@@ -29,8 +29,6 @@ import br.com.jmarcos.bookstore.controller.dto.person.PersonUpdateDTO;
 import br.com.jmarcos.bookstore.model.Person;
 import br.com.jmarcos.bookstore.service.PersonService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
@@ -45,33 +43,11 @@ public class PersonController {
                 this.personService = personService;
         }
 
-        // REGISTER A PERSON //
-
         @Operation(summary = "record a new  profile", description = "save a new profile in database. With a profile, you can buy books", responses = {
-                        @ApiResponse(responseCode = "201", description = "congratulations, now you have a new profile in our bookstore system", content = @Content(mediaType = "application/json", examples = {
-                                        @ExampleObject(value = "{"
-                                                        + "\"id\": 123,"
-                                                        + "\"name\": \"John Doe\","
-                                                        + "\"email\": \"johndoe@example.com\","
-                                                        + "\"address\": {"
-                                                        + "\"id\": \"123\","
-                                                        + "\"street\": \"123 Main St\","
-                                                        + "\"number\": \"123\","
-                                                        + "\"city\": \"Anytown\","
-                                                        + "\"state\": \"CA\","
-                                                        + "\"zip\": \"00000-000\""
-                                                        + "},"
-                                                        + "\"phone\": \"12 34567-8910\""
-                                                        + "}")
-                        })),
-
-                        @ApiResponse(responseCode = "400", description = "bad request, you may have filled something wrong"),
-
-                        @ApiResponse(responseCode = "403", description = "Permission denied to access this resource"),
-
-                        @ApiResponse(responseCode = "409", description = "this emails already exists in the database"),
-
-                        @ApiResponse(responseCode = "500", description = "Internal Server Error")
+                        @ApiResponse(responseCode = "201", description = "created"),
+                        @ApiResponse(responseCode = "400", ref = "badRequest"),
+                        @ApiResponse(responseCode = "403", ref = "permissionDenied"),
+                        @ApiResponse(responseCode = "409", ref = "conflict"),
         })
 
         @PostMapping
@@ -84,30 +60,13 @@ public class PersonController {
                 return ResponseEntity.created(uri).body(new PersonResponseDTO(person));
         }
 
-        // USER TOOLS //
 
         @SecurityRequirement(name = "Authorization")
         @Operation(summary = "update your profile data", description = "update data like email, name ", responses = {
-                        @ApiResponse(responseCode = "500", ref = "InternalServerError"),
-                        @ApiResponse(responseCode = "200", description = "profile updated", content = @Content(mediaType = "application/json", examples = {
-                                        @ExampleObject(value = "{"
-                                                        + "\"id\": 123,"
-                                                        + "\"name\": \"John Doe\","
-                                                        + "\"email\": \"johndoe@example.com\","
-                                                        + "\"address\": {"
-                                                        + "\"id\": \"123\","
-                                                        + "\"street\": \"123 Main St\","
-                                                        + "\"number\": \"123\","
-                                                        + "\"city\": \"Anytown\","
-                                                        + "\"state\": \"CA\","
-                                                        + "\"zip\": \"12345\""
-                                                        + "},"
-                                                        + "\"phone\": \"555-555-1234\""
-                                                        + "}")
-                        })),
-                        @ApiResponse(responseCode = "400", description = "bad request, you may have filled something wrong"),
+                        @ApiResponse(responseCode = "200", ref = "ok"),
+                        @ApiResponse(responseCode = "400", ref = "badRequest"),
                         @ApiResponse(responseCode = "403", ref = "permissionDenied"),
-                        @ApiResponse(responseCode = "409", description = "this emails already exists in the database") })
+                        @ApiResponse(responseCode = "409", ref = "conflict") })
 
         @PutMapping("/profile")
         public ResponseEntity<Object> updateProfile(@RequestBody PersonUpdateDTO personUpdateDTO,
@@ -121,7 +80,6 @@ public class PersonController {
 
         @SecurityRequirement(name = "Authorization")
         @Operation(summary = "delete your profile", description = "delete all your profile data", responses = {
-                        @ApiResponse(responseCode = "500", ref = "InternalServerError"),
                         @ApiResponse(responseCode = "200", ref = "ok"),
                         @ApiResponse(responseCode = "400", ref = "badRequest"),
                         @ApiResponse(responseCode = "403", ref = "permissionDenied"),
@@ -137,26 +95,10 @@ public class PersonController {
 
         @SecurityRequirement(name = "Authorization")
         @Operation(summary = "get your profile data", description = "show your profile data", responses = {
-                        @ApiResponse(responseCode = "500", ref = "InternalServerError"),
-                        @ApiResponse(responseCode = "200", ref = "ok", content = @Content(mediaType = "application/json", examples = {
-                                        @ExampleObject(value = "{"
-                                                        + "\"id\": 123,"
-                                                        + "\"name\": \"John Doe\","
-                                                        + "\"email\": \"johndoe@example.com\","
-                                                        + "\"address\": {"
-                                                        + "\"id\": \"123\","
-                                                        + "\"street\": \"123 Main St\","
-                                                        + "\"number\": \"123\","
-                                                        + "\"city\": \"Anytown\","
-                                                        + "\"state\": \"CA\","
-                                                        + "\"zip\": \"12345\""
-                                                        + "},"
-                                                        + "\"phone\": \"555-555-1234\""
-                                                        + "}")
-                        })),
+                        @ApiResponse(responseCode = "200", ref = "ok"),
                         @ApiResponse(responseCode = "400", ref = "badRequest"),
                         @ApiResponse(responseCode = "403", ref = "permissionDenied"),
-                        @ApiResponse(responseCode = "409", description = "this emails already exists in the database") })
+                        @ApiResponse(responseCode = "409", ref = "conflict") })
 
         @GetMapping("/profile")
         public ResponseEntity<PersonResponseDTO> getProfileData(@AuthenticationPrincipal Person person) {
@@ -164,11 +106,9 @@ public class PersonController {
                 return ResponseEntity.ok(new PersonResponseDTO(user));
         }
 
-        // ADMIN TOOLS //
 
         @SecurityRequirement(name = "Authorization")
-        @Operation(summary = "list all profiles in database", description = "get a list of all pessoal data in database", responses = {
-                        @ApiResponse(responseCode = "500", ref = "InternalServerError"),
+        @Operation(summary = "list all profiles in database", description = "returns a list of all pessoal data in database", responses = {
                         @ApiResponse(responseCode = "200", ref = "ok"),
                         @ApiResponse(responseCode = "403", ref = "permissionDenied")
         })
@@ -183,26 +123,10 @@ public class PersonController {
 
         @SecurityRequirement(name = "Authorization")
         @Operation(summary = "Returns a profile by id", description = "Returns a profile with the  specified id", responses = {
-                        @ApiResponse(responseCode = "500", ref = "InternalServerError"),
-                        @ApiResponse(responseCode = "200", ref = "ok", content = @Content(mediaType = "application/json", examples = {
-                                        @ExampleObject(value = "{"
-                                                        + "\"id\": 123,"
-                                                        + "\"name\": \"John Doe\","
-                                                        + "\"email\": \"johndoe@example.com\","
-                                                        + "\"address\": {"
-                                                        + "\"id\": \"123\","
-                                                        + "\"street\": \"123 Main St\","
-                                                        + "\"number\": \"123\","
-                                                        + "\"city\": \"Anytown\","
-                                                        + "\"state\": \"CA\","
-                                                        + "\"zip\": \"12345\""
-                                                        + "},"
-                                                        + "\"phone\": \"555-555-1234\""
-                                                        + "}")
-                        })),
-                        @ApiResponse(responseCode = "400", description = "bad request, you may have filled something wrong"),
+                        @ApiResponse(responseCode = "200", ref = "ok"),
+                        @ApiResponse(responseCode = "400", ref = "badRequest"),
                         @ApiResponse(responseCode = "403", ref = "permissionDenied"),
-                        @ApiResponse(responseCode = "404", description = "profile not found in database")
+                        @ApiResponse(responseCode = "404", ref = "ResourceNotFound")
         })
         @GetMapping("/{id}")
         public ResponseEntity<Object> searchById(@PathVariable Long id) {
@@ -214,26 +138,10 @@ public class PersonController {
 
         @SecurityRequirement(name = "Authorization")
         @Operation(summary = "Returns a profile by email", description = "Returns a profile with the specified email", responses = {
-                        @ApiResponse(responseCode = "500", ref = "InternalServerError"),
-                        @ApiResponse(responseCode = "200", ref = "ok", content = @Content(mediaType = "application/json", examples = {
-                                        @ExampleObject(value = "{"
-                                                        + "\"id\": 123,"
-                                                        + "\"name\": \"John Doe\","
-                                                        + "\"email\": \"johndoe@example.com\","
-                                                        + "\"address\": {"
-                                                        + "\"id\": \"123\","
-                                                        + "\"street\": \"123 Main St\","
-                                                        + "\"number\": \"123\","
-                                                        + "\"city\": \"Anytown\","
-                                                        + "\"state\": \"CA\","
-                                                        + "\"zip\": \"12345\""
-                                                        + "},"
-                                                        + "\"phone\": \"555-555-1234\""
-                                                        + "}")
-                        })),
-                        @ApiResponse(responseCode = "400", description = "bad request, you may have filled something wrong"),
+                        @ApiResponse(responseCode = "200", ref = "ok"),
+                        @ApiResponse(responseCode = "400", ref = "badRequest"),
                         @ApiResponse(responseCode = "403", ref = "permissionDenied"),
-                        @ApiResponse(responseCode = "404", description = "profile not found in database")
+                        @ApiResponse(responseCode = "404", ref = "ResourceNotFound")
         })
 
         @RequestMapping(value = "/search_by_email", method = RequestMethod.GET)
@@ -246,11 +154,10 @@ public class PersonController {
 
         @SecurityRequirement(name = "Authorization")
         @Operation(summary = "delete a profile by id", description = "delete any profile by the specified id", responses = {
-                        @ApiResponse(responseCode = "500", ref = "InternalServerError"),
                         @ApiResponse(responseCode = "200", ref = "ok"),
                         @ApiResponse(responseCode = "400", ref = "badRequest"),
                         @ApiResponse(responseCode = "403", ref = "permissionDenied"),
-                        @ApiResponse(responseCode = "404", description = "profile not found in database")
+                        @ApiResponse(responseCode = "404", ref = "ResourceNotFound")
         })
 
         @DeleteMapping("/{id}")
@@ -262,11 +169,10 @@ public class PersonController {
 
         @SecurityRequirement(name = "Authorization")
         @Operation(summary = "set profile permission", description = "add a permission to a profile", responses = {
-                        @ApiResponse(responseCode = "500", ref = "InternalServerError"),
                         @ApiResponse(responseCode = "200", ref = "ok"),
                         @ApiResponse(responseCode = "400", ref = "badRequest"),
                         @ApiResponse(responseCode = "403", ref = "permissionDenied"),
-                        @ApiResponse(responseCode = "404", description = "profile not found in database")
+                        @ApiResponse(responseCode = "404", ref = "ResourceNotFound")
         })
 
         @PatchMapping("/{personId}")

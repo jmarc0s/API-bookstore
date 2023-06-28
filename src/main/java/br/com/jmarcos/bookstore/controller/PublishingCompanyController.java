@@ -22,8 +22,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import br.com.jmarcos.bookstore.controller.dto.publishinCompany.PublishingCompanyRequestDTO;
@@ -45,7 +43,6 @@ public class PublishingCompanyController {
 
         @SecurityRequirement(name = "Authorization")
         @Operation(summary = "Returns a list of Publishing Companies", description = "Returns a list of all Publishing Company in database", responses = {
-                        @ApiResponse(responseCode = "500", ref = "InternalServerError"),
                         @ApiResponse(responseCode = "200", ref = "ok"),
                         @ApiResponse(responseCode = "403", ref = "permissionDenied"),
 
@@ -61,26 +58,10 @@ public class PublishingCompanyController {
 
         @SecurityRequirement(name = "Authorization")
         @Operation(summary = "record a new publishing Company", description = "save a new Publishing Company in database", responses = {
-                        @ApiResponse(responseCode = "500", ref = "InternalServerError"),
-                        @ApiResponse(responseCode = "200", description = "Publishing Company saved", content = @Content(mediaType = "application/json", examples = {
-                                        @ExampleObject(value = "{"
-                                                        + "\"id\": 123,"
-                                                        + "\"name\": \"publishingCompany\","
-                                                        + "\"url\": \"publishingCompanyUrl.com\","
-                                                        + "\"address\": {"
-                                                        + "\"id\": \"123\","
-                                                        + "\"street\": \"123 Main St\","
-                                                        + "\"number\": \"123\","
-                                                        + "\"city\": \"Anytown\","
-                                                        + "\"state\": \"CA\","
-                                                        + "\"zip\": \"12345\""
-                                                        + "},"
-                                                        + "\"phone\": \"555-555-1234\""
-                                                        + "}")
-                        })),
-                        @ApiResponse(responseCode = "400", description = "bad request, you may have filled something wrong"),
+                        @ApiResponse(responseCode = "200", ref = "ok"),
+                        @ApiResponse(responseCode = "400", ref = "badRequest"),
                         @ApiResponse(responseCode = "403", ref = "permissionDenied"),
-                        @ApiResponse(responseCode = "409", description = "this name is already in use by other Publishing Company")
+                        @ApiResponse(responseCode = "409", ref = "conflict")
         })
 
         @CacheEvict(value = "PublishingCompanyList", allEntries = true)
@@ -97,26 +78,10 @@ public class PublishingCompanyController {
 
         @SecurityRequirement(name = "Authorization")
         @Operation(summary = "Returns a publishing Company by id", description = "returns a publishing company by the specified id", responses = {
-                        @ApiResponse(responseCode = "500", ref = "InternalServerError"),
-                        @ApiResponse(responseCode = "200", description = "Successful Request", content = @Content(mediaType = "application/json", examples = {
-                                        @ExampleObject(value = "{"
-                                                        + "\"id\": 123,"
-                                                        + "\"name\": \"publishingCompany\","
-                                                        + "\"url\": \"publishingCompanyUrl.com\","
-                                                        + "\"address\": {"
-                                                        + "\"id\": \"123\","
-                                                        + "\"street\": \"123 Main St\","
-                                                        + "\"number\": \"123\","
-                                                        + "\"city\": \"Anytown\","
-                                                        + "\"state\": \"CA\","
-                                                        + "\"zip\": \"12345\""
-                                                        + "},"
-                                                        + "\"phone\": \"555-555-1234\""
-                                                        + "}")
-                        })),
-                        @ApiResponse(responseCode = "400", description = "bad request, you may have filled something wrong"),
+                        @ApiResponse(responseCode = "200", ref = "ok"),
+                        @ApiResponse(responseCode = "400", ref = "badRequest"),
                         @ApiResponse(responseCode = "403", ref = "permissionDenied"),
-                        @ApiResponse(responseCode = "404", description = "publishing company not found in database")
+                        @ApiResponse(responseCode = "404", ref = "ResourceNotFound")
 
         })
 
@@ -129,26 +94,10 @@ public class PublishingCompanyController {
 
         @SecurityRequirement(name = "Authorization")
         @Operation(summary = "Returns a publishing Company by name", description = "returns a publishing company by the specified name", responses = {
-                        @ApiResponse(responseCode = "500", ref = "InternalServerError"),
-                        @ApiResponse(responseCode = "200", description = "Successful Request", content = @Content(mediaType = "application/json", examples = {
-                                        @ExampleObject(value = "{"
-                                                        + "\"id\": 123,"
-                                                        + "\"name\": \"publishingCompany\","
-                                                        + "\"url\": \"publishingCompanyUrl.com\","
-                                                        + "\"address\": {"
-                                                        + "\"id\": \"123\","
-                                                        + "\"street\": \"123 Main St\","
-                                                        + "\"number\": \"123\","
-                                                        + "\"city\": \"Anytown\","
-                                                        + "\"state\": \"CA\","
-                                                        + "\"zip\": \"12345\""
-                                                        + "},"
-                                                        + "\"phone\": \"555-555-1234\""
-                                                        + "}")
-                        })),
-                        @ApiResponse(responseCode = "400", description = "bad request, you may have filled something wrong"),
+                        @ApiResponse(responseCode = "200", ref = "ok"),
+                        @ApiResponse(responseCode = "400", ref = "badRequest"),
                         @ApiResponse(responseCode = "403", ref = "permissionDenied"),
-                        @ApiResponse(responseCode = "404", description = "publishing company not found in database")
+                        @ApiResponse(responseCode = "404", ref = "ResourceNotFound")
 
         })
 
@@ -162,11 +111,10 @@ public class PublishingCompanyController {
 
         @SecurityRequirement(name = "Authorization")
         @Operation(summary = "delete a publishing Company by id", description = "delete a publishing company by the specified id from database", responses = {
-                        @ApiResponse(responseCode = "500", ref = "InternalServerError"),
                         @ApiResponse(responseCode = "200", ref = "ok"),
-                        @ApiResponse(responseCode = "400", description = "bad request, you may have filled something wrong"),
+                        @ApiResponse(responseCode = "400", ref = "badRequest"),
                         @ApiResponse(responseCode = "403", ref = "permissionDenied"),
-                        @ApiResponse(responseCode = "404", description = "publishing company not found in database")
+                        @ApiResponse(responseCode = "404", ref = "ResourceNotFound")
 
         })
 
@@ -180,27 +128,11 @@ public class PublishingCompanyController {
 
         @SecurityRequirement(name = "Authorization")
         @Operation(summary = "updates a publishing", description = "update data like, name, url, address etc", responses = {
-                        @ApiResponse(responseCode = "500", ref = "InternalServerError"),
-                        @ApiResponse(responseCode = "200", description = "publishing company updated", content = @Content(mediaType = "application/json", examples = {
-                                        @ExampleObject(value = "{"
-                                                        + "\"id\": 123,"
-                                                        + "\"name\": \"publishingCompany\","
-                                                        + "\"url\": \"publishingCompanyUrl.com\","
-                                                        + "\"address\": {"
-                                                        + "\"id\": \"123\","
-                                                        + "\"street\": \"123 Main St\","
-                                                        + "\"number\": \"123\","
-                                                        + "\"city\": \"Anytown\","
-                                                        + "\"state\": \"CA\","
-                                                        + "\"zip\": \"12345\""
-                                                        + "},"
-                                                        + "\"phone\": \"555-555-1234\""
-                                                        + "}")
-                        })),
-                        @ApiResponse(responseCode = "400", description = "bad request, you may have filled something wrong"),
+                        @ApiResponse(responseCode = "200", ref = "ok"),
+                        @ApiResponse(responseCode = "400", ref = "badRequest"),
                         @ApiResponse(responseCode = "403", ref = "permissionDenied"),
-                        @ApiResponse(responseCode = "404", description = "publishing company not found in database"),
-                        @ApiResponse(responseCode = "409", description = "this url already exists in the database")
+                        @ApiResponse(responseCode = "404", ref = "ResourceNotFound"),
+                        @ApiResponse(responseCode = "409", ref = "conflict")
 
         })
 

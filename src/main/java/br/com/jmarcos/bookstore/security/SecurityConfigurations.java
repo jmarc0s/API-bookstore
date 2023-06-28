@@ -69,17 +69,12 @@ public class SecurityConfigurations {
         return http.build();
     }
 
-    // classe necessaria para a injeção do atributo AuthenticationManager no
-    // AuthService
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
-        return configuration.getAuthenticationManager(); // chama o autenticacao service pois ela consegue identificar
-                                                         // quem implements UserDetailsService
+        return configuration.getAuthenticationManager();
 
     }
 
-    // esse metodo é necessario para que o spring descriptografe a senha que está no
-    // banco de dados
     @Bean
     public BCryptPasswordEncoder bCryptPasswordEncoder() {
         return new BCryptPasswordEncoder();

@@ -1,8 +1,6 @@
 package br.com.jmarcos.bookstore.controller;
 
 import java.net.URI;
-import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
@@ -24,8 +22,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import br.com.jmarcos.bookstore.controller.dto.storehouse.StorehouseRequestDTO;
@@ -48,25 +44,10 @@ public class StorehouseController {
 
         @SecurityRequirement(name = "Authorization")
         @Operation(summary = "record a new Storehouse", description = "save a storehouse in database", responses = {
-                        @ApiResponse(responseCode = "500", ref = "InternalServerError"),
-                        @ApiResponse(responseCode = "200", description = "storehouse saved", content = @Content(mediaType = "application/json", examples = {
-                                        @ExampleObject(value = "{"
-                                                        + "\"id\": 123,"
-                                                        + "\"code\": \"1234\","
-                                                        + "\"address\": {"
-                                                        + "\"id\": \"123\","
-                                                        + "\"street\": \"123 Main St\","
-                                                        + "\"number\": \"123\","
-                                                        + "\"city\": \"Anytown\","
-                                                        + "\"state\": \"CA\","
-                                                        + "\"zip\": \"12345\""
-                                                        + "},"
-                                                        + "\"phone\": \"555-555-1234\""
-                                                        + "}")
-                        })),
-                        @ApiResponse(responseCode = "400", description = "bad request, you may have filled something wrong"),
+                        @ApiResponse(responseCode = "200", ref = "ok"),
+                        @ApiResponse(responseCode = "400", ref = "badRequest"),
                         @ApiResponse(responseCode = "403", ref = "permissionDenied"),
-                        @ApiResponse(responseCode = "409", description = "this code is already in use by other Storehouse in database")
+                        @ApiResponse(responseCode = "409", ref = "conflict")
         })
 
         @CacheEvict(value = "StorehouseList", allEntries = true)
@@ -81,7 +62,6 @@ public class StorehouseController {
 
         @SecurityRequirement(name = "Authorization")
         @Operation(summary = "Returns a list of Storehouses", description = "Returns a list of all storehouses in database", responses = {
-                        @ApiResponse(responseCode = "500", ref = "InternalServerError"),
                         @ApiResponse(responseCode = "200", ref = "ok"),
                         @ApiResponse(responseCode = "403", ref = "permissionDenied"),
 
@@ -97,25 +77,10 @@ public class StorehouseController {
 
         @SecurityRequirement(name = "Authorization")
         @Operation(summary = "Returns a Storehouse by id", description = "returns a storehouse by the specified id", responses = {
-                        @ApiResponse(responseCode = "500", ref = "InternalServerError"),
-                        @ApiResponse(responseCode = "200", description = "Successful Request", content = @Content(mediaType = "application/json", examples = {
-                                        @ExampleObject(value = "{"
-                                                        + "\"id\": 123,"
-                                                        + "\"code\": \"1234\","
-                                                        + "\"address\": {"
-                                                        + "\"id\": \"123\","
-                                                        + "\"street\": \"123 Main St\","
-                                                        + "\"number\": \"123\","
-                                                        + "\"city\": \"Anytown\","
-                                                        + "\"state\": \"CA\","
-                                                        + "\"zip\": \"12345\""
-                                                        + "},"
-                                                        + "\"phone\": \"555-555-1234\""
-                                                        + "}")
-                        })),
-                        @ApiResponse(responseCode = "400", description = "bad request, you may have filled something wrong"),
+                        @ApiResponse(responseCode = "200", ref = "ok"),
+                        @ApiResponse(responseCode = "400", ref = "badRequest"),
                         @ApiResponse(responseCode = "403", ref = "permissionDenied"),
-                        @ApiResponse(responseCode = "404", description = "storehouse not found in database")
+                        @ApiResponse(responseCode = "404", ref = "ResourceNotFound")
         })
 
         @GetMapping("/{id}")
@@ -126,11 +91,10 @@ public class StorehouseController {
 
         @SecurityRequirement(name = "Authorization")
         @Operation(summary = "delete a storehouse by id", description = "delete a storehouse by the specified id from database", responses = {
-                        @ApiResponse(responseCode = "500", ref = "InternalServerError"),
                         @ApiResponse(responseCode = "200", ref = "ok"),
-                        @ApiResponse(responseCode = "400", description = "bad request, you may have filled something wrong"),
+                        @ApiResponse(responseCode = "400", ref = "badRequest"),
                         @ApiResponse(responseCode = "403", ref = "permissionDenied"),
-                        @ApiResponse(responseCode = "404", description = "storehouse not found in database")
+                        @ApiResponse(responseCode = "404", ref = "ResourceNotFound")
         })
 
         @DeleteMapping("/{id}")
@@ -142,25 +106,10 @@ public class StorehouseController {
 
         @SecurityRequirement(name = "Authorization")
         @Operation(summary = "updates a storehouse", description = "update data like code, address etc", responses = {
-                        @ApiResponse(responseCode = "500", ref = "InternalServerError"),
-                        @ApiResponse(responseCode = "200", description = "Successful Request", content = @Content(mediaType = "application/json", examples = {
-                                        @ExampleObject(value = "{"
-                                                        + "\"id\": 123,"
-                                                        + "\"code\": \"1234\","
-                                                        + "\"address\": {"
-                                                        + "\"id\": \"123\","
-                                                        + "\"street\": \"123 Main St\","
-                                                        + "\"number\": \"123\","
-                                                        + "\"city\": \"Anytown\","
-                                                        + "\"state\": \"CA\","
-                                                        + "\"zip\": \"12345\""
-                                                        + "},"
-                                                        + "\"phone\": \"555-555-1234\""
-                                                        + "}")
-                        })),
-                        @ApiResponse(responseCode = "400", description = "bad request, you may have filled something wrong"),
+                        @ApiResponse(responseCode = "200", ref = "ok"),
+                        @ApiResponse(responseCode = "400", ref = "badRequest"),
                         @ApiResponse(responseCode = "403", ref = "permissionDenied"),
-                        @ApiResponse(responseCode = "404", description = "storehouse not found in database")
+                        @ApiResponse(responseCode = "404", ref = "ResourceNotFound")
         })
 
         @CacheEvict(value = "StorehouseList", allEntries = true)
@@ -176,25 +125,10 @@ public class StorehouseController {
 
         @SecurityRequirement(name = "Authorization")
         @Operation(summary = "Returns a Storehouse by code", description = "returns a storehouse by the specified code", responses = {
-                        @ApiResponse(responseCode = "500", ref = "InternalServerError"),
-                        @ApiResponse(responseCode = "200", description = "Successful Request", content = @Content(mediaType = "application/json", examples = {
-                                        @ExampleObject(value = "{"
-                                                        + "\"id\": 123,"
-                                                        + "\"code\": \"1234\","
-                                                        + "\"address\": {"
-                                                        + "\"id\": \"123\","
-                                                        + "\"street\": \"123 Main St\","
-                                                        + "\"number\": \"123\","
-                                                        + "\"city\": \"Anytown\","
-                                                        + "\"state\": \"CA\","
-                                                        + "\"zip\": \"12345\""
-                                                        + "},"
-                                                        + "\"phone\": \"555-555-1234\""
-                                                        + "}")
-                        })),
-                        @ApiResponse(responseCode = "400", description = "bad request, you may have filled something wrong"),
+                        @ApiResponse(responseCode = "200", ref = "ok"),
+                        @ApiResponse(responseCode = "400", ref = "badRequest"),
                         @ApiResponse(responseCode = "403", ref = "permissionDenied"),
-                        @ApiResponse(responseCode = "404", description = "storehouse not found in database")
+                        @ApiResponse(responseCode = "404", ref = "ResourceNotFound")
         })
 
         @RequestMapping(value = "/search_by_code", method = RequestMethod.GET)
@@ -204,39 +138,4 @@ public class StorehouseController {
                 return ResponseEntity.ok(new StorehouseResponseDTO(storehouse));
         }
 
-        @SecurityRequirement(name = "Authorization")
-        @Operation(summary = "Returns a Storehouse by address", description = "returns a storehouse by the specified address", responses = {
-                        @ApiResponse(responseCode = "500", ref = "InternalServerError"),
-                        @ApiResponse(responseCode = "200", description = "Successful Request", content = @Content(mediaType = "application/json", examples = {
-                                        @ExampleObject(value = "{"
-                                                        + "\"id\": 123,"
-                                                        + "\"code\": \"1234\","
-                                                        + "\"address\": {"
-                                                        + "\"id\": \"123\","
-                                                        + "\"street\": \"123 Main St\","
-                                                        + "\"number\": \"123\","
-                                                        + "\"city\": \"Anytown\","
-                                                        + "\"state\": \"CA\","
-                                                        + "\"zip\": \"12345\""
-                                                        + "},"
-                                                        + "\"phone\": \"555-555-1234\""
-                                                        + "}")
-                        })),
-                        @ApiResponse(responseCode = "400", description = "bad request, you may have filled something wrong"),
-                        @ApiResponse(responseCode = "403", ref = "permissionDenied"),
-                        @ApiResponse(responseCode = "404", description = "storehouse not found in database")
-        })
-
-        @RequestMapping(value = "/search_by_address", method = RequestMethod.GET)
-        public List<StorehouseResponseDTO> searchByAddress(@RequestParam(required = false) String street,
-                        @RequestParam(required = false) Integer number,
-                        @RequestParam(required = false) String city,
-                        @RequestParam(required = false) String state,
-                        @RequestParam(required = false) String zipCode) {
-                return this.storehouseService
-                                .findStorehousesByAddress(street, number, city, state, zipCode)
-                                .stream()
-                                .map(StorehouseResponseDTO::new)
-                                .collect(Collectors.toList());
-        }
 }

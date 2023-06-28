@@ -13,7 +13,7 @@ import io.jsonwebtoken.SignatureAlgorithm;
 
 @Service
 public class TokenService {
-    @Value("${bookstore.jwt.expiration}") /* "1 dia" */
+    @Value("${bookstore.jwt.expiration}")
     private String expiration;
 
     @Value("${bookstore.jwt.secret}")
@@ -25,21 +25,16 @@ public class TokenService {
         Date deadline = new Date(today.getTime() + Long.parseLong(expiration));
         return Jwts.builder()
                 .setIssuer("bookstore API")
-                .setSubject(person.getId().toString()) // setando o usuario (dono do token). obs: é necessario converter
-                                                       // para string
-                .setIssuedAt(today) // setando a data de criação do token
-                .setExpiration(deadline) // setando a data de expiração do token
-                // configurando criptografia do token
-                .signWith(SignatureAlgorithm.HS256, secret) // o primeiro parametro informa qual o algoritimo de
-                                                            // criptografia e o segundo informa qual é a senha
-                .compact(); // compacta tudo
+                .setSubject(person.getId().toString())
+                .setIssuedAt(today)
+                .setExpiration(deadline)
+                .signWith(SignatureAlgorithm.HS256, secret)
+                .compact();
     }
 
     public boolean isAValidToken(String token) {
         try {
-            Jwts.parser().setSigningKey(this.secret).parseClaimsJws(token); // parseClaimsJws recupera o token e as
-                                                                            // informações dele, setSigningKey é a senha
-                                                                            // e parser descriptografa
+            Jwts.parser().setSigningKey(this.secret).parseClaimsJws(token); 
             return true;
         } catch (Exception e) {
             return false;
@@ -49,6 +44,6 @@ public class TokenService {
     public Long getPersonId(String token) {
         Claims claims = Jwts.parser().setSigningKey(this.secret).parseClaimsJws(token).getBody();
 
-        return Long.parseLong(claims.getSubject()); // retorna o id do usuario do token
+        return Long.parseLong(claims.getSubject());
     }
 }
