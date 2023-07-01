@@ -112,20 +112,19 @@ public class GroceryCartController {
 
         @PostMapping
         public ResponseEntity<Object> save(
-                        @RequestBody(required = false) @Valid GroceryCartRequestDTO groceryCartRequestDTO,
+                        @RequestBody @Valid GroceryCartRequestDTO groceryCartRequestDTO,
                         UriComponentsBuilder uriBuilder,
                         @AuthenticationPrincipal Person person) {
                 GroceryCart groceryCart;
 
-                if (groceryCartRequestDTO != null) {
-                        groceryCart = this.groceryCartService.save(groceryCartRequestDTO.toGroceryCart(person.getId()),
-                                        groceryCartRequestDTO.getBooks()
-                                        .stream()
-                                        .map(groceryCartBookDTO -> groceryCartBookDTO.toGroceryCart())
-                                        .collect(Collectors.toList()));
-                } else {
-                        groceryCart = this.groceryCartService.save(person.getId());
-                }
+                //VERIFICAR SE EXISTE UM PEDIDO ABERTO, se HOUVER PEDIDO ABERTO, APENAS ADICIONAR LIVROS A ELE
+
+                groceryCart = this.groceryCartService.save(groceryCartRequestDTO.toGroceryCart(person.getId()),
+                                groceryCartRequestDTO.getBooks()
+                                .stream()
+                                .map(groceryCartBookDTO -> groceryCartBookDTO.toGroceryCart())
+                                .collect(Collectors.toList()));
+                
 
                 List<GroceryCartBook> groceryCartBook = this.groceryCartService.listGroceryCartBook(groceryCart);
 
