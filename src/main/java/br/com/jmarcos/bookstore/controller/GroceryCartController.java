@@ -3,6 +3,7 @@ package br.com.jmarcos.bookstore.controller;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +25,6 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import br.com.jmarcos.bookstore.controller.dto.groceryCart.GroceryCartAddbookDTO;
 import br.com.jmarcos.bookstore.controller.dto.groceryCart.GroceryCartRequestDTO;
 import br.com.jmarcos.bookstore.controller.dto.groceryCart.GroceryCartResponseDTO;
 import br.com.jmarcos.bookstore.controller.dto.groceryCart.GroceryCartUpdatebookDTO;
@@ -116,39 +116,32 @@ public class GroceryCartController {
                         UriComponentsBuilder uriBuilder,
                         @AuthenticationPrincipal Person person) {
                 GroceryCart groceryCart;
+                // VERIFICAR SE EXISTE UM PEDIDO ABERTO, SE HOUVER PEDIDO ABERTO, APENAS
+                // ADICIONAR LIVROS A ELE
 
-                //VERIFICAR SE EXISTE UM PEDIDO ABERTO, se HOUVER PEDIDO ABERTO, APENAS ADICIONAR LIVROS A ELE
+                Optional<GroceryCart> OpenOrder = this.groceryCartService.findOpenOrder(person.getId());
 
-                groceryCart = this.groceryCartService.save(groceryCartRequestDTO.toGroceryCart(person.getId()),
-                                groceryCartRequestDTO.getBooks()
+                if (OpenOrder.isEmpty()) {
+
+                        groceryCart = this.groceryCartService.save(groceryCartRequestDTO.toGroceryCart(person.getId()),
+                                        groceryCartRequestDTO.getBooks()
+                                                        .stream()
+                                                        .map(groceryCartBookDTO -> groceryCartBookDTO.toGroceryCart())
+                                                        .collect(Collectors.toList()));
+
+                        List<GroceryCartBook> groceryCartBook = this.groceryCartService
+                                        .listGroceryCartBook(groceryCart);
+
+                        URI uri = uriBuilder.path("/grocery_cart/{id}").buildAndExpand(groceryCart.getId()).toUri();
+                        return ResponseEntity.created(uri)
+                                        .body(new GroceryCartResponseDTO(groceryCart, groceryCartBook));
+
+                }
+
+                groceryCart = this.groceryCartService.addBooks(OpenOrder.get(), groceryCartRequestDTO.getBooks()
                                 .stream()
                                 .map(groceryCartBookDTO -> groceryCartBookDTO.toGroceryCart())
                                 .collect(Collectors.toList()));
-                
-
-                List<GroceryCartBook> groceryCartBook = this.groceryCartService.listGroceryCartBook(groceryCart);
-
-                URI uri = uriBuilder.path("/grocery_cart/{id}").buildAndExpand(groceryCart.getId()).toUri();
-                return ResponseEntity.created(uri).body(new GroceryCartResponseDTO(groceryCart, groceryCartBook));
-
-        }
-
-        @SecurityRequirement(name = "Authorization")
-        @Operation(summary = "add a new book on your grocery cart", description = "add a new book on your grocery cart", responses = {
-                        @ApiResponse(responseCode = "200", ref = "ok"),
-                        @ApiResponse(responseCode = "400", ref = "badRequest"),
-                        @ApiResponse(responseCode = "403", ref = "permissionDenied"),
-                        @ApiResponse(responseCode = "404", ref = "ResourceNotFound")
-        })
-
-        @PostMapping("/{id}/books")
-        public ResponseEntity<Object> addBook(@PathVariable Long id,
-                        @RequestBody @Valid GroceryCartAddbookDTO groceryCartAddbookDTO,
-                        @AuthenticationPrincipal Person person) {
-                GroceryCart groceryCart = this.groceryCartService.searchByIdAndPersonId(id, person.getId());
-
-                groceryCart = this.groceryCartService.addBook(groceryCart, groceryCartAddbookDTO.getBookId(),
-                                groceryCartAddbookDTO.getQuantity());
 
                 List<GroceryCartBook> groceryCartBook = this.groceryCartService.listGroceryCartBook(groceryCart);
                 return ResponseEntity.ok(new GroceryCartResponseDTO(groceryCart, groceryCartBook));

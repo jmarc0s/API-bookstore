@@ -60,42 +60,25 @@ public class GroceryCartService {
         groceryCart.setBooks(books);
 
         GroceryCart savedGroceryCart = this.groceryCartRepository.save(groceryCart);
-        this.createGroceryCartBook(savedGroceryCart, groceryCartBooks);
+
+        groceryCartBooks.forEach(groceryCartBook -> groceryCartBook.setGroceryCart(groceryCart));
+        this.groceryCartBookRepository.saveAll(groceryCartBooks);
 
         return savedGroceryCart;
 
     }
 
-    public GroceryCart save(Long personId) {
-        GroceryCart groceryCart = new GroceryCart();
-        Person person = this.personService.searchById(personId);
+    public Optional<GroceryCart> findOpenOrder(Long personId) {
+        Optional<GroceryCart> openOder = this.groceryCartRepository.findOpenOrder(personId);
 
-        groceryCart.setPerson(person);
-
-        return this.groceryCartRepository.save(groceryCart);
-    }
-
-
-    public GroceryCart addBook(GroceryCart groceryCart, Long bookId, int quantity) {
-        Optional<GroceryCartBook> groceryCartBook = this.groceryCartBookRepository
-                .findByGroceryCartIdAndBookId(groceryCart.getId(), bookId);
-        Book book = this.bookService.findById(bookId);
-
-        if (groceryCartBook.isPresent()) {
-            throw new ConflictException("Book is already in this grocery cart");
-        }
-
-        groceryCart.getBooks().add(book);
-        newGroceryCartbook(groceryCart, book, quantity);
-        return this.groceryCartRepository.save(groceryCart);
-
+        return openOder;
     }
 
     @Transactional
     public GroceryCart deleteBook(GroceryCart groceryCart, Long bookId) {
         Book book = this.bookService.findById(bookId);
 
-        this.deleteGroceryCartBook(groceryCart, book);
+        this.groceryCartBookRepository.deleteByGroceryCartIdAndBookId(groceryCart.getId(), book.getId());
         groceryCart.getBooks().remove(book);
 
         return this.groceryCartRepository.save(groceryCart);
@@ -128,28 +111,9 @@ public class GroceryCartService {
         return false;
     }
 
-    private void deleteGroceryCartBook(GroceryCart groceryCart, Book book) {
-        this.groceryCartBookRepository.deleteByGroceryCartIdAndBookId(groceryCart.getId(), book.getId());
-    }
-
-    private void createGroceryCartBook(GroceryCart groceryCart, List<GroceryCartBook> groceryCartBooks) {
-        groceryCartBooks.forEach(groceryCartBook -> groceryCartBook.setGroceryCart(groceryCart));
-
-        this.groceryCartBookRepository.saveAll(groceryCartBooks);
-    }
-
-    private void newGroceryCartbook(GroceryCart groceryCart, Book book, int quantity) {
-        GroceryCartBook groceryCartBook = new GroceryCartBook();
-        groceryCartBook.setGroceryCart(groceryCart);
-        groceryCartBook.setBook(book);
-        groceryCartBook.setQuantity(quantity);
-        this.groceryCartBookRepository.save(groceryCartBook);
-    }
-
     public List<GroceryCartBook> listGroceryCartBook(GroceryCart groceryCart) {
         return this.groceryCartBookRepository.findAllByGroceryCartId(groceryCart.getId());
     }
-
 
     private List<Book> searchBooks(List<GroceryCartBook> groceryCartBooks) {
         List<Book> books = new ArrayList<>();
@@ -164,5 +128,22 @@ public class GroceryCartService {
 
         return books;
     }
-    
+
+    public GroceryCart addBooks(GroceryCart groceryCart, List<GroceryCartBook> books) {
+        List<Book> bookList = this.searchBooks(books);
+
+        for (GroceryCartBook orderBook : books) {
+            Optional<GroceryCartBook> groceryCartBook = this.groceryCartBookRepository
+                    .findByGroceryCartIdAndBookId(groceryCart.getId(), orderBook.getBook().getId());
+
+            if (groceryCartBook.isPresent()) {
+                throw new ConflictException("Book is already in this grocery cart");
+            }
+            orderBook.setGroceryCart(groceryCart);
+            groceryCart.getBooks().add(orderBook.getBook());
+        }
+        this.groceryCartBookRepository.saveAll(books);
+        return this.groceryCartRepository.save(groceryCart);
+    }
+
 }

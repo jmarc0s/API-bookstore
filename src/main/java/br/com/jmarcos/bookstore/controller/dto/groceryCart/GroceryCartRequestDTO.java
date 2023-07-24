@@ -8,6 +8,7 @@ import br.com.jmarcos.bookstore.controller.dto.book.BookRequestDTO;
 import br.com.jmarcos.bookstore.model.Book;
 import br.com.jmarcos.bookstore.model.GroceryCart;
 import br.com.jmarcos.bookstore.model.Person;
+import br.com.jmarcos.bookstore.model.enums.OrderStatusEnum;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.Getter;
@@ -31,6 +32,7 @@ public class GroceryCartRequestDTO {
             groceryCart.getBooks().add(book);
         }
         groceryCart.setPerson(new Person(personId));
+        groceryCart.setOrderSTatus(OrderStatusEnum.OPEN);
 
         return groceryCart;
     }
