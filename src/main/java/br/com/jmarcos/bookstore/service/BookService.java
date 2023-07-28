@@ -1,5 +1,6 @@
 package br.com.jmarcos.bookstore.service;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -8,17 +9,21 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import br.com.jmarcos.bookstore.model.Author;
 import br.com.jmarcos.bookstore.model.Book;
 import br.com.jmarcos.bookstore.model.PublishingCompany;
 import br.com.jmarcos.bookstore.model.Storehouse;
+import br.com.jmarcos.bookstore.model.enums.BookCategory;
 import br.com.jmarcos.bookstore.model.intermediateClass.StorehouseBook;
 import br.com.jmarcos.bookstore.repository.BookRepository;
 import br.com.jmarcos.bookstore.repository.intermediateClass.StorehouseBookRepository;
 import br.com.jmarcos.bookstore.service.exceptions.ConflictException;
 import br.com.jmarcos.bookstore.service.exceptions.ResourceNotFoundException;
+import br.com.jmarcos.bookstore.specifications.BookSpecification;
 import jakarta.transaction.Transactional;
 
 @Service
@@ -81,6 +86,14 @@ public class BookService {
                 .orElseThrow(() -> new ResourceNotFoundException("Book not found in database with the specified id"));
     }
 
+    /////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////
+    public List<Book> findByCategory(List<BookCategory> bookCategories) {
+        return null;
+    }
+
+    /////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////
     @Transactional
     public void deleteById(Long id) {
         Book book = this.findById(id);
@@ -89,14 +102,14 @@ public class BookService {
         this.bookRepository.deleteById(book.getId());
     }
 
-    public Book updateBook(Book newbook,List<StorehouseBook> storehouseBooks) {
+    public Book updateBook(Book newbook, List<StorehouseBook> storehouseBooks) {
         Book oldBook = this.findById(newbook.getId());
         if (!Objects.equals(oldBook.getTitle(), newbook.getTitle())
                 && this.existsByTitle(newbook.getTitle())) {
             throw new ConflictException("Book title is already in use.");
 
         }
-        
+
         newbook = this.prepareBook(newbook, storehouseBooks);
         this.updateStorehouseBook(newbook, storehouseBooks);
 
@@ -148,7 +161,7 @@ public class BookService {
     @Transactional
     public void updateStorehouseBook(Book book, List<StorehouseBook> storehouseBooks) {
         List<StorehouseBook> storehouseBookList = this.storehouseBookRepository.findAllByBookId(book.getId());
-        
+
         this.storehouseBookRepository.deleteAll(storehouseBookList);
 
     }
@@ -157,6 +170,7 @@ public class BookService {
         oldBook.setTitle(newBook.getTitle());
         oldBook.setYear(newBook.getYear());
         oldBook.setPrice(newBook.getPrice());
+        oldBook.setBookCategories(newBook.getBookCategories());
         oldBook.setPublishingCompany(newBook.getPublishingCompany());
         oldBook.setAuthorList(newBook.getAuthorList());
         oldBook.setStorehouseList(newBook.getStorehouseList());
@@ -164,7 +178,7 @@ public class BookService {
         return oldBook;
     }
 
-    private Book prepareBook(Book book, List<StorehouseBook> storehouseBooks){
+    private Book prepareBook(Book book, List<StorehouseBook> storehouseBooks) {
         PublishingCompany publishingCompany = this.findPublisgingCompany(book);
         List<Author> authors = this.findAuthorsList(book);
         List<Storehouse> storehouses = this.findStorehousesList(storehouseBooks);
@@ -174,6 +188,12 @@ public class BookService {
         book.setStorehouseList(storehouses);
 
         return book;
+    }
+
+    public List<Book> searchByPriceAndYear(Integer year, BigDecimal price) {
+        return this.bookRepository.findAll(Specification
+                .where(BookSpecification.bookHasPrice(price))
+                .and(BookSpecification.bookHasYear(year)));
     }
 
 }

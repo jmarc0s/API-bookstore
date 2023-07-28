@@ -1,5 +1,6 @@
 package br.com.jmarcos.bookstore.controller;
 
+import java.math.BigDecimal;
 import java.net.URI;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -116,11 +117,11 @@ public class BookController {
         @PostMapping
         public ResponseEntity<Object> save(@RequestBody @Valid BookRequestDTO bookRequestDTO,
                         UriComponentsBuilder uriBuilder) {
-                Book book = this.bookService.save(bookRequestDTO.toBook(), 
-                        bookRequestDTO.getStorehouseBookDTOs()
-                        .stream()
-                        .map(storehouseBookDTO -> storehouseBookDTO.toStorehouseBook())
-                        .collect(Collectors.toList()));
+                Book book = this.bookService.save(bookRequestDTO.toBook(),
+                                bookRequestDTO.getStorehouseBookDTOs()
+                                                .stream()
+                                                .map(storehouseBookDTO -> storehouseBookDTO.toStorehouseBook())
+                                                .collect(Collectors.toList()));
 
                 URI uri = uriBuilder.path("/storehouse/{id}").buildAndExpand(book.getId()).toUri();
                 return ResponseEntity.created(uri).body(new BookResponseDTO(book));
@@ -156,13 +157,22 @@ public class BookController {
         public ResponseEntity<Object> update(@PathVariable Long id, @RequestBody @Valid BookUpdateDTO bookUpdateDTO) {
                 Book book = this.bookService.findById(id);
 
-                book = this.bookService.updateBook(bookUpdateDTO.toBook(id), 
-                        bookUpdateDTO.getStorehouseBookDTOs()
-                        .stream()
-                        .map(storehouseBookDTO -> storehouseBookDTO.toStorehouseBook())
-                        .collect(Collectors.toList()));
+                book = this.bookService.updateBook(bookUpdateDTO.toBook(id),
+                                bookUpdateDTO.getStorehouseBookDTOs()
+                                                .stream()
+                                                .map(storehouseBookDTO -> storehouseBookDTO.toStorehouseBook())
+                                                .collect(Collectors.toList()));
 
                 return ResponseEntity.ok(new BookResponseDTO(book));
+        }
+
+        @GetMapping("/search_by_price_and_year")
+        public List<BookResponseDTO> searchByPriceAndYear(@RequestParam(required = false) Integer year,
+                        @RequestParam(required = false) BigDecimal price) {
+                return this.bookService.searchByPriceAndYear(year, price)
+                                .stream()
+                                .map(BookResponseDTO::new)
+                                .collect(Collectors.toList());
         }
 
 }
