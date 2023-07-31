@@ -37,7 +37,7 @@ public class BookResponseDTO {
         BookListPublishingCompanyDTO bookListPublishingCompanyDTO = new BookListPublishingCompanyDTO(
                 book.getPublishingCompany());
         this.PublishingCompany = bookListPublishingCompanyDTO;
-        this.setBookCategories(book.getBookCategories());
+        this.setBookCategories(book.getCategories());
 
         for (Author author : book.getAuthorList()) {
             BookListAuthorDTO bookListAuthorDTO = new BookListAuthorDTO(author);

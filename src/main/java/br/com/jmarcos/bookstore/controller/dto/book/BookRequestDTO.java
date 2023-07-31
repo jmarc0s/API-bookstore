@@ -61,7 +61,7 @@ public class BookRequestDTO {
         book.setPrice(price);
         PublishingCompany publishingCompany = new PublishingCompany(publishingCompanyId);
         book.setPublishingCompany(publishingCompany);
-        book.setBookCategories(bookCategories);
+        book.setCategories(bookCategories);
         for (Long authorId : authorIdList) {
             Author author = AuthorRequestDTO.toAuthor(authorId);
             book.getAuthorList().add(author);

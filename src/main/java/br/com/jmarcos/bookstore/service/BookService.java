@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import br.com.jmarcos.bookstore.model.Author;
@@ -170,7 +169,7 @@ public class BookService {
         oldBook.setTitle(newBook.getTitle());
         oldBook.setYear(newBook.getYear());
         oldBook.setPrice(newBook.getPrice());
-        oldBook.setBookCategories(newBook.getBookCategories());
+        oldBook.setCategories(newBook.getCategories());
         oldBook.setPublishingCompany(newBook.getPublishingCompany());
         oldBook.setAuthorList(newBook.getAuthorList());
         oldBook.setStorehouseList(newBook.getStorehouseList());
@@ -190,10 +189,11 @@ public class BookService {
         return book;
     }
 
-    public List<Book> searchByPriceAndYear(Integer year, BigDecimal price) {
+    public List<Book> filterBooks(Integer year, BigDecimal price, List<BookCategory> categories) {
         return this.bookRepository.findAll(Specification
-                .where(BookSpecification.bookHasPrice(price))
-                .and(BookSpecification.bookHasYear(year)));
+                .where(BookSpecification.bookHasPriceLessThan(price))
+                .and(BookSpecification.bookHasYear(year))
+                .and(BookSpecification.bookHasCategories(categories)));
     }
 
 }

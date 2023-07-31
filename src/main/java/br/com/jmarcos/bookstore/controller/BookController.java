@@ -33,6 +33,7 @@ import br.com.jmarcos.bookstore.controller.dto.book.BookRequestDTO;
 import br.com.jmarcos.bookstore.controller.dto.book.BookResponseDTO;
 import br.com.jmarcos.bookstore.controller.dto.book.BookUpdateDTO;
 import br.com.jmarcos.bookstore.model.Book;
+import br.com.jmarcos.bookstore.model.enums.BookCategory;
 import br.com.jmarcos.bookstore.service.BookService;
 import jakarta.validation.Valid;
 
@@ -166,10 +167,11 @@ public class BookController {
                 return ResponseEntity.ok(new BookResponseDTO(book));
         }
 
-        @GetMapping("/search_by_price_and_year")
-        public List<BookResponseDTO> searchByPriceAndYear(@RequestParam(required = false) Integer year,
-                        @RequestParam(required = false) BigDecimal price) {
-                return this.bookService.searchByPriceAndYear(year, price)
+        @GetMapping("/filter")
+        public List<BookResponseDTO> filterBooks(@RequestParam(required = false) Integer year,
+                        @RequestParam(required = false) BigDecimal price,
+                        @RequestParam(required = false) List<BookCategory> categories) {
+                return this.bookService.filterBooks(year, price, categories)
                                 .stream()
                                 .map(BookResponseDTO::new)
                                 .collect(Collectors.toList());

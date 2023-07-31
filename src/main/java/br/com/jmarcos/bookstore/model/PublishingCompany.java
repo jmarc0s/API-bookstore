@@ -1,6 +1,7 @@
 package br.com.jmarcos.bookstore.model;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,14 +39,14 @@ public class PublishingCompany {
     @Column(name = "publishing_company_url")
     private String url;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "address_id")
     private Address address;
 
     @Column(name = "publishing_company_phone")
     private String phone;
 
-    @OneToMany(mappedBy = "publishingCompany", cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "publishingCompany", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
     private List<Book> bookList = new ArrayList<>();
 
     public PublishingCompany(String requestName, String requestUrl, Address requestAddress, String requestPhone) {
