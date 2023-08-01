@@ -68,7 +68,7 @@ public class BookServiceTest {
         PageImpl<Book> bookPage = new PageImpl<>(bookList);
         when(bookRepository.findAll(pageable)).thenReturn(bookPage);
 
-        Page<Book> all = bookService.search(pageable);
+        Page<Book> all = bookService.search(pageable, null, null, null);
         List<Book> bookSavedList = all.stream().toList();
 
         Assertions.assertFalse(bookSavedList.isEmpty());

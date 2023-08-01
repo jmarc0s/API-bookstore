@@ -47,18 +47,22 @@ public class BookController {
                 this.bookService = bookService;
         }
 
-        @Operation(summary = "Returns a list of Books", description = "Returns a list of all books in database", responses = {
+        @Operation(summary = "Returns a list of Books", description = "Returns a list of all books in database. The returned list can be filtered by price, categories and release year", responses = {
                         @ApiResponse(responseCode = "200", ref = "ok"),
                         @ApiResponse(responseCode = "403", ref = "permissionDenied"),
+                        @ApiResponse(responseCode = "400", ref = "badRequest")
 
         })
 
         @Cacheable(value = "BookList")
         @GetMapping
         public Page<BookResponseDTO> search(
-                        @PageableDefault(sort = "id", direction = Direction.ASC, page = 0, size = 10) Pageable pageable) {
+                        @PageableDefault(sort = "id", direction = Direction.ASC, page = 0, size = 10) Pageable pageable,
+                        @RequestParam(name = "release_year", required = false) Integer year,
+                        @RequestParam(name = "max_price", required = false) BigDecimal price,
+                        @RequestParam(required = false) List<BookCategory> categories) {
                 return this.bookService
-                                .search(pageable)
+                                .search(pageable, year, price, categories)
                                 .map(BookResponseDTO::new);
         }
 
@@ -165,16 +169,6 @@ public class BookController {
                                                 .collect(Collectors.toList()));
 
                 return ResponseEntity.ok(new BookResponseDTO(book));
-        }
-
-        @GetMapping("/filter")
-        public List<BookResponseDTO> filterBooks(@RequestParam(required = false) Integer year,
-                        @RequestParam(required = false) BigDecimal price,
-                        @RequestParam(required = false) List<BookCategory> categories) {
-                return this.bookService.filterBooks(year, price, categories)
-                                .stream()
-                                .map(BookResponseDTO::new)
-                                .collect(Collectors.toList());
         }
 
 }

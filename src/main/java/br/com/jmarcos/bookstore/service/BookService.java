@@ -53,8 +53,11 @@ public class BookService {
         return exists.isPresent();
     }
 
-    public Page<Book> search(Pageable pageable) {
-        return this.bookRepository.findAll(pageable);
+    public Page<Book> search(Pageable pageable, Integer year, BigDecimal price, List<BookCategory> categories) {
+        return this.bookRepository.findAll(Specification
+                .where(BookSpecification.bookHasPriceLessThan(price))
+                .and(BookSpecification.bookHasYear(year))
+                .and(BookSpecification.bookHasCategories(categories)), pageable);
     }
 
     public Book findByTitle(String title) {
@@ -187,13 +190,6 @@ public class BookService {
         book.setStorehouseList(storehouses);
 
         return book;
-    }
-
-    public List<Book> filterBooks(Integer year, BigDecimal price, List<BookCategory> categories) {
-        return this.bookRepository.findAll(Specification
-                .where(BookSpecification.bookHasPriceLessThan(price))
-                .and(BookSpecification.bookHasYear(year))
-                .and(BookSpecification.bookHasCategories(categories)));
     }
 
 }

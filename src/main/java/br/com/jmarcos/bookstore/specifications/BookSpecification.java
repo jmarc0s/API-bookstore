@@ -2,7 +2,6 @@ package br.com.jmarcos.bookstore.specifications;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.data.jpa.domain.Specification;
 
@@ -57,33 +56,6 @@ public class BookSpecification {
         return new Specification<Book>() {
             @Override
             public Predicate toPredicate(Root<Book> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
-                List<String> categorias = categories
-                        .stream()
-                        .map(t -> t.name()) // Converte o nome da categoria para o Enum correspondente
-                        .collect(Collectors.toList());
-
-                // Join<Object, Object> categoriesJoin = root.join("categories",
-                // JoinType.INNER);
-                // cb.in(null);
-                // return /* root.get("categories").in(categorias) */ root.join("categories",
-                // JoinType.INNER)
-                // .get("book_categories").in(categories);
-
-                // List<Predicate> predicates = new ArrayList<>();
-                // Join<Object, Object> categoriesJoin = root.join("categories",
-                // JoinType.INNER);
-
-                // categoriesJoin.get("aaaaaaaaaaaaaaaa");
-                // return cb.or(predicates.toArray(new Predicate[0]));
-                // Join<Object, Object> categoriesJoin = root.join("categories", JoinType.INNER)
-                // .on(cb.equal(root.get("id"), root.get("categories").get("book").get("id")));
-
-                // return root.get("categories").in(categories);
-
-                // Join<Object, Object> categoriesJoin = root.join("categories",
-                // JoinType.INNER);
-                // return cb.equal(categoriesJoin.get("id"), 1);
-
                 Subquery<Long> subquery = query.subquery(Long.class);
                 Root<Book> subRoot = subquery.from(Book.class);
                 subquery.select(subRoot.get("id")).where(subRoot.joinSet("categories").in(categories));
