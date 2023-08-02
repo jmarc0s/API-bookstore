@@ -2,11 +2,14 @@ package br.com.jmarcos.bookstore.controller.dto.book;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import br.com.jmarcos.bookstore.model.Author;
 import br.com.jmarcos.bookstore.model.Book;
 import br.com.jmarcos.bookstore.model.Storehouse;
+import br.com.jmarcos.bookstore.model.enums.BookCategory;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -22,6 +25,7 @@ public class BookResponseDTO {
     private int year;
     private BigDecimal price;
     private BookListPublishingCompanyDTO PublishingCompany;
+    private Set<BookCategory> bookCategories = new HashSet<>();
     private List<BookListAuthorDTO> authors = new ArrayList<>();
     private List<BookListStorehouseDTO> storehouses = new ArrayList<>();
 
@@ -33,6 +37,7 @@ public class BookResponseDTO {
         BookListPublishingCompanyDTO bookListPublishingCompanyDTO = new BookListPublishingCompanyDTO(
                 book.getPublishingCompany());
         this.PublishingCompany = bookListPublishingCompanyDTO;
+        this.setBookCategories(book.getCategories());
 
         for (Author author : book.getAuthorList()) {
             BookListAuthorDTO bookListAuthorDTO = new BookListAuthorDTO(author);

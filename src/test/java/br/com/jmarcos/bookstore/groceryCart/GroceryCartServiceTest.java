@@ -25,7 +25,6 @@ import br.com.jmarcos.bookstore.repository.intermediateClass.GroceryCartBookRepo
 import br.com.jmarcos.bookstore.service.BookService;
 import br.com.jmarcos.bookstore.service.GroceryCartService;
 import br.com.jmarcos.bookstore.service.PersonService;
-import br.com.jmarcos.bookstore.service.exceptions.ConflictException;
 import br.com.jmarcos.bookstore.service.exceptions.ResourceNotFoundException;
 
 @ExtendWith(MockitoExtension.class)

@@ -1,5 +1,6 @@
 package br.com.jmarcos.bookstore.controller;
 
+import java.math.BigDecimal;
 import java.net.URI;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -32,6 +33,7 @@ import br.com.jmarcos.bookstore.controller.dto.book.BookRequestDTO;
 import br.com.jmarcos.bookstore.controller.dto.book.BookResponseDTO;
 import br.com.jmarcos.bookstore.controller.dto.book.BookUpdateDTO;
 import br.com.jmarcos.bookstore.model.Book;
+import br.com.jmarcos.bookstore.model.enums.BookCategory;
 import br.com.jmarcos.bookstore.service.BookService;
 import jakarta.validation.Valid;
 
@@ -45,18 +47,22 @@ public class BookController {
                 this.bookService = bookService;
         }
 
-        @Operation(summary = "Returns a list of Books", description = "Returns a list of all books in database", responses = {
+        @Operation(summary = "Returns a list of Books", description = "Returns a list of all books in database. The returned list can be filtered by price, categories and release year", responses = {
                         @ApiResponse(responseCode = "200", ref = "ok"),
                         @ApiResponse(responseCode = "403", ref = "permissionDenied"),
+                        @ApiResponse(responseCode = "400", ref = "badRequest")
 
         })
 
         @Cacheable(value = "BookList")
         @GetMapping
         public Page<BookResponseDTO> search(
-                        @PageableDefault(sort = "id", direction = Direction.ASC, page = 0, size = 10) Pageable pageable) {
+                        @PageableDefault(sort = "id", direction = Direction.ASC, page = 0, size = 10) Pageable pageable,
+                        @RequestParam(name = "release_year", required = false) Integer year,
+                        @RequestParam(name = "max_price", required = false) BigDecimal price,
+                        @RequestParam(required = false) List<BookCategory> categories) {
                 return this.bookService
-                                .search(pageable)
+                                .search(pageable, year, price, categories)
                                 .map(BookResponseDTO::new);
         }
 
@@ -116,11 +122,11 @@ public class BookController {
         @PostMapping
         public ResponseEntity<Object> save(@RequestBody @Valid BookRequestDTO bookRequestDTO,
                         UriComponentsBuilder uriBuilder) {
-                Book book = this.bookService.save(bookRequestDTO.toBook(), 
-                        bookRequestDTO.getStorehouseBookDTOs()
-                        .stream()
-                        .map(storehouseBookDTO -> storehouseBookDTO.toStorehouseBook())
-                        .collect(Collectors.toList()));
+                Book book = this.bookService.save(bookRequestDTO.toBook(),
+                                bookRequestDTO.getStorehouseBookDTOs()
+                                                .stream()
+                                                .map(storehouseBookDTO -> storehouseBookDTO.toStorehouseBook())
+                                                .collect(Collectors.toList()));
 
                 URI uri = uriBuilder.path("/storehouse/{id}").buildAndExpand(book.getId()).toUri();
                 return ResponseEntity.created(uri).body(new BookResponseDTO(book));
@@ -156,11 +162,11 @@ public class BookController {
         public ResponseEntity<Object> update(@PathVariable Long id, @RequestBody @Valid BookUpdateDTO bookUpdateDTO) {
                 Book book = this.bookService.findById(id);
 
-                book = this.bookService.updateBook(bookUpdateDTO.toBook(id), 
-                        bookUpdateDTO.getStorehouseBookDTOs()
-                        .stream()
-                        .map(storehouseBookDTO -> storehouseBookDTO.toStorehouseBook())
-                        .collect(Collectors.toList()));
+                book = this.bookService.updateBook(bookUpdateDTO.toBook(id),
+                                bookUpdateDTO.getStorehouseBookDTOs()
+                                                .stream()
+                                                .map(storehouseBookDTO -> storehouseBookDTO.toStorehouseBook())
+                                                .collect(Collectors.toList()));
 
                 return ResponseEntity.ok(new BookResponseDTO(book));
         }

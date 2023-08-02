@@ -34,13 +34,13 @@ public class Author {
         @Column(name = "author_name")
         private String name;
 
-        @OneToOne(cascade = CascadeType.ALL)
+        @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
         @JoinColumn(name = "address_id")
         private Address address;
 
         @Column(name = "author_url")
         private String url;
 
-        @ManyToMany(mappedBy = "authorList", fetch = FetchType.EAGER, cascade = CascadeType.REMOVE)
+        @ManyToMany(mappedBy = "authorList", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
         private List<Book> bookList = new ArrayList<>();
 }

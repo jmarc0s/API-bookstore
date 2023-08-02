@@ -3,9 +3,14 @@ package br.com.jmarcos.bookstore.model;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
+import br.com.jmarcos.bookstore.model.enums.BookCategory;
 import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -45,6 +50,10 @@ public class Book {
         @JoinColumn(name = "publishingCompany_id")
         private PublishingCompany publishingCompany;
 
+        @ElementCollection
+        @Enumerated(EnumType.STRING)
+        private Set<BookCategory> categories;
+
         @ManyToMany(fetch = FetchType.EAGER)
         @JoinTable(name = "author_book", joinColumns = {
                         @JoinColumn(name = "fk_book")
@@ -56,7 +65,7 @@ public class Book {
         @ManyToMany(mappedBy = "bookList", fetch = FetchType.EAGER)
         private List<Storehouse> storehouseList = new ArrayList<>();
 
-        @ManyToMany(fetch = FetchType.EAGER)
+        @ManyToMany(fetch = FetchType.LAZY)
         @JoinTable(name = "grocery_cart_book", joinColumns = {
                         @JoinColumn(name = "book_id")
         }, inverseJoinColumns = {

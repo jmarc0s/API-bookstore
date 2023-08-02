@@ -42,7 +42,7 @@ import br.com.jmarcos.bookstore.service.exceptions.ResourceNotFoundException;
 
 @ExtendWith(MockitoExtension.class)
 public class BookServiceTest {
-    
+
     @InjectMocks
     private BookService bookService;
 
@@ -68,7 +68,7 @@ public class BookServiceTest {
         PageImpl<Book> bookPage = new PageImpl<>(bookList);
         when(bookRepository.findAll(pageable)).thenReturn(bookPage);
 
-        Page<Book> all = bookService.search(pageable);
+        Page<Book> all = bookService.search(pageable, null, null, null);
         List<Book> bookSavedList = all.stream().toList();
 
         Assertions.assertFalse(bookSavedList.isEmpty());
@@ -136,9 +136,8 @@ public class BookServiceTest {
 
     }
 
-
     @Test
-    void save_returnsASavedBook_WhenSuccessful(){
+    void save_returnsASavedBook_WhenSuccessful() {
         Book book = createBook();
         when(publishingCompanyService.searchById(anyLong())).thenReturn(book.getPublishingCompany());
         when(authorService.searchById(anyLong())).thenReturn(book.getAuthorList().get(0));
@@ -146,9 +145,9 @@ public class BookServiceTest {
         when(bookRepository.save(any(Book.class))).thenReturn(book);
 
         Book savedBook = this.bookService.save(book, createStorehouseBookDTOs()
-            .stream()
-            .map(storehouseBookDTO -> storehouseBookDTO.toStorehouseBook())
-            .collect(Collectors.toList()));
+                .stream()
+                .map(storehouseBookDTO -> storehouseBookDTO.toStorehouseBook())
+                .collect(Collectors.toList()));
 
         Assertions.assertNotNull(savedBook);
         Assertions.assertEquals(book.getTitle(), savedBook.getTitle());
@@ -167,14 +166,14 @@ public class BookServiceTest {
     }
 
     @Test
-    void save_Throws_ConflictException_WhenBooktitleIsAlreadyInUse(){
+    void save_Throws_ConflictException_WhenBooktitleIsAlreadyInUse() {
         Book book = createBook();
         Book newbook = createBook();
         when(bookRepository.findByTitle(anyString())).thenReturn(Optional.of(book));
 
         ConflictException conflictException = Assertions
                 .assertThrows(ConflictException.class,
-                        () -> bookService.save(newbook,  createStorehouseBookDTOs()
+                        () -> bookService.save(newbook, createStorehouseBookDTOs()
                                 .stream()
                                 .map(storehouseBookDTO -> storehouseBookDTO.toStorehouseBook())
                                 .collect(Collectors.toList())));
@@ -242,9 +241,8 @@ public class BookServiceTest {
         
     }
 
-
     @Test
-    void update_returnsAnUpdatedBook_WhenSuccessful(){
+    void update_returnsAnUpdatedBook_WhenSuccessful() {
         Book book = createBook();
         BookUpdateDTO bookUpdateDTO = createBookUpdateDTO();
         Book updateBook = bookUpdateDTO.toBook(1L);
@@ -255,9 +253,9 @@ public class BookServiceTest {
         when(bookRepository.save(any(Book.class))).thenReturn(book);
 
         Book updatedBook = this.bookService.updateBook(updateBook, createStorehouseBookDTOs()
-            .stream()
-            .map(storehouseBookDTO -> storehouseBookDTO.toStorehouseBook())
-            .collect(Collectors.toList()));
+                .stream()
+                .map(storehouseBookDTO -> storehouseBookDTO.toStorehouseBook())
+                .collect(Collectors.toList()));
 
         Assertions.assertNotNull(updatedBook);
         Assertions.assertEquals(updateBook.getTitle(), updatedBook.getTitle());
@@ -287,7 +285,7 @@ public class BookServiceTest {
 
         ConflictException conflictException = Assertions
                 .assertThrows(ConflictException.class,
-                        () -> bookService.updateBook(updateBook,  createStorehouseBookDTOs()
+                        () -> bookService.updateBook(updateBook, createStorehouseBookDTOs()
                                 .stream()
                                 .map(storehouseBookDTO -> storehouseBookDTO.toStorehouseBook())
                                 .collect(Collectors.toList())));
@@ -297,7 +295,7 @@ public class BookServiceTest {
 
     }
 
-    Book createBook(){
+    Book createBook() {
         Book book = new Book();
 
         book.setId(1L);
@@ -307,36 +305,36 @@ public class BookServiceTest {
         book.setStorehouseList(createStorehouseList());
         book.setPublishingCompany(createPublishingCompany());
         book.setAuthorList(createAuthorList());
-        
+
         return book;
-        
+
     }
 
-    BookUpdateDTO createBookUpdateDTO(){
+    BookUpdateDTO createBookUpdateDTO() {
         BookUpdateDTO bookUpdateDTO = new BookUpdateDTO();
         Set<Long> authorIdList = new HashSet<>();
         authorIdList.add(2L);
 
-        bookUpdateDTO.setId(1L);
+        // bookUpdateDTO.setId(1L);
         bookUpdateDTO.setPrice(new BigDecimal(60.00));
         bookUpdateDTO.setTitle("Livro nem tão legal");
         bookUpdateDTO.setYear(2005);
         bookUpdateDTO.setPublishingCompanyId(2L);
         bookUpdateDTO.setAuthorIdList(authorIdList);
         bookUpdateDTO.setStorehouseBookDTOs(createStorehouseBookDTOs());
-        
+
         return bookUpdateDTO;
 
     }
 
-    List<Storehouse> createStorehouseList(){
+    List<Storehouse> createStorehouseList() {
         Storehouse storehouse = new Storehouse();
         storehouse.setId(1L);
 
         return List.of(storehouse);
     }
 
-    Set<StorehouseBookDTO> createStorehouseBookDTOs(){
+    Set<StorehouseBookDTO> createStorehouseBookDTOs() {
         StorehouseBookDTO storehouseBook = new StorehouseBookDTO();
         storehouseBook.setStorehouseId(1L);
         storehouseBook.setQuantity(10);
@@ -344,7 +342,7 @@ public class BookServiceTest {
         return Set.of(storehouseBook);
     }
 
-    List<Author> createAuthorList(){
+    List<Author> createAuthorList() {
         Author author = new Author();
         author.setId(1L);
         author.setName("J.K");
@@ -353,7 +351,7 @@ public class BookServiceTest {
 
     }
 
-    PublishingCompany createPublishingCompany(){
+    PublishingCompany createPublishingCompany() {
         PublishingCompany publishingCompany = new PublishingCompany();
         publishingCompany.setId(1L);
 

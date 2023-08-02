@@ -11,6 +11,7 @@ import br.com.jmarcos.bookstore.model.Author;
 import br.com.jmarcos.bookstore.model.Book;
 import br.com.jmarcos.bookstore.model.PublishingCompany;
 import br.com.jmarcos.bookstore.model.Storehouse;
+import br.com.jmarcos.bookstore.model.enums.BookCategory;
 import jakarta.persistence.ElementCollection;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Digits;
@@ -28,15 +29,13 @@ import lombok.Setter;
 @AllArgsConstructor
 public class BookUpdateDTO {
 
-    private Long id;
-
     @NotEmpty
     @NotNull
     private String title;
 
     @NotNull
     @Positive
-    @Digits(integer = 4, fraction = 0) 
+    @Digits(integer = 4, fraction = 0)
     private int year;
 
     @NotNull
@@ -44,6 +43,10 @@ public class BookUpdateDTO {
 
     @NotNull
     private Long publishingCompanyId;
+
+    @NotNull(message = "must not be null")
+    @NotEmpty(message = "must not be empty")
+    private Set<BookCategory> bookCategories = new HashSet<>();
 
     @ElementCollection
     @NotNull
@@ -61,6 +64,7 @@ public class BookUpdateDTO {
         book.setPrice(price);
         PublishingCompany publishingCompany = new PublishingCompany(publishingCompanyId);
         book.setPublishingCompany(publishingCompany);
+        book.setCategories(bookCategories);
 
         for (Long authorId : authorIdList) {
             Author author = AuthorRequestDTO.toAuthor(authorId);
