@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Properties;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -17,6 +18,13 @@ import br.com.jmarcos.bookstore.repository.PersonRepository;
 import br.com.jmarcos.bookstore.repository.intermediateClass.GroceryCartBookRepository;
 import br.com.jmarcos.bookstore.service.exceptions.ConflictException;
 import br.com.jmarcos.bookstore.service.exceptions.ResourceNotFoundException;
+import jakarta.mail.Message;
+import jakarta.mail.MessagingException;
+import jakarta.mail.PasswordAuthentication;
+import jakarta.mail.Session;
+import jakarta.mail.Transport;
+import jakarta.mail.internet.InternetAddress;
+import jakarta.mail.internet.MimeMessage;
 import jakarta.transaction.Transactional;
 
 @Service
@@ -79,7 +87,7 @@ public class PersonService {
         Person personInDataBase = this.searchById(newPerson.getId());
 
         if (!Objects.equals(personInDataBase.getEmail(), newPerson.getEmail())
-                && this.existsByEmail(newPerson.getEmail())) {                  
+                && this.existsByEmail(newPerson.getEmail())) {
             throw new ConflictException("email is already in use.");
 
         }
@@ -88,7 +96,6 @@ public class PersonService {
 
         return this.personRepository.save(updatedPerson);
     }
-
 
     public Person addPermission(Person person, String permission) {
         Permission permissionExist = this.permissionService.searchByName(permission);
@@ -125,6 +132,41 @@ public class PersonService {
             this.groceryCartBookRepository.deleteAllByGroceryCartId(groceryCart.getId());
         }
 
+    }
+
+    public void sendConfirmationEmail(String recipientEmail, String confirmationCode) {
+        final String username = "seu_email@gmail.com"; // Substitua pelo seu e-mail
+        final String password = "sua_senha"; // Substitua pela sua senha
+
+        // Configurações do servidor SMTP (no exemplo, usando o Gmail)
+        Properties props = new Properties();
+        props.put("mail.smtp.auth", "true");
+        props.put("mail.smtp.starttls.enable", "true");
+        props.put("mail.smtp.host", "smtp.gmail.com");
+        props.put("mail.smtp.port", "587");
+
+        // Sessão de e-mail com autenticação
+        Session session = Session.getInstance(props, new javax.mail.Authenticator() {
+            protected PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication(username, password);
+            }
+        });
+
+        try {
+            // Cria uma mensagem de e-mail
+            Message message = new MimeMessage(session);
+            message.setFrom(new InternetAddress(username));
+            message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(recipientEmail));
+            message.setSubject("Confirmação de E-mail");
+            message.setText("Olá, obrigado por se cadastrar! Seu código de confirmação é: " + confirmationCode);
+
+            // Envia o e-mail
+            Transport.send(message);
+
+            System.out.println("E-mail de confirmação enviado para: " + recipientEmail);
+        } catch (MessagingException e) {
+            System.out.println("Erro ao enviar o e-mail de confirmação: " + e.getMessage());
+        }
     }
 
 }
