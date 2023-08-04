@@ -8,6 +8,8 @@ import java.util.Properties;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
@@ -33,13 +35,15 @@ public class PersonService {
     private final PersonRepository personRepository;
     private final PermissionService permissionService;
     private final GroceryCartBookRepository groceryCartBookRepository;
+    private final JavaMailSender mailSender;
 
     @Autowired
     public PersonService(PersonRepository personRepository, PermissionService permissionService,
-            GroceryCartBookRepository groceryCartBookRepository) {
+            GroceryCartBookRepository groceryCartBookRepository, JavaMailSender mailSender) {
         this.personRepository = personRepository;
         this.permissionService = permissionService;
         this.groceryCartBookRepository = groceryCartBookRepository;
+        this.mailSender = mailSender;
     }
 
     public boolean existsByEmail(String email) {
@@ -135,38 +139,48 @@ public class PersonService {
     }
 
     public void sendConfirmationEmail(String recipientEmail, String confirmationCode) {
-        final String username = "seu_email@gmail.com"; // Substitua pelo seu e-mail
-        final String password = "sua_senha"; // Substitua pela sua senha
+        // final String username = "seu_email@gmail.com"; // Substitua pelo seu e-mail
+        // final String password = "sua_senha"; // Substitua pela sua senha
 
-        // Configurações do servidor SMTP (no exemplo, usando o Gmail)
-        Properties props = new Properties();
-        props.put("mail.smtp.auth", "true");
-        props.put("mail.smtp.starttls.enable", "true");
-        props.put("mail.smtp.host", "smtp.gmail.com");
-        props.put("mail.smtp.port", "587");
+        // // Configurações do servidor SMTP (no exemplo, usando o Gmail)
+        // Properties props = new Properties();
+        // props.put("mail.smtp.auth", "true");
+        // props.put("mail.smtp.starttls.enable", "true");
+        // props.put("mail.smtp.host", "smtp.gmail.com");
+        // props.put("mail.smtp.port", "587");
 
         // Sessão de e-mail com autenticação
-        Session session = Session.getInstance(props, new javax.mail.Authenticator() {
-            protected PasswordAuthentication getPasswordAuthentication() {
-                return new PasswordAuthentication(username, password);
-            }
-        });
+        // Session session = Session.getInstance(props, new javax.mail.Authenticator() {
+        // protected PasswordAuthentication getPasswordAuthentication() {
+        // return new PasswordAuthentication(username, password);
+        // }
+        // });
 
-        try {
-            // Cria uma mensagem de e-mail
-            Message message = new MimeMessage(session);
-            message.setFrom(new InternetAddress(username));
-            message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(recipientEmail));
-            message.setSubject("Confirmação de E-mail");
-            message.setText("Olá, obrigado por se cadastrar! Seu código de confirmação é: " + confirmationCode);
+        MimeMessage messageee = mailSender.createMimeMessage();
 
-            // Envia o e-mail
-            Transport.send(message);
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo("null");
+        message.setSubject("null");
+        message.setText("null");
+        mailSender.send(message);
+        // try {
+        // // Cria uma mensagem de e-mail
+        // //Message message = new MimeMessage(session);
+        // message.setFrom(new InternetAddress(username));
+        // message.setRecipients(Message.RecipientType.TO,
+        // InternetAddress.parse(recipientEmail));
+        // message.setSubject("Confirmação de E-mail");
+        // message.setText("Olá, obrigado por se cadastrar! Seu código de confirmação é:
+        // " + confirmationCode);
 
-            System.out.println("E-mail de confirmação enviado para: " + recipientEmail);
-        } catch (MessagingException e) {
-            System.out.println("Erro ao enviar o e-mail de confirmação: " + e.getMessage());
-        }
+        // // Envia o e-mail
+        // Transport.send(message);
+
+        // System.out.println("E-mail de confirmação enviado para: " + recipientEmail);
+        // } catch (MessagingException e) {
+        // System.out.println("Erro ao enviar o e-mail de confirmação: " +
+        // e.getMessage());
+        // }
     }
 
 }
