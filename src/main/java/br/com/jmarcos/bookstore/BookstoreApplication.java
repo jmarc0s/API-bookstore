@@ -83,6 +83,7 @@ public class BookstoreApplication implements CommandLineRunner {
 			personADMIN.setPassword(new BCryptPasswordEncoder().encode("ADMIN123"));
 			personADMIN.getPermission().add(this.permissionService.searchByName(
 					"ROLE_ADMIN"));
+			personADMIN.setAccountNonLocked(true);
 			this.personService.save(personADMIN);
 
 			Person personUser = new Person();
@@ -91,6 +92,7 @@ public class BookstoreApplication implements CommandLineRunner {
 			personUser.setPassword(new BCryptPasswordEncoder().encode("user123"));
 			personUser.getPermission().add(this.permissionService.searchByName(
 					"ROLE_USER"));
+			personADMIN.setAccountNonLocked(true);
 			this.personService.save(personUser);
 
 		}

@@ -56,8 +56,13 @@ public class PersonController {
 
                 Person person = personRequestDTO.toPerson();
                 person = this.personService.save(person);
-                URI uri = uriBuilder.path("/publishingCompany/{id}").buildAndExpand(person.getId()).toUri();
+                URI uri = uriBuilder.path("/persons/{id}").buildAndExpand(person.getId()).toUri();
                 return ResponseEntity.created(uri).body(new PersonResponseDTO(person));
+        }
+
+        @PostMapping("/confirm_code")
+        public ResponseEntity<Object> confirmCode(@RequestParam String email, @RequestParam Integer code){
+                return ResponseEntity.ok(this.personService.confirmCode(email, code));
         }
 
 
