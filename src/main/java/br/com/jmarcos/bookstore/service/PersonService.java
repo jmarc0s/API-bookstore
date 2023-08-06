@@ -1,5 +1,6 @@
 package br.com.jmarcos.bookstore.service;
 
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -18,6 +19,7 @@ import br.com.jmarcos.bookstore.model.Person;
 import br.com.jmarcos.bookstore.repository.PersonRepository;
 import br.com.jmarcos.bookstore.repository.intermediateClass.GroceryCartBookRepository;
 import br.com.jmarcos.bookstore.service.exceptions.ConflictException;
+import br.com.jmarcos.bookstore.service.exceptions.InvalidConfirmationCodeException;
 import br.com.jmarcos.bookstore.service.exceptions.ResourceNotFoundException;
 import jakarta.transaction.Transactional;
 
@@ -49,9 +51,9 @@ public class PersonService {
         }
 
         List<Permission> permissions = this.findPermissions(person.getPermission());
-        this.sendConfirmationEmail(person);
         person.setPermission(permissions);
         person.setConfirmationCode(this.generateConfirmationCode());
+        this.sendConfirmationEmail(person);
         return this.personRepository.save(person);
     }
 
@@ -141,15 +143,25 @@ public class PersonService {
         mailSender.send(message);
     }
 
-    private Integer generateConfirmationCode() {
-        //create a logic to create a confirmation code
-        return 1234;
+    private String generateConfirmationCode() {
+        SecureRandom random = new SecureRandom();
+        final int CODE_LENGTH = 6;
+
+        StringBuilder sb = new StringBuilder(CODE_LENGTH);
+        String chars = "AB0CD1EF2GH3IJ4KL5MN6OP7QR8ST9UVWXYZ";
+
+        for (int i = 0; i < CODE_LENGTH; i++) {
+            int index = random.nextInt(chars.length());
+            sb.append(chars.charAt(index));
+        }
+
+        return sb.toString();
     }
 
-    public String confirmCode(String email, Integer code) {
+    public String confirmCode(String email, String code) {
         Person person = this.searchByEmail(email);
-        if(!Objects.equals(person.getConfirmationCode(), code)){
-            //throws an exception telling that this is an invalid code
+        if (!Objects.equals(person.getConfirmationCode(), code)) {
+            throw new InvalidConfirmationCodeException("Invalid Code!");
         }
 
         person.setAccountNonLocked(true);

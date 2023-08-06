@@ -59,7 +59,7 @@ public class Person implements UserDetails {
     private List<Permission> permission = new ArrayList<>();
 
     @Column(name = "confirmation_code")
-    private Integer confirmationCode;
+    private String confirmationCode;
 
     @OneToMany(mappedBy = "person", cascade = CascadeType.REMOVE)
     private List<GroceryCart> groceryCarts = new ArrayList<>();

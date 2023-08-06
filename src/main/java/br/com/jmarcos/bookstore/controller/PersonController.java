@@ -61,10 +61,9 @@ public class PersonController {
         }
 
         @PostMapping("/confirm_code")
-        public ResponseEntity<Object> confirmCode(@RequestParam String email, @RequestParam Integer code){
+        public ResponseEntity<Object> confirmCode(@RequestParam String email, @RequestParam String code) {
                 return ResponseEntity.ok(this.personService.confirmCode(email, code));
         }
-
 
         @SecurityRequirement(name = "Authorization")
         @Operation(summary = "update your profile data", description = "update data like email, name ", responses = {
@@ -79,7 +78,7 @@ public class PersonController {
                 Person person = this.personService.searchById(personRequest.getId());
 
                 person = this.personService.update(personUpdateDTO.toPerson(person.getId()));
-                
+
                 return ResponseEntity.ok(new PersonResponseDTO(person));
         }
 
@@ -110,7 +109,6 @@ public class PersonController {
                 Person user = this.personService.searchById(person.getId());
                 return ResponseEntity.ok(new PersonResponseDTO(user));
         }
-
 
         @SecurityRequirement(name = "Authorization")
         @Operation(summary = "list all profiles in database", description = "returns a list of all pessoal data in database", responses = {
