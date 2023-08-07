@@ -155,10 +155,11 @@ public class PersonService {
 
         while (selectedCharsForCode.size() < CODE_LENGTH){
             int index = random.nextInt(chars.length());
-
-            if(!selectedCharsForCode.contains(chars.charAt(index))){
-                selectedCharsForCode.add(chars.charAt(index)); 
-                sb.append(chars.charAt(index));
+            char selectedChar = chars.charAt(index);
+            
+            if(!selectedCharsForCode.contains(selectedChar)){
+                selectedCharsForCode.add(selectedChar); 
+                sb.append(selectedChar);
             }
             
         }
