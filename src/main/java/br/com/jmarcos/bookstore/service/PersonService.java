@@ -2,9 +2,11 @@ package br.com.jmarcos.bookstore.service;
 
 import java.security.SecureRandom;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -146,13 +148,19 @@ public class PersonService {
     private String generateConfirmationCode() {
         SecureRandom random = new SecureRandom();
         final int CODE_LENGTH = 6;
+        Set<Character> selectedCharsForCode = new HashSet<>();
 
         StringBuilder sb = new StringBuilder(CODE_LENGTH);
         String chars = "AB0CD1EF2GH3IJ4KL5MN6OP7QR8ST9UVWXYZ";
 
-        for (int i = 0; i < CODE_LENGTH; i++) {
+        while (selectedCharsForCode.size() < CODE_LENGTH){
             int index = random.nextInt(chars.length());
-            sb.append(chars.charAt(index));
+
+            if(!selectedCharsForCode.contains(chars.charAt(index))){
+                selectedCharsForCode.add(chars.charAt(index)); 
+                sb.append(chars.charAt(index));
+            }
+            
         }
 
         return sb.toString();

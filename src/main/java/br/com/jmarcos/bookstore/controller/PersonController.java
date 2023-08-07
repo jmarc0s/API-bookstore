@@ -60,6 +60,13 @@ public class PersonController {
                 return ResponseEntity.created(uri).body(new PersonResponseDTO(person));
         }
 
+        @Operation(summary = "confirm your confirmation code", description = "confirm your code to be free to log in", responses = {
+                        @ApiResponse(responseCode = "200", ref = "ok"),
+                        @ApiResponse(responseCode = "400", ref = "badRequest"),
+                        @ApiResponse(responseCode = "404", ref = "ResourceNotFound"),
+                        @ApiResponse(responseCode = "403", ref = "permissionDenied")
+        })
+
         @PostMapping("/confirm_code")
         public ResponseEntity<Object> confirmCode(@RequestParam String email, @RequestParam String code) {
                 return ResponseEntity.ok(this.personService.confirmCode(email, code));
