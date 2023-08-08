@@ -72,6 +72,19 @@ public class PersonController {
                 return ResponseEntity.ok(this.personService.confirmCode(email, code));
         }
 
+        @Operation(summary = "change email and resend confirmation code", description = "change your email and resend confirmation code", responses = {
+                @ApiResponse(responseCode = "200", ref = "ok"),
+                @ApiResponse(responseCode = "400", ref = "badRequest"),
+                @ApiResponse(responseCode = "404", ref = "ResourceNotFound"),
+                @ApiResponse(responseCode = "403", ref = "permissionDenied")
+        })
+
+
+        @PostMapping("/change_email_and_resend_confirmation_code")
+        public ResponseEntity<Object>  changeEmailAndResendConfirmationCode(@RequestParam String oldEmail, @RequestParam String newEmail){
+                 return ResponseEntity.ok(this.personService.changeEmailAndResendConfirmationCode(oldEmail, newEmail));
+        }
+
         @SecurityRequirement(name = "Authorization")
         @Operation(summary = "update your profile data", description = "update data like email, name ", responses = {
                         @ApiResponse(responseCode = "200", ref = "ok"),

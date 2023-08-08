@@ -47,6 +47,7 @@ public class SecurityConfigurations {
                             .requestMatchers("/permissions").hasRole("ADMIN")
                             .requestMatchers("/permissions/**").hasRole("ADMIN")
                             .requestMatchers(HttpMethod.POST, "/persons").permitAll()
+                            .requestMatchers(HttpMethod.POST, "/persons/change_email_and_resend_confirmation_code").permitAll()
                             .requestMatchers(HttpMethod.POST, "/persons/confirm_code").permitAll()
                             .requestMatchers(HttpMethod.GET, "/persons").hasRole("ADMIN")
                             .requestMatchers(HttpMethod.GET, "/persons/profile").authenticated()
@@ -66,7 +67,7 @@ public class SecurityConfigurations {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and().addFilterBefore(new AuthenticateTokenFilter(tokenService, personRepository),
                         UsernamePasswordAuthenticationFilter.class);
-
+                        
         return http.build();
     }
 

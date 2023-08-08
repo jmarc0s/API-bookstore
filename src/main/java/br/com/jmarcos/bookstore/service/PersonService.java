@@ -180,4 +180,16 @@ public class PersonService {
         return "now you're free to log in";
     }
 
+    public String changeEmailAndResendConfirmationCode(String oldEmail, String newEmail) {
+        Person person = this.searchByEmail(oldEmail);
+
+        person.setEmail(newEmail);
+        person.setConfirmationCode(this.generateConfirmationCode());
+
+        this.sendConfirmationEmail(person);
+        this.personRepository.save(person);
+
+        return "Email changed";
+    }
+
 }
