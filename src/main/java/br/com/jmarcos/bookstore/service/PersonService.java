@@ -183,6 +183,10 @@ public class PersonService {
     public String changeEmailAndResendConfirmationCode(String oldEmail, String newEmail) {
         Person person = this.searchByEmail(oldEmail);
 
+        if (this.existsByEmail(newEmail)) {
+            throw new ConflictException("New email is already in use");
+        }
+
         person.setEmail(newEmail);
         person.setConfirmationCode(this.generateConfirmationCode());
 

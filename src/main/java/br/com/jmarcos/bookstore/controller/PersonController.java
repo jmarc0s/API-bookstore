@@ -76,6 +76,7 @@ public class PersonController {
                 @ApiResponse(responseCode = "200", ref = "ok"),
                 @ApiResponse(responseCode = "400", ref = "badRequest"),
                 @ApiResponse(responseCode = "404", ref = "ResourceNotFound"),
+                @ApiResponse(responseCode = "409", ref = "conflict"),
                 @ApiResponse(responseCode = "403", ref = "permissionDenied")
         })
 
