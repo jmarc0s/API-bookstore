@@ -52,8 +52,14 @@ public class Person implements UserDetails {
     @Column(name = "person_password")
     private String password;
 
+    @Column(name = "is_account_non_locked")
+    private boolean isAccountNonLocked = false;
+
     @ManyToMany(fetch = FetchType.EAGER)
     private List<Permission> permission = new ArrayList<>();
+
+    @Column(name = "confirmation_code")
+    private String confirmationCode;
 
     @OneToMany(mappedBy = "person", cascade = CascadeType.REMOVE)
     private List<GroceryCart> groceryCarts = new ArrayList<>();
@@ -80,7 +86,7 @@ public class Person implements UserDetails {
 
     @Override
     public boolean isAccountNonLocked() {
-        return true;
+        return isAccountNonLocked;
     }
 
     @Override
