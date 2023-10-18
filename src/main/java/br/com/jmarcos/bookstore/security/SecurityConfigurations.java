@@ -12,6 +12,9 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.CorsFilter;
 
 import br.com.jmarcos.bookstore.repository.PersonRepository;
 
@@ -47,7 +50,8 @@ public class SecurityConfigurations {
                             .requestMatchers("/permissions").hasRole("ADMIN")
                             .requestMatchers("/permissions/**").hasRole("ADMIN")
                             .requestMatchers(HttpMethod.POST, "/persons").permitAll()
-                            .requestMatchers(HttpMethod.POST, "/persons/change_email_and_resend_confirmation_code").permitAll()
+                            .requestMatchers(HttpMethod.POST, "/persons/change_email_and_resend_confirmation_code")
+                            .permitAll()
                             .requestMatchers(HttpMethod.POST, "/persons/confirm_code").permitAll()
                             .requestMatchers(HttpMethod.GET, "/persons").hasRole("ADMIN")
                             .requestMatchers(HttpMethod.GET, "/persons/profile").authenticated()
@@ -67,7 +71,7 @@ public class SecurityConfigurations {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and().addFilterBefore(new AuthenticateTokenFilter(tokenService, personRepository),
                         UsernamePasswordAuthenticationFilter.class);
-                        
+
         return http.build();
     }
 
@@ -82,4 +86,15 @@ public class SecurityConfigurations {
         return new BCryptPasswordEncoder();
     }
 
+    @Bean
+    public CorsFilter corsFilter() {
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowCredentials(true);
+        config.addAllowedOriginPattern("*");
+        config.addAllowedHeader("*");
+        config.addAllowedMethod("*");
+        source.registerCorsConfiguration("/**", config);
+        return new CorsFilter(source);
+    }
 }
