@@ -11,16 +11,17 @@ COPY src src
 # Build the application ( Isso usa o Maven para compilar e empacotar a aplicação. O argumento -DskipTests indica ao Maven para pular a execução dos testes unitários durante a compilação.)
 RUN mvn package -DskipTests
 
-# Etapa para copiar o arquivo JAR diretamente
-#COPY target/bookstore-1.0.0.jar bookstore-1.0.0.jar
-
-# Configuração da imagem final
+# Configurando o ambiente jdk-17 para rodar a aplicação.
 FROM openjdk:17-slim
 
 
-# Copie o arquivo JAR da etapa anterior
+# ste comando copia o arquivo JAR resultante da compilação da etapa anterior (a etapa rotulada como "build") 
+#para o diretório de trabalho atual no contêiner Docker que está sendo construído. 
+#O arquivo JAR é renomeado para bookstore-1.0.0.jar no contêiner.
 COPY --from=build target/bookstore-1.0.0.jar bookstore-1.0.0.jar
 
 # Especificação da porta, comando de execução, etc.
 EXPOSE 8080
+
+
 CMD ["java", "-jar", "bookstore-1.0.0.jar"]
