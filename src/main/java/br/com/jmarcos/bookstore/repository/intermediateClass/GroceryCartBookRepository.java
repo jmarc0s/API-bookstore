@@ -11,12 +11,12 @@ import br.com.jmarcos.bookstore.model.intermediateClass.GroceryCartBook;
 @Repository
 public interface GroceryCartBookRepository extends JpaRepository<GroceryCartBook, Long> {
 
-    void deleteAllByGroceryCartId(Long id);
+      void deleteAllByGroceryCartId(Long id);
 
-    void deleteByGroceryCartIdAndBookId(Long id, Long id2);
+      void deleteByGroceryCartIdAndBookId(Long id, Long id2);
 
-    Optional<GroceryCartBook> findByGroceryCartIdAndBookId(Long id, Long id2);
+      Optional<GroceryCartBook> findByGroceryCartIdAndBookId(Long id, Long id2);
 
-    List<GroceryCartBook> findAllByGroceryCartId(Long id);
+      List<GroceryCartBook> findAllByGroceryCartId(Long id);
 
 }

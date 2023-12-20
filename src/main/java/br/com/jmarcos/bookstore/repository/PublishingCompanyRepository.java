@@ -10,6 +10,6 @@ import br.com.jmarcos.bookstore.model.PublishingCompany;
 @Repository
 public interface PublishingCompanyRepository extends JpaRepository<PublishingCompany, Long> {
 
-    Optional<PublishingCompany> findByName(String name);
+      Optional<PublishingCompany> findByName(String name);
 
 }

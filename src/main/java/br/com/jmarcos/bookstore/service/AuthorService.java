@@ -18,77 +18,78 @@ import jakarta.transaction.Transactional;
 
 @Service
 public class AuthorService {
-    private final AuthorRepository authorRepository;
-    private final StorehouseBookRepository storehouseBookRepository;
+      private final AuthorRepository authorRepository;
+      private final StorehouseBookRepository storehouseBookRepository;
 
-    @Autowired
-    public AuthorService(AuthorRepository authorRepository, StorehouseBookRepository storehouseBookRepository) {
-        this.authorRepository = authorRepository;
-        this.storehouseBookRepository = storehouseBookRepository;
-    }
+      // FIXME
+      // retirar anotação Autowired
+      @Autowired
+      public AuthorService(AuthorRepository authorRepository, StorehouseBookRepository storehouseBookRepository) {
+            this.authorRepository = authorRepository;
+            this.storehouseBookRepository = storehouseBookRepository;
+      }
 
-    public Page<Author> search(Pageable pageable) {
-        return this.authorRepository.findAll(pageable);
-    }
+      public Page<Author> search(Pageable pageable) {
+            return this.authorRepository.findAll(pageable);
+      }
 
-    public boolean existsByName(String authorRequestDTOName) {
-        Optional<Author> exists = authorRepository.findByName(authorRequestDTOName);
+      public boolean existsByName(String authorRequestDTOName) {
+            Optional<Author> exists = authorRepository.findByName(authorRequestDTOName);
 
-        return exists.isPresent();
-    }
+            return exists.isPresent();
+      }
 
-    public Author save(Author author) {
+      public Author save(Author author) {
 
-        if (this.existsByName(author.getName())) {
-            throw new ConflictException("Author name is already in use");
-        }
+            if (this.existsByName(author.getName())) {
+                  throw new ConflictException("Author name is already in use");
+            }
 
-        return this.authorRepository.save(author);
-    }
+            return this.authorRepository.save(author);
+      }
 
-    public Author searchById(Long id) {
-        return this.authorRepository.findById(id)
-            .orElseThrow(() -> new ResourceNotFoundException("Author not found with the given id"));
-    }
+      public Author searchById(Long id) {
+            return this.authorRepository.findById(id)
+                        .orElseThrow(() -> new ResourceNotFoundException("Author not found with the given id"));
+      }
 
-    public Author searchByName(String name) {
-        return this.authorRepository.findByName(name)
-            .orElseThrow(() -> new ResourceNotFoundException("Author not found with the given name"));
-    }
+      public Author searchByName(String name) {
+            return this.authorRepository.findByName(name)
+                        .orElseThrow(() -> new ResourceNotFoundException("Author not found with the given name"));
+      }
 
-    @Transactional
-    public void deleteById(Long id) {
-        Author exists = this.searchById(id);
-        
+      @Transactional
+      public void deleteById(Long id) {
+            Author exists = this.searchById(id);
 
-        for (Book book : exists.getBookList()) {
-            this.storehouseBookRepository.deleteAllByBookId(book.getId());
-        }
+            for (Book book : exists.getBookList()) {
+                  this.storehouseBookRepository.deleteAllByBookId(book.getId());
+            }
 
-        this.authorRepository.deleteById(id);
-      
-    }
+            this.authorRepository.deleteById(id);
 
-    public Author update(Author newAuthor) {
-        Author oldAuthor = this.searchById(newAuthor.getId());
+      }
 
-        if (!Objects.equals(oldAuthor.getName(), newAuthor.getName())
-            && this.existsByName(newAuthor.getName())){
+      public Author update(Author newAuthor) {
+            Author oldAuthor = this.searchById(newAuthor.getId());
 
-                throw new ConflictException("Author name is already in use");
+            if (!Objects.equals(oldAuthor.getName(), newAuthor.getName())
+                        && this.existsByName(newAuthor.getName())) {
+
+                  throw new ConflictException("Author name is already in use");
 
             }
 
-        return this.authorRepository.save(this.fillUpdate(oldAuthor, newAuthor));
-    }
+            return this.authorRepository.save(this.fillUpdate(oldAuthor, newAuthor));
+      }
 
-    private Author fillUpdate(Author oldAuthor, Author newAuthor) {
-        newAuthor.getAddress().setId(oldAuthor.getAddress().getId());
+      private Author fillUpdate(Author oldAuthor, Author newAuthor) {
+            newAuthor.getAddress().setId(oldAuthor.getAddress().getId());
 
-        oldAuthor.setName(newAuthor.getName());
-        oldAuthor.setUrl(newAuthor.getUrl());
-        oldAuthor.setAddress(newAuthor.getAddress());
-        return oldAuthor;
-    }
+            oldAuthor.setName(newAuthor.getName());
+            oldAuthor.setUrl(newAuthor.getUrl());
+            oldAuthor.setAddress(newAuthor.getAddress());
+            return oldAuthor;
+      }
 
 }

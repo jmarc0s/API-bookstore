@@ -15,6 +15,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+// FIXME
+// mudar o nome para OrderBook
 @Getter
 @Setter
 @AllArgsConstructor
@@ -22,17 +24,17 @@ import lombok.Setter;
 @Entity
 @Table(name = "grocery_cart_book")
 public class GroceryCartBook {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+      @Id
+      @GeneratedValue(strategy = GenerationType.IDENTITY)
+      private Long id;
 
-    private int quantity;
+      private int quantity;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "grocery_cart_id")
-    private GroceryCart groceryCart;
+      @ManyToOne(fetch = FetchType.EAGER)
+      @JoinColumn(name = "grocery_cart_id")
+      private GroceryCart groceryCart;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "book_id")
-    private Book book;
+      @ManyToOne(fetch = FetchType.EAGER)
+      @JoinColumn(name = "book_id")
+      private Book book;
 }

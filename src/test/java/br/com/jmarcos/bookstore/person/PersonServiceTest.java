@@ -45,7 +45,7 @@ public class PersonServiceTest {
 
     @Mock
     private PermissionService permissionService;
-    
+
     @Mock
     private GroceryCartBookRepository groceryCartBookRepository;
 
@@ -72,6 +72,10 @@ public class PersonServiceTest {
 
     }
 
+    // FIXME
+    // java.lang.NullPointerException: Cannot invoke
+    // "org.springframework.mail.javamail.JavaMailSender.send(org.springframework.mail.SimpleMailMessage)"
+    // because "this.mailSender" is null
     @Test
     void save_returns_ASavedPerson_WhenSuccessful() {
         Person person = createPerson();
@@ -127,7 +131,6 @@ public class PersonServiceTest {
         verify(personRepository).findById(person.getId());
     }
 
-
     @Test
     void searchById_Throws_ResourceNotFoundException_WhenPersonNotFound() {
         when(personRepository.findById(anyLong())).thenReturn(Optional.empty());
@@ -136,10 +139,9 @@ public class PersonServiceTest {
                 .assertThrows(ResourceNotFoundException.class,
                         () -> personService.searchById(1L));
 
-
-            Assertions.assertTrue(resourceNotFoundException.getMessage()
+        Assertions.assertTrue(resourceNotFoundException.getMessage()
                 .contains("Person not found with the given id"));
-        
+
     }
 
     @Test
@@ -170,17 +172,15 @@ public class PersonServiceTest {
                 .assertThrows(ResourceNotFoundException.class,
                         () -> personService.searchByEmail(anyString()));
 
-
-            Assertions.assertTrue(resourceNotFoundException.getMessage()
+        Assertions.assertTrue(resourceNotFoundException.getMessage()
                 .contains("Person not found with the given email"));
-        
+
     }
 
     @Test
     void deleteById_deletesAPerson_WhenSuccessful() {
         Person person = createPerson();
         when(personRepository.findById(anyLong())).thenReturn(Optional.of(person));
-
 
         this.personService.deleteById(person.getId());
 
@@ -197,10 +197,9 @@ public class PersonServiceTest {
                 .assertThrows(ResourceNotFoundException.class,
                         () -> personService.deleteById(anyLong()));
 
-
-            Assertions.assertTrue(resourceNotFoundException.getMessage()
+        Assertions.assertTrue(resourceNotFoundException.getMessage()
                 .contains("Person not found with the given id"));
-        
+
     }
 
     @Test
@@ -257,7 +256,6 @@ public class PersonServiceTest {
 
     }
 
-
     public Person createPerson() {
         Person person = new Person();
 
@@ -296,15 +294,15 @@ public class PersonServiceTest {
     }
 
     public Book create() {
-    Book book = new Book();
+        Book book = new Book();
 
-    book.setId(1L);
+        book.setId(1L);
 
-    return book;
+        return book;
 
     }
 
-    public Permission createPermission(){
+    public Permission createPermission() {
         Permission permission = new Permission();
 
         permission.setId(1L);

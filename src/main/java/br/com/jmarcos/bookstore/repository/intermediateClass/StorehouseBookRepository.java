@@ -10,8 +10,8 @@ import br.com.jmarcos.bookstore.model.intermediateClass.StorehouseBook;
 @Repository
 public interface StorehouseBookRepository extends JpaRepository<StorehouseBook, Long> {
 
-    void deleteAllByBookId(Long id);
+      void deleteAllByBookId(Long id);
 
-    List<StorehouseBook> findAllByBookId(Long id);
+      List<StorehouseBook> findAllByBookId(Long id);
 
 }

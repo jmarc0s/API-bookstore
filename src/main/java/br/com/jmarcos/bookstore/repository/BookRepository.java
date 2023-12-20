@@ -12,14 +12,10 @@ import br.com.jmarcos.bookstore.model.Book;
 @Repository
 public interface BookRepository extends JpaRepository<Book, Long>, JpaSpecificationExecutor<Book> {
 
-    Optional<Book> findByTitle(String title);
+      Optional<Book> findByTitle(String title);
 
-    List<Book> findAllByAuthorListName(String authorName);
+      List<Book> findAllByAuthorListName(String authorName);
 
-    List<Book> findAllByPublishingCompanyId(Long id);
-
-    // @Query("SELECT b.book_title, b.book_id FROM book b WHERE b.book_id =
-    // :publishingCompanyId")
-    // Optional<Book> testeSql(int publishingCompanyId);
+      List<Book> findAllByPublishingCompanyId(Long id);
 
 }

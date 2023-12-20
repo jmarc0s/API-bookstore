@@ -21,18 +21,18 @@ import lombok.Setter;
 @Entity
 @Table(name = "storehouse_book")
 public class StorehouseBook {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+      @Id
+      @GeneratedValue(strategy = GenerationType.IDENTITY)
+      private Long id;
 
-    private int quantity;
+      private int quantity;
 
-    @ManyToOne
-    @JoinColumn(name = "storehouse_id")
-    private Storehouse storehouse;
+      @ManyToOne
+      @JoinColumn(name = "storehouse_id")
+      private Storehouse storehouse;
 
-    @ManyToOne
-    @JoinColumn(name = "book_id")
-    private Book book;
+      @ManyToOne
+      @JoinColumn(name = "book_id")
+      private Book book;
 
 }

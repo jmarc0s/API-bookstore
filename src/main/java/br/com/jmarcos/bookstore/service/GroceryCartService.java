@@ -19,131 +19,130 @@ import jakarta.transaction.Transactional;
 
 @Service
 public class GroceryCartService {
-    private final GroceryCartRepository groceryCartRepository;
-    private final BookService bookService;
-    private final PersonService personService;
-    private final GroceryCartBookRepository groceryCartBookRepository;
+      private final GroceryCartRepository groceryCartRepository;
+      private final BookService bookService;
+      private final PersonService personService;
+      private final GroceryCartBookRepository groceryCartBookRepository;
 
-    @Autowired
-    public GroceryCartService(GroceryCartRepository groceryCartRepository,
-            GroceryCartBookRepository groceryCartBookRepository,
-            PersonService personService, BookService bookService) {
-        this.groceryCartRepository = groceryCartRepository;
-        this.personService = personService;
-        this.groceryCartBookRepository = groceryCartBookRepository;
-        this.bookService = bookService;
-    }
+      @Autowired
+      public GroceryCartService(GroceryCartRepository groceryCartRepository,
+                  GroceryCartBookRepository groceryCartBookRepository,
+                  PersonService personService, BookService bookService) {
+            this.groceryCartRepository = groceryCartRepository;
+            this.personService = personService;
+            this.groceryCartBookRepository = groceryCartBookRepository;
+            this.bookService = bookService;
+      }
 
-    public List<GroceryCart> searchByPersonId(Long personId) {
-        return this.groceryCartRepository.findAllByPersonId(personId);
-    }
+      public List<GroceryCart> searchByPersonId(Long personId) {
+            return this.groceryCartRepository.findAllByPersonId(personId);
+      }
 
-    @Transactional
-    public void deleteByIdAndPersonId(Long id, Long personId) {
-        GroceryCart groceryCart = this.searchByIdAndPersonId(id, personId);
+      @Transactional
+      public void deleteByIdAndPersonId(Long id, Long personId) {
+            GroceryCart groceryCart = this.searchByIdAndPersonId(id, personId);
 
-        this.groceryCartBookRepository.deleteAllByGroceryCartId(groceryCart.getId());
-        this.groceryCartRepository.deleteById(groceryCart.getId());
+            this.groceryCartBookRepository.deleteAllByGroceryCartId(groceryCart.getId());
+            this.groceryCartRepository.deleteById(groceryCart.getId());
+      }
 
-    }
+      public GroceryCart searchByIdAndPersonId(Long id, Long personId) {
+            return this.groceryCartRepository.findByIdAndPersonId(id, personId)
+                        .orElseThrow(() -> new ResourceNotFoundException("GroceryCart not found with the given id"));
+      }
 
-    public GroceryCart searchByIdAndPersonId(Long id, Long personId) {
-        return this.groceryCartRepository.findByIdAndPersonId(id, personId)
-                .orElseThrow(() -> new ResourceNotFoundException("GroceryCart not found with the given id"));
-    }
+      public GroceryCart save(GroceryCart groceryCart, List<GroceryCartBook> groceryCartBooks) {
+            List<Book> books = this.searchBooks(groceryCartBooks);
+            Person person = this.personService.searchById(groceryCart.getPerson().getId());
 
-    public GroceryCart save(GroceryCart groceryCart, List<GroceryCartBook> groceryCartBooks) {
-        List<Book> books = this.searchBooks(groceryCartBooks);
-        Person person = this.personService.searchById(groceryCart.getPerson().getId());
+            groceryCart.setPerson(person);
+            groceryCart.setBooks(books);
 
-        groceryCart.setPerson(person);
-        groceryCart.setBooks(books);
+            GroceryCart savedGroceryCart = this.groceryCartRepository.save(groceryCart);
 
-        GroceryCart savedGroceryCart = this.groceryCartRepository.save(groceryCart);
+            groceryCartBooks.forEach(groceryCartBook -> groceryCartBook.setGroceryCart(groceryCart));
+            this.groceryCartBookRepository.saveAll(groceryCartBooks);
 
-        groceryCartBooks.forEach(groceryCartBook -> groceryCartBook.setGroceryCart(groceryCart));
-        this.groceryCartBookRepository.saveAll(groceryCartBooks);
+            return savedGroceryCart;
 
-        return savedGroceryCart;
+      }
 
-    }
+      public Optional<GroceryCart> findOpenOrder(Long personId) {
+            Optional<GroceryCart> openOder = this.groceryCartRepository.findOpenOrder(personId);
 
-    public Optional<GroceryCart> findOpenOrder(Long personId) {
-        Optional<GroceryCart> openOder = this.groceryCartRepository.findOpenOrder(personId);
+            return openOder;
+      }
 
-        return openOder;
-    }
+      @Transactional
+      public GroceryCart deleteBook(GroceryCart groceryCart, Long bookId) {
+            Book book = this.bookService.findById(bookId);
 
-    @Transactional
-    public GroceryCart deleteBook(GroceryCart groceryCart, Long bookId) {
-        Book book = this.bookService.findById(bookId);
+            this.groceryCartBookRepository.deleteByGroceryCartIdAndBookId(groceryCart.getId(), book.getId());
+            groceryCart.getBooks().remove(book);
 
-        this.groceryCartBookRepository.deleteByGroceryCartIdAndBookId(groceryCart.getId(), book.getId());
-        groceryCart.getBooks().remove(book);
+            return this.groceryCartRepository.save(groceryCart);
+      }
 
-        return this.groceryCartRepository.save(groceryCart);
-    }
+      public GroceryCart updateBook(GroceryCart groceryCart, Long bookId, int quantity) {
+            Book book = this.bookService.findById(bookId);
 
-    public GroceryCart updateBook(GroceryCart groceryCart, Long bookId, int quantity) {
-        Book book = this.bookService.findById(bookId);
-
-        if (this.updateGroceryCartBook(groceryCart, book, quantity)) {
-            return groceryCart;
-        }
-        throw new ResourceNotFoundException("book not found in this grocery cart");
-
-    }
-
-    private Boolean updateGroceryCartBook(GroceryCart groceryCart, Book book, int quantity) {
-
-        Optional<GroceryCartBook> groceryCartBookOp = this.groceryCartBookRepository
-                .findByGroceryCartIdAndBookId(groceryCart.getId(), book.getId());
-
-        if (groceryCartBookOp.isPresent()) {
-
-            GroceryCartBook groceryCartBook = groceryCartBookOp.get();
-            groceryCartBook.setQuantity(quantity);
-            this.groceryCartBookRepository.save(groceryCartBook);
-
-            return true;
-        }
-
-        return false;
-    }
-
-    public List<GroceryCartBook> listGroceryCartBook(GroceryCart groceryCart) {
-        return this.groceryCartBookRepository.findAllByGroceryCartId(groceryCart.getId());
-    }
-
-    private List<Book> searchBooks(List<GroceryCartBook> groceryCartBooks) {
-        List<Book> books = new ArrayList<>();
-
-        for (GroceryCartBook groceryCartBook : groceryCartBooks) {
-
-            Book bookExists = this.bookService.findById(groceryCartBook.getBook().getId());
-            groceryCartBook.setBook(bookExists);
-            books.add(bookExists);
-
-        }
-
-        return books;
-    }
-
-    public GroceryCart addBooks(GroceryCart groceryCart, List<GroceryCartBook> books) {
-        List<Book> bookList = this.searchBooks(books);
-
-        for (GroceryCartBook orderBook : books) {
-            Optional<GroceryCartBook> groceryCartBook = this.groceryCartBookRepository
-                    .findByGroceryCartIdAndBookId(groceryCart.getId(), orderBook.getBook().getId());
-
-            if (groceryCartBook.isPresent()) {
-                throw new ConflictException("Book is already in this grocery cart");
+            if (this.updateGroceryCartBook(groceryCart, book, quantity)) {
+                  return groceryCart;
             }
-            orderBook.setGroceryCart(groceryCart);
-            groceryCart.getBooks().add(orderBook.getBook());
-        }
-        this.groceryCartBookRepository.saveAll(books);
-        return this.groceryCartRepository.save(groceryCart);
-    }
+            throw new ResourceNotFoundException("book not found in this grocery cart");
+
+      }
+
+      private Boolean updateGroceryCartBook(GroceryCart groceryCart, Book book, int quantity) {
+
+            Optional<GroceryCartBook> groceryCartBookOp = this.groceryCartBookRepository
+                        .findByGroceryCartIdAndBookId(groceryCart.getId(), book.getId());
+
+            if (groceryCartBookOp.isPresent()) {
+
+                  GroceryCartBook groceryCartBook = groceryCartBookOp.get();
+                  groceryCartBook.setQuantity(quantity);
+                  this.groceryCartBookRepository.save(groceryCartBook);
+
+                  return true;
+            }
+
+            return false;
+      }
+
+      public List<GroceryCartBook> listGroceryCartBook(GroceryCart groceryCart) {
+            return this.groceryCartBookRepository.findAllByGroceryCartId(groceryCart.getId());
+      }
+
+      private List<Book> searchBooks(List<GroceryCartBook> groceryCartBooks) {
+            List<Book> books = new ArrayList<>();
+
+            for (GroceryCartBook groceryCartBook : groceryCartBooks) {
+
+                  Book bookExists = this.bookService.findById(groceryCartBook.getBook().getId());
+                  groceryCartBook.setBook(bookExists);
+                  books.add(bookExists);
+
+            }
+
+            return books;
+      }
+
+      public GroceryCart addBooks(GroceryCart groceryCart, List<GroceryCartBook> books) {
+            List<Book> bookList = this.searchBooks(books);
+
+            for (GroceryCartBook orderBook : books) {
+                  Optional<GroceryCartBook> groceryCartBook = this.groceryCartBookRepository
+                              .findByGroceryCartIdAndBookId(groceryCart.getId(), orderBook.getBook().getId());
+
+                  if (groceryCartBook.isPresent()) {
+                        throw new ConflictException("Book is already in this grocery cart");
+                  }
+                  orderBook.setGroceryCart(groceryCart);
+                  groceryCart.getBooks().add(orderBook.getBook());
+            }
+            this.groceryCartBookRepository.saveAll(books);
+            return this.groceryCartRepository.save(groceryCart);
+      }
 
 }

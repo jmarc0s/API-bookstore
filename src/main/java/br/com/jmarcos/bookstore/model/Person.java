@@ -31,83 +31,83 @@ import org.springframework.security.core.userdetails.UserDetails;
 @Entity
 @Table(name = "person")
 public class Person implements UserDetails {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "person_id")
-    private Long id;
+      @Id
+      @GeneratedValue(strategy = GenerationType.IDENTITY)
+      @Column(name = "person_id")
+      private Long id;
 
-    @Column(name = "person_name")
-    private String name;
+      @Column(name = "person_name")
+      private String name;
 
-    @Column(name = "person_email")
-    private String email;
+      @Column(name = "person_email")
+      private String email;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "address_id")
-    private Address address;
+      @OneToOne(cascade = CascadeType.ALL)
+      @JoinColumn(name = "address_id")
+      private Address address;
 
-    @Column(name = "person_phone")
-    private String phone;
+      @Column(name = "person_phone")
+      private String phone;
 
-    @Column(name = "person_password")
-    private String password;
+      @Column(name = "person_password")
+      private String password;
 
-    @Column(name = "is_account_non_locked")
-    private boolean isAccountNonLocked = false;
+      @Column(name = "is_account_non_locked")
+      private boolean isAccountNonLocked = false;
 
-    @ManyToMany(fetch = FetchType.EAGER)
-    private List<Permission> permission = new ArrayList<>();
+      @ManyToMany(fetch = FetchType.EAGER)
+      private List<Permission> permission = new ArrayList<>();
 
-    @Column(name = "confirmation_code")
-    private String confirmationCode;
+      @Column(name = "confirmation_code")
+      private String confirmationCode;
 
-    @OneToMany(mappedBy = "person", cascade = CascadeType.REMOVE)
-    private List<GroceryCart> groceryCarts = new ArrayList<>();
+      @OneToMany(mappedBy = "person", cascade = CascadeType.REMOVE)
+      private List<GroceryCart> groceryCarts = new ArrayList<>();
 
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return this.permission;
-    }
+      @Override
+      public Collection<? extends GrantedAuthority> getAuthorities() {
+            return this.permission;
+      }
 
-    @Override
-    public String getPassword() {
-        return this.password;
-    }
+      @Override
+      public String getPassword() {
+            return this.password;
+      }
 
-    @Override
-    public String getUsername() {
-        return this.email;
-    }
+      @Override
+      public String getUsername() {
+            return this.email;
+      }
 
-    @Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
+      @Override
+      public boolean isAccountNonExpired() {
+            return true;
+      }
 
-    @Override
-    public boolean isAccountNonLocked() {
-        return isAccountNonLocked;
-    }
+      @Override
+      public boolean isAccountNonLocked() {
+            return isAccountNonLocked;
+      }
 
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
+      @Override
+      public boolean isCredentialsNonExpired() {
+            return true;
+      }
 
-    @Override
-    public boolean isEnabled() {
-        return true;
-    }
+      @Override
+      public boolean isEnabled() {
+            return true;
+      }
 
-    public Person(Long personId) {
-        this.id = personId;
-    }
+      public Person(Long personId) {
+            this.id = personId;
+      }
 
-    public Person(String name2, String email2, Address address2, String phone2) {
-        this.name = name2;
-        this.email = email2;
-        this.address = address2;
-        this.phone = phone2;
-    }
+      public Person(String name2, String email2, Address address2, String phone2) {
+            this.name = name2;
+            this.email = email2;
+            this.address = address2;
+            this.phone = phone2;
+      }
 
 }

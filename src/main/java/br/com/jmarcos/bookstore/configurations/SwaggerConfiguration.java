@@ -16,6 +16,9 @@ import org.springframework.context.annotation.Configuration;
 @SecurityScheme(type = SecuritySchemeType.HTTP, bearerFormat = "JWT", name = "Authorization", scheme = "Bearer")
 public class SwaggerConfiguration {
 
+        // FIXME
+        // fazer com que esse metodo torne a utilização do header Authorization padrão
+        // para todos os endpoints
         @Bean
         public OpenAPI basOpenAPI() {
 

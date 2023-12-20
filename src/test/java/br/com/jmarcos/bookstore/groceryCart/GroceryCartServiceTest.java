@@ -87,12 +87,12 @@ public class GroceryCartServiceTest {
                 .assertThrows(ResourceNotFoundException.class,
                         () -> groceryCartService.searchByIdAndPersonId(anyLong(), anyLong()));
 
-
-            Assertions.assertTrue(resourceNotFoundException.getMessage()
+        Assertions.assertTrue(resourceNotFoundException.getMessage()
                 .contains("GroceryCart not found with the given id"));
-        
+
     }
 
+    // FIXME
     // @Test
     // void save_returns_ASavedGroceryCart_WhenSuccessful(){
     // GroceryCart groceryCart = createGroceryCart();
@@ -145,19 +145,18 @@ public class GroceryCartServiceTest {
     }
 
     @Test
-    void delete_Throws_ResourceNotFoundException_WhenGroceryCartNotFound(){
+    void delete_Throws_ResourceNotFoundException_WhenGroceryCartNotFound() {
         when(groceryCartRepository.findByIdAndPersonId(anyLong(), anyLong())).thenReturn(Optional.empty());
 
         ResourceNotFoundException resourceNotFoundException = Assertions
                 .assertThrows(ResourceNotFoundException.class,
                         () -> groceryCartService.deleteByIdAndPersonId(anyLong(), anyLong()));
 
-
-            Assertions.assertTrue(resourceNotFoundException.getMessage()
+        Assertions.assertTrue(resourceNotFoundException.getMessage()
                 .contains("GroceryCart not found with the given id"));
-        
-    }
 
+    }
+    // FIXME
     // @Test
     // void addBook_returns_AGroceryCartWithAnAddedBook_WhenSuccessful(){
     // GroceryCart groceryCart = createGroceryCart();
@@ -179,6 +178,7 @@ public class GroceryCartServiceTest {
 
     // }
 
+    // FIXME
     // @Test
     // void addBook_Throws_ConflictException_WhenBookIsAlreadyInGroceryCart(){
     // GroceryCart groceryCart = createGroceryCart();

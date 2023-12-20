@@ -10,6 +10,6 @@ import br.com.jmarcos.bookstore.model.Person;
 @Repository
 public interface PersonRepository extends JpaRepository<Person, Long> {
 
-    Optional<Person> findByEmail(String email);
+      Optional<Person> findByEmail(String email);
 
 }

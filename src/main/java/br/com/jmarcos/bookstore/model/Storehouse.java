@@ -28,33 +28,33 @@ import lombok.Setter;
 @Table(name = "storehouse")
 public class Storehouse {
 
-        @Id
-        @GeneratedValue(strategy = GenerationType.IDENTITY)
-        @Column(name = "storehouse_id")
-        private Long id;
+      @Id
+      @GeneratedValue(strategy = GenerationType.IDENTITY)
+      @Column(name = "storehouse_id")
+      private Long id;
 
-        @Column(name = "storehouse_code")
-        private Integer code;
+      @Column(name = "storehouse_code")
+      private Integer code;
 
-        @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-        @JoinColumn(name = "address_id")
-        private Address address;
+      @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+      @JoinColumn(name = "address_id")
+      private Address address;
 
-        @Column(name = "storehouse_phone")
-        private String phone;
+      @Column(name = "storehouse_phone")
+      private String phone;
 
-        @ManyToMany
-        @JoinTable(name = "storehouse_book", joinColumns = {
-                        @JoinColumn(name = "storehouse_id")
-        }, inverseJoinColumns = {
-                        @JoinColumn(name = "book_id")
-        })
-        private List<Book> bookList = new ArrayList<>();
+      @ManyToMany
+      @JoinTable(name = "storehouse_book", joinColumns = {
+                  @JoinColumn(name = "storehouse_id")
+      }, inverseJoinColumns = {
+                  @JoinColumn(name = "book_id")
+      })
+      private List<Book> bookList = new ArrayList<>();
 
-        public Storehouse(Integer codeRequest, Address addressRequest, String phoneRequest) {
-                this.code = codeRequest;
-                this.address = addressRequest;
-                this.phone = phoneRequest;
-        }
+      public Storehouse(Integer codeRequest, Address addressRequest, String phoneRequest) {
+            this.code = codeRequest;
+            this.address = addressRequest;
+            this.phone = phoneRequest;
+      }
 
 }

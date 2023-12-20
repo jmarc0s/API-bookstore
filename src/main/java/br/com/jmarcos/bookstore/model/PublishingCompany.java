@@ -28,36 +28,36 @@ import lombok.Setter;
 @Table(name = "publishing_company")
 public class PublishingCompany {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "publishing_company_id")
-    private Long id;
+      @Id
+      @GeneratedValue(strategy = GenerationType.IDENTITY)
+      @Column(name = "publishing_company_id")
+      private Long id;
 
-    @Column(name = "publishing_company_name")
-    private String name;
+      @Column(name = "publishing_company_name")
+      private String name;
 
-    @Column(name = "publishing_company_url")
-    private String url;
+      @Column(name = "publishing_company_url")
+      private String url;
 
-    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JoinColumn(name = "address_id")
-    private Address address;
+      @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+      @JoinColumn(name = "address_id")
+      private Address address;
 
-    @Column(name = "publishing_company_phone")
-    private String phone;
+      @Column(name = "publishing_company_phone")
+      private String phone;
 
-    @OneToMany(mappedBy = "publishingCompany", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
-    private List<Book> bookList = new ArrayList<>();
+      @OneToMany(mappedBy = "publishingCompany", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
+      private List<Book> bookList = new ArrayList<>();
 
-    public PublishingCompany(String requestName, String requestUrl, Address requestAddress, String requestPhone) {
-        this.name = requestName;
-        this.url = requestUrl;
-        this.address = requestAddress;
-        this.phone = requestPhone;
-    }
+      public PublishingCompany(String requestName, String requestUrl, Address requestAddress, String requestPhone) {
+            this.name = requestName;
+            this.url = requestUrl;
+            this.address = requestAddress;
+            this.phone = requestPhone;
+      }
 
-    public PublishingCompany(Long id) {
-        this.id = id;
-    }
+      public PublishingCompany(Long id) {
+            this.id = id;
+      }
 
 }

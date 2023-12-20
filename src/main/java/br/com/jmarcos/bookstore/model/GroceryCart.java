@@ -27,20 +27,22 @@ import lombok.Setter;
 @AllArgsConstructor
 @Entity
 @Table(name = "grocery_cart")
+// FIXME
+// mudar o nome para Order
 public class GroceryCart {
-        @Id
-        @GeneratedValue(strategy = GenerationType.IDENTITY)
-        @Column(name = "grocery_cart_id")
-        private Long id;
+      @Id
+      @GeneratedValue(strategy = GenerationType.IDENTITY)
+      @Column(name = "grocery_cart_id")
+      private Long id;
 
-        @ManyToMany(mappedBy = "groceryCarts", fetch = FetchType.EAGER)
-        private List<Book> books = new ArrayList<>();
+      @ManyToMany(mappedBy = "groceryCarts", fetch = FetchType.EAGER)
+      private List<Book> books = new ArrayList<>();
 
-        @ManyToOne(fetch = FetchType.EAGER)
-        @JoinColumn(name = "person_id")
-        private Person person;
+      @ManyToOne(fetch = FetchType.EAGER)
+      @JoinColumn(name = "person_id")
+      private Person person;
 
-        @Enumerated(EnumType.STRING)
-        @Column(name = "order_status")
-        private OrderStatusEnum orderSTatus;
+      @Enumerated(EnumType.STRING)
+      @Column(name = "order_status")
+      private OrderStatusEnum orderSTatus;
 }

@@ -26,35 +26,42 @@ import jakarta.validation.Valid;
 @RequestMapping("/auth")
 public class AuthController {
 
-    @Autowired
-    private AuthenticationManager authenticationManager;
-    @Autowired
-    private TokenService tokenService;
+      // FIXME
+      // retirar essas anotações. (utlizar o construtor para a injeção das
+      // dependencias)
+      @Autowired
+      private AuthenticationManager authenticationManager;
+      @Autowired
+      private TokenService tokenService;
 
-    @Operation(summary = "Login in the system", description = "login to access more features", responses = {
-            @ApiResponse(responseCode = "200", ref = "ok"),
-            @ApiResponse(responseCode = "400", ref = "badRequest"),
-            @ApiResponse(responseCode = "401", description = "invalid user")
-    })
-    @PostMapping
-    public ResponseEntity<Object> Login(
-            @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(mediaType = "application/json", examples = {
-                    @ExampleObject(value = "{"
-                            + "\"login\": \"user@gmail.com\","
-                            + "\"password\": \"user123\""
-                            + "}"),
-            })) @RequestBody @Valid PersonLoginDTO personLoginDTO) {
+      @Operation(summary = "Login in the system", description = "login to access more features", responses = {
+                  @ApiResponse(responseCode = "200", ref = "ok"),
+                  @ApiResponse(responseCode = "400", ref = "badRequest"),
+                  @ApiResponse(responseCode = "401", description = "invalid user")
+      })
+      @PostMapping
+      public ResponseEntity<Object> Login(
+                  @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(mediaType = "application/json", examples = {
+                              @ExampleObject(value = "{"
+                                          + "\"login\": \"user@gmail.com\","
+                                          + "\"password\": \"user123\""
+                                          + "}"),
+                  })) @RequestBody @Valid PersonLoginDTO personLoginDTO) {
 
-        UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = personLoginDTO.convert();
+            UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = personLoginDTO.convert();
 
-        try {
-            Authentication authentication = authenticationManager.authenticate(usernamePasswordAuthenticationToken);
-            String token = tokenService.createToken(authentication);
+            // FIXME
+            // RETIRAR ESSE TRY CATCH E ADICIONAR UM METODO QUE CAPTURA ESSA EXPTION NO
+            // HANDLEREXCEPTION
+            try {
+                  Authentication authentication = authenticationManager
+                              .authenticate(usernamePasswordAuthenticationToken);
+                  String token = tokenService.createToken(authentication);
 
-            return ResponseEntity.ok(new TokenDTO(token, "Bearer"));
-        } catch (AuthenticationException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid parameters");
-        }
+                  return ResponseEntity.ok(new TokenDTO(token, "Bearer"));
+            } catch (AuthenticationException e) {
+                  return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid parameters");
+            }
 
-    }
+      }
 }

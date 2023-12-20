@@ -61,6 +61,14 @@ public class BookServiceTest {
     @Mock
     private StorehouseBookRepository storehouseBookRepository;
 
+    // FIXME
+    // org.mockito.exceptions.misusing.PotentialStubbingProblem:
+    // Strict stubbing
+    // argument mismatch.
+    // Please check:-this invocation
+    // of'findAll'method:bookRepository.findAll(org.springframework.data.jpa.domain.SpecificationComposition$$Lambda$458/0x0000000800e366a8
+    // @71 a06021,Page request[number:0,size 5,sort:UNSORTED]
+
     @Test
     void search_returns_AllBooks_WhenSuccessful() {
         PageRequest pageable = PageRequest.of(0, 5);
@@ -111,9 +119,9 @@ public class BookServiceTest {
                 .assertThrows(ResourceNotFoundException.class,
                         () -> bookService.findByTitle(anyString()));
 
-            Assertions.assertTrue(resourceNotFoundException.getMessage()
+        Assertions.assertTrue(resourceNotFoundException.getMessage()
                 .contains("Book not found in database with the specified title"));
-        
+
     }
 
     @Test
@@ -211,9 +219,9 @@ public class BookServiceTest {
                 .assertThrows(ResourceNotFoundException.class,
                         () -> bookService.findById(anyLong()));
 
-            Assertions.assertTrue(resourceNotFoundException.getMessage()
+        Assertions.assertTrue(resourceNotFoundException.getMessage()
                 .contains("Book not found in database with the specified id"));
-        
+
     }
 
     @Test
@@ -236,9 +244,9 @@ public class BookServiceTest {
                 .assertThrows(ResourceNotFoundException.class,
                         () -> bookService.deleteById(anyLong()));
 
-            Assertions.assertTrue(resourceNotFoundException.getMessage()
+        Assertions.assertTrue(resourceNotFoundException.getMessage()
                 .contains("Book not found in database with the specified id"));
-        
+
     }
 
     @Test
@@ -315,7 +323,6 @@ public class BookServiceTest {
         Set<Long> authorIdList = new HashSet<>();
         authorIdList.add(2L);
 
-        // bookUpdateDTO.setId(1L);
         bookUpdateDTO.setPrice(new BigDecimal(60.00));
         bookUpdateDTO.setTitle("Livro nem tão legal");
         bookUpdateDTO.setYear(2005);

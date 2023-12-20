@@ -40,135 +40,147 @@ import jakarta.validation.Valid;
 @RestController
 @RequestMapping("/books")
 public class BookController {
-        private final BookService bookService;
+      private final BookService bookService;
 
-        @Autowired
-        public BookController(BookService bookService) {
-                this.bookService = bookService;
-        }
+      @Autowired
+      public BookController(BookService bookService) {
+            this.bookService = bookService;
+      }
 
-        @Operation(summary = "Returns a list of Books", description = "Returns a list of all books in database. The returned list can be filtered by price, categories and release year", responses = {
-                        @ApiResponse(responseCode = "200", ref = "ok"),
-                        @ApiResponse(responseCode = "403", ref = "permissionDenied"),
-                        @ApiResponse(responseCode = "400", ref = "badRequest")
+      @Operation(summary = "Returns a list of Books", description = "Returns a list of all books in database. The returned list can be filtered by price, categories and release year", responses = {
+                  @ApiResponse(responseCode = "200", ref = "ok"),
+                  @ApiResponse(responseCode = "403", ref = "permissionDenied"),
+                  @ApiResponse(responseCode = "400", ref = "badRequest")
 
-        })
+      })
 
-        @Cacheable(value = "BookList")
-        @GetMapping
-        public Page<BookResponseDTO> search(
-                        @PageableDefault(sort = "id", direction = Direction.ASC, page = 0, size = 10) Pageable pageable,
-                        @RequestParam(name = "release_year", required = false) Integer year,
-                        @RequestParam(name = "max_price", required = false) BigDecimal price,
-                        @RequestParam(required = false) List<BookCategory> categories) {
-                return this.bookService
-                                .search(pageable, year, price, categories)
-                                .map(BookResponseDTO::new);
-        }
+      @Cacheable(value = "BookList")
+      @GetMapping
+      // FIXME
+      // retornar lista ao inves de page
+      public Page<BookResponseDTO> search(
+                  @PageableDefault(sort = "id", direction = Direction.ASC, page = 0, size = 10) Pageable pageable,
+                  @RequestParam(name = "release_year", required = false) Integer year,
+                  @RequestParam(name = "max_price", required = false) BigDecimal price,
+                  @RequestParam(required = false) List<BookCategory> categories) {
+            return this.bookService
+                        .search(pageable, year, price, categories)
+                        .map(BookResponseDTO::new);
+      }
 
-        @Operation(summary = "returns a book by id", description = "returns book by the specified id", responses = {
-                        @ApiResponse(responseCode = "200", ref = "ok"),
-                        @ApiResponse(responseCode = "400", ref = "badRequest"),
-                        @ApiResponse(responseCode = "403", ref = "permissionDenied"),
-                        @ApiResponse(responseCode = "404", ref = "ResourceNotFound")
-        })
-        @GetMapping("/{id}")
-        public ResponseEntity<Object> searchById(@PathVariable Long id) {
-                Book book = this.bookService.findById(id);
+      @Operation(summary = "returns a book by id", description = "returns book by the specified id", responses = {
+                  @ApiResponse(responseCode = "200", ref = "ok"),
+                  @ApiResponse(responseCode = "400", ref = "badRequest"),
+                  @ApiResponse(responseCode = "403", ref = "permissionDenied"),
+                  @ApiResponse(responseCode = "404", ref = "ResourceNotFound")
+      })
+      @GetMapping("/{id}")
+      // FIXME
+      // especificar o tipo de retorno no responseEntity
+      public ResponseEntity<Object> searchById(@PathVariable Long id) {
+            Book book = this.bookService.findById(id);
 
-                return ResponseEntity.ok(new BookResponseDTO(book));
-        }
+            return ResponseEntity.ok(new BookResponseDTO(book));
+      }
 
-        @Operation(summary = "returns a book by title", description = "returns book by the specified title", responses = {
-                        @ApiResponse(responseCode = "200", ref = "ok"),
-                        @ApiResponse(responseCode = "400", ref = "badRequest"),
-                        @ApiResponse(responseCode = "403", ref = "permissionDenied"),
-                        @ApiResponse(responseCode = "404", ref = "ResourceNotFound")
-        })
+      @Operation(summary = "returns a book by title", description = "returns book by the specified title", responses = {
+                  @ApiResponse(responseCode = "200", ref = "ok"),
+                  @ApiResponse(responseCode = "400", ref = "badRequest"),
+                  @ApiResponse(responseCode = "403", ref = "permissionDenied"),
+                  @ApiResponse(responseCode = "404", ref = "ResourceNotFound")
+      })
 
-        @RequestMapping(value = "/search_by_title", method = RequestMethod.GET)
-        public ResponseEntity<Object> searchByTitle(@RequestParam String title) {
-                Book book = this.bookService.findByTitle(title);
+      // FIXME
+      // especificar o tipo de retorno no responseEntity
+      @RequestMapping(value = "/search_by_title", method = RequestMethod.GET)
+      public ResponseEntity<Object> searchByTitle(@RequestParam String title) {
+            Book book = this.bookService.findByTitle(title);
 
-                return ResponseEntity.ok(new BookResponseDTO(book));
-        }
+            return ResponseEntity.ok(new BookResponseDTO(book));
+      }
 
-        @Operation(summary = "returns a list of books by author name", description = "returns a list of books by the specified author name", responses = {
-                        @ApiResponse(responseCode = "200", ref = "ok"),
-                        @ApiResponse(responseCode = "400", ref = "badRequest"),
-                        @ApiResponse(responseCode = "403", ref = "permissionDenied"),
-        })
+      @Operation(summary = "returns a list of books by author name", description = "returns a list of books by the specified author name", responses = {
+                  @ApiResponse(responseCode = "200", ref = "ok"),
+                  @ApiResponse(responseCode = "400", ref = "badRequest"),
+                  @ApiResponse(responseCode = "403", ref = "permissionDenied"),
+      })
 
-        @RequestMapping(value = "/search_by_author_name", method = RequestMethod.GET)
-        public List<BookResponseDTO> searchByAuthorName(@RequestParam("author_name") String authorName) {
+      @RequestMapping(value = "/search_by_author_name", method = RequestMethod.GET)
+      public List<BookResponseDTO> searchByAuthorName(@RequestParam("author_name") String authorName) {
 
-                return this.bookService
-                                .findByAuthorName(authorName)
-                                .stream()
-                                .map(BookResponseDTO::new)
-                                .collect(Collectors.toList());
-        }
+            return this.bookService
+                        .findByAuthorName(authorName)
+                        .stream()
+                        .map(BookResponseDTO::new)
+                        .collect(Collectors.toList());
+      }
 
-        @SecurityRequirement(name = "Authorization")
-        @Operation(summary = "record a new book", description = "save a new book in database", responses = {
-                        @ApiResponse(responseCode = "200", ref = "ok"),
-                        @ApiResponse(responseCode = "400", ref = "badRequest"),
-                        @ApiResponse(responseCode = "403", ref = "permissionDenied"),
-                        @ApiResponse(responseCode = "404", ref = "ResourceNotFound"),
-                        @ApiResponse(responseCode = "409", ref = "conflict")
-        })
+      @SecurityRequirement(name = "Authorization")
+      @Operation(summary = "record a new book", description = "save a new book in database", responses = {
+                  @ApiResponse(responseCode = "200", ref = "ok"),
+                  @ApiResponse(responseCode = "400", ref = "badRequest"),
+                  @ApiResponse(responseCode = "403", ref = "permissionDenied"),
+                  @ApiResponse(responseCode = "404", ref = "ResourceNotFound"),
+                  @ApiResponse(responseCode = "409", ref = "conflict")
+      })
 
-        @CacheEvict(value = "BookList", allEntries = true)
-        @PostMapping
-        public ResponseEntity<Object> save(@RequestBody @Valid BookRequestDTO bookRequestDTO,
-                        UriComponentsBuilder uriBuilder) {
-                Book book = this.bookService.save(bookRequestDTO.toBook(),
-                                bookRequestDTO.getStorehouseBookDTOs()
-                                                .stream()
-                                                .map(storehouseBookDTO -> storehouseBookDTO.toStorehouseBook())
-                                                .collect(Collectors.toList()));
+      // FIXME
+      // especificar o tipo de retorno no responseEntity
+      @CacheEvict(value = "BookList", allEntries = true)
+      @PostMapping
+      public ResponseEntity<Object> save(@RequestBody @Valid BookRequestDTO bookRequestDTO,
+                  UriComponentsBuilder uriBuilder) {
+            Book book = this.bookService.save(bookRequestDTO.toBook(),
+                        bookRequestDTO.getStorehouseBookDTOs()
+                                    .stream()
+                                    .map(storehouseBookDTO -> storehouseBookDTO.toStorehouseBook())
+                                    .collect(Collectors.toList()));
 
-                URI uri = uriBuilder.path("/storehouse/{id}").buildAndExpand(book.getId()).toUri();
-                return ResponseEntity.created(uri).body(new BookResponseDTO(book));
+            URI uri = uriBuilder.path("/storehouse/{id}").buildAndExpand(book.getId()).toUri();
+            return ResponseEntity.created(uri).body(new BookResponseDTO(book));
 
-        }
+      }
 
-        @SecurityRequirement(name = "Authorization")
-        @Operation(summary = "delete a book by id", description = "delete a book by the specified id from database", responses = {
-                        @ApiResponse(responseCode = "200", ref = "ok"),
-                        @ApiResponse(responseCode = "400", ref = "badRequest"),
-                        @ApiResponse(responseCode = "403", ref = "permissionDenied"),
-                        @ApiResponse(responseCode = "404", ref = "ResourceNotFound")
-        })
+      @SecurityRequirement(name = "Authorization")
+      @Operation(summary = "delete a book by id", description = "delete a book by the specified id from database", responses = {
+                  @ApiResponse(responseCode = "200", ref = "ok"),
+                  @ApiResponse(responseCode = "400", ref = "badRequest"),
+                  @ApiResponse(responseCode = "403", ref = "permissionDenied"),
+                  @ApiResponse(responseCode = "404", ref = "ResourceNotFound")
+      })
 
-        @DeleteMapping("/{id}")
-        public ResponseEntity<Object> deleteById(@PathVariable Long id) {
-                this.bookService.deleteById(id);
+      // FIXME
+      // especificar o tipo de retorno no responseEntity
+      @DeleteMapping("/{id}")
+      public ResponseEntity<Object> deleteById(@PathVariable Long id) {
+            this.bookService.deleteById(id);
 
-                return ResponseEntity.status(HttpStatus.OK).body("Book was deleted");
-        }
+            return ResponseEntity.status(HttpStatus.OK).body("Book was deleted");
+      }
 
-        @SecurityRequirement(name = "Authorization")
-        @Operation(summary = "updates a book", description = "updates data like title, author, year, etc", responses = {
-                        @ApiResponse(responseCode = "200", ref = "ok"),
-                        @ApiResponse(responseCode = "400", ref = "badRequest"),
-                        @ApiResponse(responseCode = "403", ref = "permissionDenied"),
-                        @ApiResponse(responseCode = "404", ref = "ResourceNotFound"),
-                        @ApiResponse(responseCode = "409", ref = "conflict")
-        })
+      @SecurityRequirement(name = "Authorization")
+      @Operation(summary = "updates a book", description = "updates data like title, author, year, etc", responses = {
+                  @ApiResponse(responseCode = "200", ref = "ok"),
+                  @ApiResponse(responseCode = "400", ref = "badRequest"),
+                  @ApiResponse(responseCode = "403", ref = "permissionDenied"),
+                  @ApiResponse(responseCode = "404", ref = "ResourceNotFound"),
+                  @ApiResponse(responseCode = "409", ref = "conflict")
+      })
 
-        @CacheEvict(value = "BookList", allEntries = true)
-        @PutMapping("/{id}")
-        public ResponseEntity<Object> update(@PathVariable Long id, @RequestBody @Valid BookUpdateDTO bookUpdateDTO) {
-                Book book = this.bookService.findById(id);
+      // FIXME
+      // especificar o tipo de retorno no responseEntity
+      @CacheEvict(value = "BookList", allEntries = true)
+      @PutMapping("/{id}")
+      public ResponseEntity<Object> update(@PathVariable Long id, @RequestBody @Valid BookUpdateDTO bookUpdateDTO) {
+            Book book = this.bookService.findById(id);
 
-                book = this.bookService.updateBook(bookUpdateDTO.toBook(id),
-                                bookUpdateDTO.getStorehouseBookDTOs()
-                                                .stream()
-                                                .map(storehouseBookDTO -> storehouseBookDTO.toStorehouseBook())
-                                                .collect(Collectors.toList()));
+            book = this.bookService.updateBook(bookUpdateDTO.toBook(id),
+                        bookUpdateDTO.getStorehouseBookDTOs()
+                                    .stream()
+                                    .map(storehouseBookDTO -> storehouseBookDTO.toStorehouseBook())
+                                    .collect(Collectors.toList()));
 
-                return ResponseEntity.ok(new BookResponseDTO(book));
-        }
+            return ResponseEntity.ok(new BookResponseDTO(book));
+      }
 
 }

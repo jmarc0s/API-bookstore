@@ -32,44 +32,44 @@ import lombok.Setter;
 @Getter
 @Setter
 public class Book {
-        @Id
-        @GeneratedValue(strategy = GenerationType.IDENTITY)
-        @Column(name = "book_id")
-        private Long id;
+      @Id
+      @GeneratedValue(strategy = GenerationType.IDENTITY)
+      @Column(name = "book_id")
+      private Long id;
 
-        @Column(name = "book_title")
-        private String title;
+      @Column(name = "book_title")
+      private String title;
 
-        @Column(name = "book_year")
-        private int year;
+      @Column(name = "book_year")
+      private int year;
 
-        @Column(name = "book_price")
-        private BigDecimal price;
+      @Column(name = "book_price")
+      private BigDecimal price;
 
-        @ManyToOne(fetch = FetchType.EAGER)
-        @JoinColumn(name = "publishingCompany_id")
-        private PublishingCompany publishingCompany;
+      @ManyToOne(fetch = FetchType.EAGER)
+      @JoinColumn(name = "publishingCompany_id")
+      private PublishingCompany publishingCompany;
 
-        @ElementCollection
-        @Enumerated(EnumType.STRING)
-        private Set<BookCategory> categories;
+      @ElementCollection
+      @Enumerated(EnumType.STRING)
+      private Set<BookCategory> categories;
 
-        @ManyToMany(fetch = FetchType.EAGER)
-        @JoinTable(name = "author_book", joinColumns = {
-                        @JoinColumn(name = "fk_book")
-        }, inverseJoinColumns = {
-                        @JoinColumn(name = "fk_author")
-        })
-        private List<Author> authorList = new ArrayList<>();
+      @ManyToMany(fetch = FetchType.EAGER)
+      @JoinTable(name = "author_book", joinColumns = {
+                  @JoinColumn(name = "fk_book")
+      }, inverseJoinColumns = {
+                  @JoinColumn(name = "fk_author")
+      })
+      private List<Author> authorList = new ArrayList<>();
 
-        @ManyToMany(mappedBy = "bookList", fetch = FetchType.EAGER)
-        private List<Storehouse> storehouseList = new ArrayList<>();
+      @ManyToMany(mappedBy = "bookList", fetch = FetchType.EAGER)
+      private List<Storehouse> storehouseList = new ArrayList<>();
 
-        @ManyToMany(fetch = FetchType.LAZY)
-        @JoinTable(name = "grocery_cart_book", joinColumns = {
-                        @JoinColumn(name = "book_id")
-        }, inverseJoinColumns = {
-                        @JoinColumn(name = "grocery_cart_id")
-        })
-        private List<GroceryCart> groceryCarts = new ArrayList<>();
+      @ManyToMany(fetch = FetchType.LAZY)
+      @JoinTable(name = "grocery_cart_book", joinColumns = {
+                  @JoinColumn(name = "book_id")
+      }, inverseJoinColumns = {
+                  @JoinColumn(name = "grocery_cart_id")
+      })
+      private List<GroceryCart> groceryCarts = new ArrayList<>();
 }

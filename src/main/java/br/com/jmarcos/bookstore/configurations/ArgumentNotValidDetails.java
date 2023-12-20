@@ -1,6 +1,5 @@
 package br.com.jmarcos.bookstore.configurations;
 
-
 import org.springframework.validation.FieldError;
 
 import lombok.AllArgsConstructor;
@@ -14,13 +13,13 @@ import lombok.Setter;
 @AllArgsConstructor
 public class ArgumentNotValidDetails {
 
-    private String field;
+      private String field;
 
-    private String fieldsMessage;
+      private String fieldsMessage;
 
-    public ArgumentNotValidDetails(FieldError fieldError){
-        this.field = fieldError.getField();
-        this.fieldsMessage = fieldError.getDefaultMessage();
-    }
+      public ArgumentNotValidDetails(FieldError fieldError) {
+            this.field = fieldError.getField();
+            this.fieldsMessage = fieldError.getDefaultMessage();
+      }
 
 }

@@ -36,176 +36,187 @@ import jakarta.validation.Valid;
 @RestController
 @RequestMapping("/persons")
 public class PersonController {
-        private final PersonService personService;
+      private final PersonService personService;
 
-        @Autowired
-        public PersonController(PersonService personService) {
-                this.personService = personService;
-        }
+      @Autowired
+      public PersonController(PersonService personService) {
+            this.personService = personService;
+      }
 
-        @Operation(summary = "record a new  profile", description = "save a new profile in database. With a profile, you can buy books", responses = {
-                        @ApiResponse(responseCode = "201", description = "created"),
-                        @ApiResponse(responseCode = "400", ref = "badRequest"),
-                        @ApiResponse(responseCode = "403", ref = "permissionDenied"),
-                        @ApiResponse(responseCode = "409", ref = "conflict"),
-        })
+      @Operation(summary = "record a new  profile", description = "save a new profile in database. With a profile, you can buy books", responses = {
+                  @ApiResponse(responseCode = "201", description = "created"),
+                  @ApiResponse(responseCode = "400", ref = "badRequest"),
+                  @ApiResponse(responseCode = "403", ref = "permissionDenied"),
+                  @ApiResponse(responseCode = "409", ref = "conflict"),
+      })
+      // FIXME
+      // especificar o tipo de retorno no responseEntity
+      @PostMapping
+      public ResponseEntity<Object> save(@RequestBody @Valid PersonRequestDTO personRequestDTO,
+                  UriComponentsBuilder uriBuilder) {
 
-        @PostMapping
-        public ResponseEntity<Object> save(@RequestBody @Valid PersonRequestDTO personRequestDTO,
-                        UriComponentsBuilder uriBuilder) {
+            Person person = personRequestDTO.toPerson();
+            person = this.personService.save(person);
+            URI uri = uriBuilder.path("/persons/{id}").buildAndExpand(person.getId()).toUri();
+            return ResponseEntity.created(uri).body(new PersonResponseDTO(person));
+      }
 
-                Person person = personRequestDTO.toPerson();
-                person = this.personService.save(person);
-                URI uri = uriBuilder.path("/persons/{id}").buildAndExpand(person.getId()).toUri();
-                return ResponseEntity.created(uri).body(new PersonResponseDTO(person));
-        }
+      @Operation(summary = "confirm your confirmation code", description = "confirm your code to be free to log in", responses = {
+                  @ApiResponse(responseCode = "200", ref = "ok"),
+                  @ApiResponse(responseCode = "400", ref = "badRequest"),
+                  @ApiResponse(responseCode = "404", ref = "ResourceNotFound"),
+                  @ApiResponse(responseCode = "403", ref = "permissionDenied")
+      })
+      // FIXME
+      // especificar o tipo de retorno no responseEntity
+      @PostMapping("/confirm_code")
+      public ResponseEntity<Object> confirmCode(@RequestParam String email, @RequestParam String code) {
+            return ResponseEntity.ok(this.personService.confirmCode(email, code));
+      }
 
-        @Operation(summary = "confirm your confirmation code", description = "confirm your code to be free to log in", responses = {
-                        @ApiResponse(responseCode = "200", ref = "ok"),
-                        @ApiResponse(responseCode = "400", ref = "badRequest"),
-                        @ApiResponse(responseCode = "404", ref = "ResourceNotFound"),
-                        @ApiResponse(responseCode = "403", ref = "permissionDenied")
-        })
+      @Operation(summary = "change email and resend confirmation code", description = "change your email and resend confirmation code", responses = {
+                  @ApiResponse(responseCode = "200", ref = "ok"),
+                  @ApiResponse(responseCode = "400", ref = "badRequest"),
+                  @ApiResponse(responseCode = "404", ref = "ResourceNotFound"),
+                  @ApiResponse(responseCode = "409", ref = "conflict"),
+                  @ApiResponse(responseCode = "403", ref = "permissionDenied")
+      })
+      // FIXME
+      // especificar o tipo de retorno no responseEntitys
+      @PostMapping("/change_email_and_resend_confirmation_code")
+      public ResponseEntity<Object> changeEmailAndResendConfirmationCode(@RequestParam String oldEmail,
+                  @RequestParam String newEmail) {
+            return ResponseEntity.ok(this.personService.changeEmailAndResendConfirmationCode(oldEmail, newEmail));
+      }
 
-        @PostMapping("/confirm_code")
-        public ResponseEntity<Object> confirmCode(@RequestParam String email, @RequestParam String code) {
-                return ResponseEntity.ok(this.personService.confirmCode(email, code));
-        }
+      @SecurityRequirement(name = "Authorization")
+      @Operation(summary = "update your profile data", description = "update data like email, name ", responses = {
+                  @ApiResponse(responseCode = "200", ref = "ok"),
+                  @ApiResponse(responseCode = "400", ref = "badRequest"),
+                  @ApiResponse(responseCode = "403", ref = "permissionDenied"),
+                  @ApiResponse(responseCode = "409", ref = "conflict") })
+      // FIXME
+      // especificar o tipo de retorno no responseEntity
+      @PutMapping("/profile")
+      public ResponseEntity<Object> updateProfile(@RequestBody PersonUpdateDTO personUpdateDTO,
+                  @AuthenticationPrincipal Person personRequest) {
+            Person person = this.personService.searchById(personRequest.getId());
 
-        @Operation(summary = "change email and resend confirmation code", description = "change your email and resend confirmation code", responses = {
-                @ApiResponse(responseCode = "200", ref = "ok"),
-                @ApiResponse(responseCode = "400", ref = "badRequest"),
-                @ApiResponse(responseCode = "404", ref = "ResourceNotFound"),
-                @ApiResponse(responseCode = "409", ref = "conflict"),
-                @ApiResponse(responseCode = "403", ref = "permissionDenied")
-        })
+            person = this.personService.update(personUpdateDTO.toPerson(person.getId()));
 
+            return ResponseEntity.ok(new PersonResponseDTO(person));
+      }
 
-        @PostMapping("/change_email_and_resend_confirmation_code")
-        public ResponseEntity<Object>  changeEmailAndResendConfirmationCode(@RequestParam String oldEmail, @RequestParam String newEmail){
-                 return ResponseEntity.ok(this.personService.changeEmailAndResendConfirmationCode(oldEmail, newEmail));
-        }
+      @SecurityRequirement(name = "Authorization")
+      @Operation(summary = "delete your profile", description = "delete all your profile data", responses = {
+                  @ApiResponse(responseCode = "200", ref = "ok"),
+                  @ApiResponse(responseCode = "400", ref = "badRequest"),
+                  @ApiResponse(responseCode = "403", ref = "permissionDenied"),
+      })
+      // FIXME
+      // especificar o tipo de retorno no responseEntity
+      @DeleteMapping("/profile")
+      public ResponseEntity<Object> deleteProfile(@AuthenticationPrincipal Person person) {
+            this.personService.deleteById(person.getId());
 
-        @SecurityRequirement(name = "Authorization")
-        @Operation(summary = "update your profile data", description = "update data like email, name ", responses = {
-                        @ApiResponse(responseCode = "200", ref = "ok"),
-                        @ApiResponse(responseCode = "400", ref = "badRequest"),
-                        @ApiResponse(responseCode = "403", ref = "permissionDenied"),
-                        @ApiResponse(responseCode = "409", ref = "conflict") })
+            return ResponseEntity.status(HttpStatus.OK).body("profile was deleted");
 
-        @PutMapping("/profile")
-        public ResponseEntity<Object> updateProfile(@RequestBody PersonUpdateDTO personUpdateDTO,
-                        @AuthenticationPrincipal Person personRequest) {
-                Person person = this.personService.searchById(personRequest.getId());
+      }
 
-                person = this.personService.update(personUpdateDTO.toPerson(person.getId()));
+      @SecurityRequirement(name = "Authorization")
+      @Operation(summary = "get your profile data", description = "show your profile data", responses = {
+                  @ApiResponse(responseCode = "200", ref = "ok"),
+                  @ApiResponse(responseCode = "400", ref = "badRequest"),
+                  @ApiResponse(responseCode = "403", ref = "permissionDenied"),
+                  @ApiResponse(responseCode = "409", ref = "conflict") })
 
-                return ResponseEntity.ok(new PersonResponseDTO(person));
-        }
+      @GetMapping("/profile")
+      public ResponseEntity<PersonResponseDTO> getProfileData(@AuthenticationPrincipal Person person) {
+            Person user = this.personService.searchById(person.getId());
+            return ResponseEntity.ok(new PersonResponseDTO(user));
+      }
 
-        @SecurityRequirement(name = "Authorization")
-        @Operation(summary = "delete your profile", description = "delete all your profile data", responses = {
-                        @ApiResponse(responseCode = "200", ref = "ok"),
-                        @ApiResponse(responseCode = "400", ref = "badRequest"),
-                        @ApiResponse(responseCode = "403", ref = "permissionDenied"),
-        })
+      @SecurityRequirement(name = "Authorization")
+      @Operation(summary = "list all profiles in database", description = "returns a list of all pessoal data in database", responses = {
+                  @ApiResponse(responseCode = "200", ref = "ok"),
+                  @ApiResponse(responseCode = "403", ref = "permissionDenied")
+      })
+      // FIXME
+      // especificar o tipo de retorno no responseEntity
+      @GetMapping
+      public Page<PersonResponseDTO> search(
+                  @PageableDefault(sort = "id", direction = Direction.ASC, page = 0, size = 10) Pageable pageable) {
+            return this.personService
+                        .search(pageable)
+                        .map(PersonResponseDTO::new);
+      }
 
-        @DeleteMapping("/profile")
-        public ResponseEntity<Object> deleteProfile(@AuthenticationPrincipal Person person) {
-                this.personService.deleteById(person.getId());
+      @SecurityRequirement(name = "Authorization")
+      @Operation(summary = "Returns a profile by id", description = "Returns a profile with the  specified id", responses = {
+                  @ApiResponse(responseCode = "200", ref = "ok"),
+                  @ApiResponse(responseCode = "400", ref = "badRequest"),
+                  @ApiResponse(responseCode = "403", ref = "permissionDenied"),
+                  @ApiResponse(responseCode = "404", ref = "ResourceNotFound")
+      })
+      // FIXME
+      // especificar o tipo de retorno no responseEntity
+      @GetMapping("/{id}")
+      public ResponseEntity<Object> searchById(@PathVariable Long id) {
+            Person person = this.personService.searchById(id);
 
-                return ResponseEntity.status(HttpStatus.OK).body("profile was deleted");
+            return ResponseEntity.ok(new PersonResponseDTO(person));
 
-        }
+      }
 
-        @SecurityRequirement(name = "Authorization")
-        @Operation(summary = "get your profile data", description = "show your profile data", responses = {
-                        @ApiResponse(responseCode = "200", ref = "ok"),
-                        @ApiResponse(responseCode = "400", ref = "badRequest"),
-                        @ApiResponse(responseCode = "403", ref = "permissionDenied"),
-                        @ApiResponse(responseCode = "409", ref = "conflict") })
+      @SecurityRequirement(name = "Authorization")
+      @Operation(summary = "Returns a profile by email", description = "Returns a profile with the specified email", responses = {
+                  @ApiResponse(responseCode = "200", ref = "ok"),
+                  @ApiResponse(responseCode = "400", ref = "badRequest"),
+                  @ApiResponse(responseCode = "403", ref = "permissionDenied"),
+                  @ApiResponse(responseCode = "404", ref = "ResourceNotFound")
+      })
+      // FIXME
+      // especificar o tipo de retorno no responseEntity
+      @RequestMapping(value = "/search_by_email", method = RequestMethod.GET)
+      public ResponseEntity<Object> searchByEmail(@RequestParam String email) {
+            Person person = this.personService.searchByEmail(email);
 
-        @GetMapping("/profile")
-        public ResponseEntity<PersonResponseDTO> getProfileData(@AuthenticationPrincipal Person person) {
-                Person user = this.personService.searchById(person.getId());
-                return ResponseEntity.ok(new PersonResponseDTO(user));
-        }
+            return ResponseEntity.ok(new PersonResponseDTO(person));
 
-        @SecurityRequirement(name = "Authorization")
-        @Operation(summary = "list all profiles in database", description = "returns a list of all pessoal data in database", responses = {
-                        @ApiResponse(responseCode = "200", ref = "ok"),
-                        @ApiResponse(responseCode = "403", ref = "permissionDenied")
-        })
+      }
 
-        @GetMapping
-        public Page<PersonResponseDTO> search(
-                        @PageableDefault(sort = "id", direction = Direction.ASC, page = 0, size = 10) Pageable pageable) {
-                return this.personService
-                                .search(pageable)
-                                .map(PersonResponseDTO::new);
-        }
+      @SecurityRequirement(name = "Authorization")
+      @Operation(summary = "delete a profile by id", description = "delete any profile by the specified id", responses = {
+                  @ApiResponse(responseCode = "200", ref = "ok"),
+                  @ApiResponse(responseCode = "400", ref = "badRequest"),
+                  @ApiResponse(responseCode = "403", ref = "permissionDenied"),
+                  @ApiResponse(responseCode = "404", ref = "ResourceNotFound")
+      })
+      // FIXME
+      // especificar o tipo de retorno no responseEntity
+      @DeleteMapping("/{id}")
+      public ResponseEntity<Object> deleteById(@PathVariable Long id) {
+            this.personService.deleteById(id);
 
-        @SecurityRequirement(name = "Authorization")
-        @Operation(summary = "Returns a profile by id", description = "Returns a profile with the  specified id", responses = {
-                        @ApiResponse(responseCode = "200", ref = "ok"),
-                        @ApiResponse(responseCode = "400", ref = "badRequest"),
-                        @ApiResponse(responseCode = "403", ref = "permissionDenied"),
-                        @ApiResponse(responseCode = "404", ref = "ResourceNotFound")
-        })
-        @GetMapping("/{id}")
-        public ResponseEntity<Object> searchById(@PathVariable Long id) {
-                Person person = this.personService.searchById(id);
+            return ResponseEntity.status(HttpStatus.OK).body("Person was deleted");
+      }
 
-                return ResponseEntity.ok(new PersonResponseDTO(person));
+      @SecurityRequirement(name = "Authorization")
+      @Operation(summary = "set profile permission", description = "add a permission to a profile", responses = {
+                  @ApiResponse(responseCode = "200", ref = "ok"),
+                  @ApiResponse(responseCode = "400", ref = "badRequest"),
+                  @ApiResponse(responseCode = "403", ref = "permissionDenied"),
+                  @ApiResponse(responseCode = "404", ref = "ResourceNotFound")
+      })
+      // FIXME
+      // especificar o tipo de retorno no responseEntity
+      @PatchMapping("/{personId}")
+      public ResponseEntity<Object> setPermission(@PathVariable Long personId, @RequestParam String permission) {
+            Person person = this.personService.searchById(personId);
 
-        }
+            person = this.personService.addPermission(person, permission);
 
-        @SecurityRequirement(name = "Authorization")
-        @Operation(summary = "Returns a profile by email", description = "Returns a profile with the specified email", responses = {
-                        @ApiResponse(responseCode = "200", ref = "ok"),
-                        @ApiResponse(responseCode = "400", ref = "badRequest"),
-                        @ApiResponse(responseCode = "403", ref = "permissionDenied"),
-                        @ApiResponse(responseCode = "404", ref = "ResourceNotFound")
-        })
+            return ResponseEntity.ok(new PersonResponseDTO(person));
 
-        @RequestMapping(value = "/search_by_email", method = RequestMethod.GET)
-        public ResponseEntity<Object> searchByEmail(@RequestParam String email) {
-                Person person = this.personService.searchByEmail(email);
-
-                return ResponseEntity.ok(new PersonResponseDTO(person));
-
-        }
-
-        @SecurityRequirement(name = "Authorization")
-        @Operation(summary = "delete a profile by id", description = "delete any profile by the specified id", responses = {
-                        @ApiResponse(responseCode = "200", ref = "ok"),
-                        @ApiResponse(responseCode = "400", ref = "badRequest"),
-                        @ApiResponse(responseCode = "403", ref = "permissionDenied"),
-                        @ApiResponse(responseCode = "404", ref = "ResourceNotFound")
-        })
-
-        @DeleteMapping("/{id}")
-        public ResponseEntity<Object> deleteById(@PathVariable Long id) {
-                this.personService.deleteById(id);
-
-                return ResponseEntity.status(HttpStatus.OK).body("Person was deleted");
-        }
-
-        @SecurityRequirement(name = "Authorization")
-        @Operation(summary = "set profile permission", description = "add a permission to a profile", responses = {
-                        @ApiResponse(responseCode = "200", ref = "ok"),
-                        @ApiResponse(responseCode = "400", ref = "badRequest"),
-                        @ApiResponse(responseCode = "403", ref = "permissionDenied"),
-                        @ApiResponse(responseCode = "404", ref = "ResourceNotFound")
-        })
-
-        @PatchMapping("/{personId}")
-        public ResponseEntity<Object> setPermission(@PathVariable Long personId, @RequestParam String permission) {
-                Person person = this.personService.searchById(personId);
-
-                person = this.personService.addPermission(person, permission);
-
-                return ResponseEntity.ok(new PersonResponseDTO(person));
-
-        }
+      }
 }

@@ -19,31 +19,31 @@ import lombok.Setter;
 @Table(name = "address")
 public class Address {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "address_id")
-    private Long id;
+      @Id
+      @GeneratedValue(strategy = GenerationType.IDENTITY)
+      @Column(name = "address_id")
+      private Long id;
 
-    @Column(name = "address_street")
-    private String street;
+      @Column(name = "address_street")
+      private String street;
 
-    @Column(name = "address_number")
-    private int number;
+      @Column(name = "address_number")
+      private int number;
 
-    @Column(name = "address_city")
-    private String city;
+      @Column(name = "address_city")
+      private String city;
 
-    @Column(name = "address_state")
-    private String state;
+      @Column(name = "address_state")
+      private String state;
 
-    @Column(name = "address_zip_code")
-    private String zipCode;
+      @Column(name = "address_zip_code")
+      private String zipCode;
 
-    public Address(String street2, int number2, String city2, String state2, String zipCode2) {
-        this.street = street2;
-        this.number = number2;
-        this.city = city2;
-        this.state = state2;
-        this.zipCode = zipCode2;
-    }
+      public Address(String street2, int number2, String city2, String state2, String zipCode2) {
+            this.street = street2;
+            this.number = number2;
+            this.city = city2;
+            this.state = state2;
+            this.zipCode = zipCode2;
+      }
 }

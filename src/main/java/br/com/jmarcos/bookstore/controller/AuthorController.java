@@ -34,108 +34,120 @@ import jakarta.validation.Valid;
 @RestController
 @RequestMapping("/authors")
 public class AuthorController {
-        private final AuthorService authorService;
+      private final AuthorService authorService;
 
-        @Autowired
-        public AuthorController(AuthorService authorService) {
-                this.authorService = authorService;
-        }
+      @Autowired
+      public AuthorController(AuthorService authorService) {
+            this.authorService = authorService;
+      }
 
-        @SecurityRequirement(name = "Authorization")
-        @Operation(summary = "Returns a list of Authors", description = "Returns a list of all authors in database", responses = {
-                        @ApiResponse(responseCode = "200", ref = "ok"),
-                        @ApiResponse(responseCode = "403", ref = "permissionDenied"),
+      @SecurityRequirement(name = "Authorization")
+      @Operation(summary = "Returns a list of Authors", description = "Returns a list of all authors in database", responses = {
+                  @ApiResponse(responseCode = "200", ref = "ok"),
+                  @ApiResponse(responseCode = "403", ref = "permissionDenied"),
 
-        })
-        @Cacheable(value = "AuthorList")
-        @GetMapping
-        public Page<AuthorResponseDTO> search(Pageable pageable) {
-                return this.authorService
-                                .search(pageable)
-                                .map(AuthorResponseDTO::new);
-        }
+      })
+      @Cacheable(value = "AuthorList")
+      @GetMapping
+      // FIXME
+      // retornar uma lista ao inves de page
+      public Page<AuthorResponseDTO> search(Pageable pageable) {
+            return this.authorService
+                        .search(pageable)
+                        .map(AuthorResponseDTO::new);
+      }
 
-        @SecurityRequirement(name = "Authorization")
-        @Operation(summary = "record a new Author", description = "save a author in database", responses = {
-                        @ApiResponse(responseCode = "200", ref = "ok"),
-                        @ApiResponse(responseCode = "400", ref = "badRequest"),
-                        @ApiResponse(responseCode = "403", ref = "permissionDenied"),
-                        @ApiResponse(responseCode = "409", ref = "conflict")
-        })
+      @SecurityRequirement(name = "Authorization")
+      @Operation(summary = "record a new Author", description = "save a author in database", responses = {
+                  @ApiResponse(responseCode = "200", ref = "ok"),
+                  @ApiResponse(responseCode = "400", ref = "badRequest"),
+                  @ApiResponse(responseCode = "403", ref = "permissionDenied"),
+                  @ApiResponse(responseCode = "409", ref = "conflict")
+      })
 
-        @CacheEvict(value = "AuthorList", allEntries = true)
-        @PostMapping
-        public ResponseEntity<Object> save(@RequestBody @Valid AuthorRequestDTO authorRequestDTO,
-                        UriComponentsBuilder uriBuilder) {
+      @CacheEvict(value = "AuthorList", allEntries = true)
+      @PostMapping
+      // FIXME
+      // especificar o tipo de retorno no responseEntity
+      public ResponseEntity<Object> save(@RequestBody @Valid AuthorRequestDTO authorRequestDTO,
+                  UriComponentsBuilder uriBuilder) {
 
-                Author author = this.authorService.save(authorRequestDTO.toAuthor());
+            Author author = this.authorService.save(authorRequestDTO.toAuthor());
 
-                URI uri = uriBuilder.path("/authors/{id}").buildAndExpand(author.getId()).toUri();
-                return ResponseEntity.created(uri).body(new AuthorResponseDTO(author));
-        }
+            URI uri = uriBuilder.path("/authors/{id}").buildAndExpand(author.getId()).toUri();
+            return ResponseEntity.created(uri).body(new AuthorResponseDTO(author));
+      }
 
-        @SecurityRequirement(name = "Authorization")
-        @Operation(summary = "returns an author by id", description = "returns an author by the specified id", responses = {
-                        @ApiResponse(responseCode = "200", ref = "ok"),
-                        @ApiResponse(responseCode = "400", ref = "badRequest"),
-                        @ApiResponse(responseCode = "403", ref = "permissionDenied"),
-                        @ApiResponse(responseCode = "404", ref = "ResourceNotFound")
-        })
+      @SecurityRequirement(name = "Authorization")
+      @Operation(summary = "returns an author by id", description = "returns an author by the specified id", responses = {
+                  @ApiResponse(responseCode = "200", ref = "ok"),
+                  @ApiResponse(responseCode = "400", ref = "badRequest"),
+                  @ApiResponse(responseCode = "403", ref = "permissionDenied"),
+                  @ApiResponse(responseCode = "404", ref = "ResourceNotFound")
+      })
 
-        @GetMapping("/{id}")
-        public ResponseEntity<Object> searchById(@PathVariable Long id) {
-                Author author = this.authorService.searchById(id);
+      @GetMapping("/{id}")
+      // FIXME
+      // especificar o tipo de retorno no responseEntity
+      public ResponseEntity<Object> searchById(@PathVariable Long id) {
+            Author author = this.authorService.searchById(id);
 
-                return ResponseEntity.ok(new AuthorResponseDTO(author));
-        }
+            return ResponseEntity.ok(new AuthorResponseDTO(author));
+      }
 
-        @SecurityRequirement(name = "Authorization")
-        @Operation(summary = "returns an author by name", description = "returns an author by the specified name", responses = {
-                        @ApiResponse(responseCode = "200", ref = "ok"),
-                        @ApiResponse(responseCode = "400", ref = "badRequest"),
-                        @ApiResponse(responseCode = "403", ref = "permissionDenied"),
-                        @ApiResponse(responseCode = "404", ref = "ResourceNotFound")
-        })
+      @SecurityRequirement(name = "Authorization")
+      @Operation(summary = "returns an author by name", description = "returns an author by the specified name", responses = {
+                  @ApiResponse(responseCode = "200", ref = "ok"),
+                  @ApiResponse(responseCode = "400", ref = "badRequest"),
+                  @ApiResponse(responseCode = "403", ref = "permissionDenied"),
+                  @ApiResponse(responseCode = "404", ref = "ResourceNotFound")
+      })
 
-        @RequestMapping(value = "/search_by_name", method = RequestMethod.GET)
-        public ResponseEntity<Object> searchByName(@RequestParam String name) {
-                Author author = this.authorService.searchByName(name);
+      // FIXME
+      // especificar o tipo de retorno no responseEntity
+      @RequestMapping(value = "/search_by_name", method = RequestMethod.GET)
+      public ResponseEntity<Object> searchByName(@RequestParam String name) {
+            Author author = this.authorService.searchByName(name);
 
-                return ResponseEntity.ok(new AuthorResponseDTO(author));
+            return ResponseEntity.ok(new AuthorResponseDTO(author));
 
-        }
+      }
 
-        @SecurityRequirement(name = "Authorization")
-        @Operation(summary = "delete an author by id", description = "delete a author by the specified id from database", responses = {
-                        @ApiResponse(responseCode = "200", ref = "ok"),
-                        @ApiResponse(responseCode = "400", ref = "badRequest"),
-                        @ApiResponse(responseCode = "403", ref = "permissionDenied"),
-                        @ApiResponse(responseCode = "404", ref = "ResourceNotFound")
-        })
+      @SecurityRequirement(name = "Authorization")
+      @Operation(summary = "delete an author by id", description = "delete a author by the specified id from database", responses = {
+                  @ApiResponse(responseCode = "200", ref = "ok"),
+                  @ApiResponse(responseCode = "400", ref = "badRequest"),
+                  @ApiResponse(responseCode = "403", ref = "permissionDenied"),
+                  @ApiResponse(responseCode = "404", ref = "ResourceNotFound")
+      })
 
-        @DeleteMapping("/{id}")
-        public ResponseEntity<Object> deleteById(@PathVariable Long id) {
-                this.authorService.deleteById(id);
+      // FIXME
+      // especificar o tipo de retorno no responseEntity
+      @DeleteMapping("/{id}")
+      public ResponseEntity<Object> deleteById(@PathVariable Long id) {
+            this.authorService.deleteById(id);
 
-                return  ResponseEntity.status(HttpStatus.OK).body("Author was deleted");
-        }
+            return ResponseEntity.status(HttpStatus.OK).body("Author was deleted");
+      }
 
-        @SecurityRequirement(name = "Authorization")
-        @Operation(summary = "update an author", description = "update data like name, url, etc", responses = {
-                        @ApiResponse(responseCode = "200", ref = "ok"),
-                        @ApiResponse(responseCode = "400", ref = "badRequest"),
-                        @ApiResponse(responseCode = "403", ref = "permissionDenied"),
-                        @ApiResponse(responseCode = "404", ref = "ResourceNotFound"),
-                        @ApiResponse(responseCode = "409", ref = "conflict")
-        })
+      @SecurityRequirement(name = "Authorization")
+      @Operation(summary = "update an author", description = "update data like name, url, etc", responses = {
+                  @ApiResponse(responseCode = "200", ref = "ok"),
+                  @ApiResponse(responseCode = "400", ref = "badRequest"),
+                  @ApiResponse(responseCode = "403", ref = "permissionDenied"),
+                  @ApiResponse(responseCode = "404", ref = "ResourceNotFound"),
+                  @ApiResponse(responseCode = "409", ref = "conflict")
+      })
 
-        @CacheEvict(value = "AuthorList", allEntries = true)
-        @PutMapping("/{id}")
-        public ResponseEntity<Object> update(@RequestBody @Valid AuthorUpdateDTO authorUpdateDTO,
-                        @PathVariable Long id) {
+      // FIXME
+      // especificar o tipo de retorno no responseEntity
+      @CacheEvict(value = "AuthorList", allEntries = true)
+      @PutMapping("/{id}")
+      public ResponseEntity<Object> update(@RequestBody @Valid AuthorUpdateDTO authorUpdateDTO,
+                  @PathVariable Long id) {
 
-                Author author = this.authorService.update(authorUpdateDTO.toAuthor(id));
+            Author author = this.authorService.update(authorUpdateDTO.toAuthor(id));
 
-                return ResponseEntity.ok(new AuthorResponseDTO(author));
-        }
+            return ResponseEntity.ok(new AuthorResponseDTO(author));
+      }
 }

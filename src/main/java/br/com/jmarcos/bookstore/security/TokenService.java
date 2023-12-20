@@ -13,37 +13,37 @@ import io.jsonwebtoken.SignatureAlgorithm;
 
 @Service
 public class TokenService {
-    @Value("${bookstore.jwt.expiration}")
-    private String expiration;
+      @Value("${bookstore.jwt.expiration}")
+      private String expiration;
 
-    @Value("${bookstore.jwt.secret}")
-    private String secret;
+      @Value("${bookstore.jwt.secret}")
+      private String secret;
 
-    public String createToken(Authentication authentication) {
-        Person person = (Person) authentication.getPrincipal();
-        Date today = new Date();
-        Date deadline = new Date(today.getTime() + Long.parseLong(expiration));
-        return Jwts.builder()
-                .setIssuer("bookstore API")
-                .setSubject(person.getId().toString())
-                .setIssuedAt(today)
-                .setExpiration(deadline)
-                .signWith(SignatureAlgorithm.HS256, secret)
-                .compact();
-    }
+      public String createToken(Authentication authentication) {
+            Person person = (Person) authentication.getPrincipal();
+            Date today = new Date();
+            Date deadline = new Date(today.getTime() + Long.parseLong(expiration));
+            return Jwts.builder()
+                        .setIssuer("bookstore API")
+                        .setSubject(person.getId().toString())
+                        .setIssuedAt(today)
+                        .setExpiration(deadline)
+                        .signWith(SignatureAlgorithm.HS256, secret)
+                        .compact();
+      }
 
-    public boolean isAValidToken(String token) {
-        try {
-            Jwts.parser().setSigningKey(this.secret).parseClaimsJws(token); 
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
-    }
+      public boolean isAValidToken(String token) {
+            try {
+                  Jwts.parser().setSigningKey(this.secret).parseClaimsJws(token);
+                  return true;
+            } catch (Exception e) {
+                  return false;
+            }
+      }
 
-    public Long getPersonId(String token) {
-        Claims claims = Jwts.parser().setSigningKey(this.secret).parseClaimsJws(token).getBody();
+      public Long getPersonId(String token) {
+            Claims claims = Jwts.parser().setSigningKey(this.secret).parseClaimsJws(token).getBody();
 
-        return Long.parseLong(claims.getSubject());
-    }
+            return Long.parseLong(claims.getSubject());
+      }
 }

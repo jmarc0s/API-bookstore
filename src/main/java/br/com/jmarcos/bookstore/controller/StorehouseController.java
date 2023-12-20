@@ -35,107 +35,115 @@ import jakarta.validation.Valid;
 @RequestMapping("/storehouses")
 public class StorehouseController {
 
-        private final StorehouseService storehouseService;
+      private final StorehouseService storehouseService;
 
-        @Autowired
-        public StorehouseController(StorehouseService storehouseService) {
-                this.storehouseService = storehouseService;
-        }
+      @Autowired
+      public StorehouseController(StorehouseService storehouseService) {
+            this.storehouseService = storehouseService;
+      }
 
-        @SecurityRequirement(name = "Authorization")
-        @Operation(summary = "record a new Storehouse", description = "save a storehouse in database", responses = {
-                        @ApiResponse(responseCode = "200", ref = "ok"),
-                        @ApiResponse(responseCode = "400", ref = "badRequest"),
-                        @ApiResponse(responseCode = "403", ref = "permissionDenied"),
-                        @ApiResponse(responseCode = "409", ref = "conflict")
-        })
+      @SecurityRequirement(name = "Authorization")
+      @Operation(summary = "record a new Storehouse", description = "save a storehouse in database", responses = {
+                  @ApiResponse(responseCode = "200", ref = "ok"),
+                  @ApiResponse(responseCode = "400", ref = "badRequest"),
+                  @ApiResponse(responseCode = "403", ref = "permissionDenied"),
+                  @ApiResponse(responseCode = "409", ref = "conflict")
+      })
+      // FIXME
+      // especificar o tipo de retorno no responseEntity
+      @CacheEvict(value = "StorehouseList", allEntries = true)
+      @PostMapping
+      public ResponseEntity<Object> save(@RequestBody @Valid StorehouseRequestDTO storehouseRequestDTO,
+                  UriComponentsBuilder uriBuilder) {
 
-        @CacheEvict(value = "StorehouseList", allEntries = true)
-        @PostMapping
-        public ResponseEntity<Object> save(@RequestBody @Valid StorehouseRequestDTO storehouseRequestDTO,
-                        UriComponentsBuilder uriBuilder) {
+            Storehouse storehouse = this.storehouseService.save(storehouseRequestDTO.toStorehouse());
+            URI uri = uriBuilder.path("/storehouse/{id}").buildAndExpand(storehouse.getId()).toUri();
+            return ResponseEntity.created(uri).body(new StorehouseResponseDTO(storehouse));
+      }
 
-                Storehouse storehouse = this.storehouseService.save(storehouseRequestDTO.toStorehouse());
-                URI uri = uriBuilder.path("/storehouse/{id}").buildAndExpand(storehouse.getId()).toUri();
-                return ResponseEntity.created(uri).body(new StorehouseResponseDTO(storehouse));
-        }
+      @SecurityRequirement(name = "Authorization")
+      @Operation(summary = "Returns a list of Storehouses", description = "Returns a list of all storehouses in database", responses = {
+                  @ApiResponse(responseCode = "200", ref = "ok"),
+                  @ApiResponse(responseCode = "403", ref = "permissionDenied"),
 
-        @SecurityRequirement(name = "Authorization")
-        @Operation(summary = "Returns a list of Storehouses", description = "Returns a list of all storehouses in database", responses = {
-                        @ApiResponse(responseCode = "200", ref = "ok"),
-                        @ApiResponse(responseCode = "403", ref = "permissionDenied"),
+      })
+      // FIXME
+      // retornar lista ao inves de page
+      @Cacheable(value = "StorehouseList")
+      @GetMapping
+      public Page<StorehouseResponseDTO> search(Pageable pageable) {
+            return this.storehouseService
+                        .search(pageable)
+                        .map(StorehouseResponseDTO::new);
+      }
 
-        })
+      @SecurityRequirement(name = "Authorization")
+      @Operation(summary = "Returns a Storehouse by id", description = "returns a storehouse by the specified id", responses = {
+                  @ApiResponse(responseCode = "200", ref = "ok"),
+                  @ApiResponse(responseCode = "400", ref = "badRequest"),
+                  @ApiResponse(responseCode = "403", ref = "permissionDenied"),
+                  @ApiResponse(responseCode = "404", ref = "ResourceNotFound")
+      })
 
-        @Cacheable(value = "StorehouseList")
-        @GetMapping
-        public Page<StorehouseResponseDTO> search(Pageable pageable) {
-                return this.storehouseService
-                                .search(pageable)
-                                .map(StorehouseResponseDTO::new);
-        }
+      // FIXME
+      // especificar o tipo de retorno no responseEntity
+      @GetMapping("/{id}")
+      public ResponseEntity<Object> searchById(@PathVariable Long id) {
+            Storehouse storehouse = this.storehouseService.searchByID(id);
+            return ResponseEntity.ok(new StorehouseResponseDTO(storehouse));
+      }
 
-        @SecurityRequirement(name = "Authorization")
-        @Operation(summary = "Returns a Storehouse by id", description = "returns a storehouse by the specified id", responses = {
-                        @ApiResponse(responseCode = "200", ref = "ok"),
-                        @ApiResponse(responseCode = "400", ref = "badRequest"),
-                        @ApiResponse(responseCode = "403", ref = "permissionDenied"),
-                        @ApiResponse(responseCode = "404", ref = "ResourceNotFound")
-        })
+      @SecurityRequirement(name = "Authorization")
+      @Operation(summary = "delete a storehouse by id", description = "delete a storehouse by the specified id from database", responses = {
+                  @ApiResponse(responseCode = "200", ref = "ok"),
+                  @ApiResponse(responseCode = "400", ref = "badRequest"),
+                  @ApiResponse(responseCode = "403", ref = "permissionDenied"),
+                  @ApiResponse(responseCode = "404", ref = "ResourceNotFound")
+      })
 
-        @GetMapping("/{id}")
-        public ResponseEntity<Object> searchById(@PathVariable Long id) {
-                Storehouse storehouse = this.storehouseService.searchByID(id);
-                return ResponseEntity.ok(new StorehouseResponseDTO(storehouse));
-        }
+      // FIXME
+      // especificar o tipo de retorno no responseEntity e retornar um no content
+      @DeleteMapping("/{id}")
+      public ResponseEntity<Object> delete(@PathVariable Long id) {
+            this.storehouseService.delete(id);
 
-        @SecurityRequirement(name = "Authorization")
-        @Operation(summary = "delete a storehouse by id", description = "delete a storehouse by the specified id from database", responses = {
-                        @ApiResponse(responseCode = "200", ref = "ok"),
-                        @ApiResponse(responseCode = "400", ref = "badRequest"),
-                        @ApiResponse(responseCode = "403", ref = "permissionDenied"),
-                        @ApiResponse(responseCode = "404", ref = "ResourceNotFound")
-        })
+            return ResponseEntity.status(HttpStatus.OK).body("storehouse was deleted");
+      }
 
-        @DeleteMapping("/{id}")
-        public ResponseEntity<Object> delete(@PathVariable Long id) {
-                this.storehouseService.delete(id);
+      @SecurityRequirement(name = "Authorization")
+      @Operation(summary = "updates a storehouse", description = "update data like code, address etc", responses = {
+                  @ApiResponse(responseCode = "200", ref = "ok"),
+                  @ApiResponse(responseCode = "400", ref = "badRequest"),
+                  @ApiResponse(responseCode = "403", ref = "permissionDenied"),
+                  @ApiResponse(responseCode = "404", ref = "ResourceNotFound")
+      })
+      // FIXME
+      // especificar o tipo de retorno no responseEntity
+      @CacheEvict(value = "StorehouseList", allEntries = true)
+      @PutMapping("/{id}")
+      public ResponseEntity<Object> update(@PathVariable Long id,
+                  @RequestBody @Valid StorehouseUpdateDTO storehouseUpdateDTO) {
+            Storehouse storehouse = this.storehouseService.searchByID(id);
 
-                return ResponseEntity.status(HttpStatus.OK).body("storehouse was deleted");
-        }
+            storehouse = this.storehouseService.update(storehouseUpdateDTO.toStorehouse(id));
 
-        @SecurityRequirement(name = "Authorization")
-        @Operation(summary = "updates a storehouse", description = "update data like code, address etc", responses = {
-                        @ApiResponse(responseCode = "200", ref = "ok"),
-                        @ApiResponse(responseCode = "400", ref = "badRequest"),
-                        @ApiResponse(responseCode = "403", ref = "permissionDenied"),
-                        @ApiResponse(responseCode = "404", ref = "ResourceNotFound")
-        })
+            return ResponseEntity.ok(new StorehouseResponseDTO(storehouse));
+      }
 
-        @CacheEvict(value = "StorehouseList", allEntries = true)
-        @PutMapping("/{id}")
-        public ResponseEntity<Object> update(@PathVariable Long id,
-                        @RequestBody @Valid StorehouseUpdateDTO storehouseUpdateDTO) {
-                Storehouse storehouse = this.storehouseService.searchByID(id);
+      @SecurityRequirement(name = "Authorization")
+      @Operation(summary = "Returns a Storehouse by code", description = "returns a storehouse by the specified code", responses = {
+                  @ApiResponse(responseCode = "200", ref = "ok"),
+                  @ApiResponse(responseCode = "400", ref = "badRequest"),
+                  @ApiResponse(responseCode = "403", ref = "permissionDenied"),
+                  @ApiResponse(responseCode = "404", ref = "ResourceNotFound")
+      })
+      // FIXME
+      // especificar o tipo de retorno no responseEntity
+      @RequestMapping(value = "/search_by_code", method = RequestMethod.GET)
+      public ResponseEntity<Object> searchByCode(@RequestParam Integer code) {
+            Storehouse storehouse = this.storehouseService.searchByCode(code);
 
-                storehouse = this.storehouseService.update(storehouseUpdateDTO.toStorehouse(id));
-
-                return ResponseEntity.ok(new StorehouseResponseDTO(storehouse));
-        }
-
-        @SecurityRequirement(name = "Authorization")
-        @Operation(summary = "Returns a Storehouse by code", description = "returns a storehouse by the specified code", responses = {
-                        @ApiResponse(responseCode = "200", ref = "ok"),
-                        @ApiResponse(responseCode = "400", ref = "badRequest"),
-                        @ApiResponse(responseCode = "403", ref = "permissionDenied"),
-                        @ApiResponse(responseCode = "404", ref = "ResourceNotFound")
-        })
-
-        @RequestMapping(value = "/search_by_code", method = RequestMethod.GET)
-        public ResponseEntity<Object> searchByCode(@RequestParam Integer code) {
-                Storehouse storehouse = this.storehouseService.searchByCode(code);
-
-                return ResponseEntity.ok(new StorehouseResponseDTO(storehouse));
-        }
+            return ResponseEntity.ok(new StorehouseResponseDTO(storehouse));
+      }
 
 }

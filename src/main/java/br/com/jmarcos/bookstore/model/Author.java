@@ -26,21 +26,21 @@ import lombok.Setter;
 @Entity
 @Table(name = "author")
 public class Author {
-        @Id
-        @GeneratedValue(strategy = GenerationType.IDENTITY)
-        @Column(name = "author_id")
-        private Long id;
+      @Id
+      @GeneratedValue(strategy = GenerationType.IDENTITY)
+      @Column(name = "author_id")
+      private Long id;
 
-        @Column(name = "author_name")
-        private String name;
+      @Column(name = "author_name")
+      private String name;
 
-        @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-        @JoinColumn(name = "address_id")
-        private Address address;
+      @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+      @JoinColumn(name = "address_id")
+      private Address address;
 
-        @Column(name = "author_url")
-        private String url;
+      @Column(name = "author_url")
+      private String url;
 
-        @ManyToMany(mappedBy = "authorList", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
-        private List<Book> bookList = new ArrayList<>();
+      @ManyToMany(mappedBy = "authorList", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+      private List<Book> bookList = new ArrayList<>();
 }
