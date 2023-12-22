@@ -55,16 +55,15 @@ public class BookController {
 
       @Cacheable(value = "BookList")
       @GetMapping
-      // FIXME
-      // retornar lista ao inves de page
-      public Page<BookResponseDTO> search(
+      public List<BookResponseDTO> search(
                   @PageableDefault(sort = "id", direction = Direction.ASC, page = 0, size = 10) Pageable pageable,
                   @RequestParam(name = "release_year", required = false) Integer year,
                   @RequestParam(name = "max_price", required = false) BigDecimal price,
                   @RequestParam(required = false) List<BookCategory> categories) {
             return this.bookService
                         .search(pageable, year, price, categories)
-                        .map(BookResponseDTO::new);
+                        .map(BookResponseDTO::new)
+                        .toList();
       }
 
       @Operation(summary = "returns a book by id", description = "returns book by the specified id", responses = {
@@ -74,9 +73,7 @@ public class BookController {
                   @ApiResponse(responseCode = "404", ref = "ResourceNotFound")
       })
       @GetMapping("/{id}")
-      // FIXME
-      // especificar o tipo de retorno no responseEntity
-      public ResponseEntity<Object> searchById(@PathVariable Long id) {
+      public ResponseEntity<BookResponseDTO> searchById(@PathVariable Long id) {
             Book book = this.bookService.findById(id);
 
             return ResponseEntity.ok(new BookResponseDTO(book));
@@ -89,10 +86,8 @@ public class BookController {
                   @ApiResponse(responseCode = "404", ref = "ResourceNotFound")
       })
 
-      // FIXME
-      // especificar o tipo de retorno no responseEntity
       @RequestMapping(value = "/search_by_title", method = RequestMethod.GET)
-      public ResponseEntity<Object> searchByTitle(@RequestParam String title) {
+      public ResponseEntity<BookResponseDTO> searchByTitle(@RequestParam String title) {
             Book book = this.bookService.findByTitle(title);
 
             return ResponseEntity.ok(new BookResponseDTO(book));
@@ -122,11 +117,9 @@ public class BookController {
                   @ApiResponse(responseCode = "409", ref = "conflict")
       })
 
-      // FIXME
-      // especificar o tipo de retorno no responseEntity
       @CacheEvict(value = "BookList", allEntries = true)
       @PostMapping
-      public ResponseEntity<Object> save(@RequestBody @Valid BookRequestDTO bookRequestDTO,
+      public ResponseEntity<BookResponseDTO> save(@RequestBody @Valid BookRequestDTO bookRequestDTO,
                   UriComponentsBuilder uriBuilder) {
             Book book = this.bookService.save(bookRequestDTO.toBook(),
                         bookRequestDTO.getStorehouseBookDTOs()
@@ -140,19 +133,17 @@ public class BookController {
       }
 
       @Operation(summary = "delete a book by id", description = "delete a book by the specified id from database", responses = {
-                  @ApiResponse(responseCode = "200", ref = "ok"),
+                  @ApiResponse(responseCode = "204", description = "book was deleted"),
                   @ApiResponse(responseCode = "400", ref = "badRequest"),
                   @ApiResponse(responseCode = "403", ref = "permissionDenied"),
                   @ApiResponse(responseCode = "404", ref = "ResourceNotFound")
       })
 
-      // FIXME
-      // especificar o tipo de retorno no responseEntity
       @DeleteMapping("/{id}")
-      public ResponseEntity<Object> deleteById(@PathVariable Long id) {
+      public ResponseEntity<Void> deleteById(@PathVariable Long id) {
             this.bookService.deleteById(id);
 
-            return ResponseEntity.status(HttpStatus.OK).body("Book was deleted");
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
       }
 
       @Operation(summary = "updates a book", description = "updates data like title, author, year, etc", responses = {
@@ -163,11 +154,10 @@ public class BookController {
                   @ApiResponse(responseCode = "409", ref = "conflict")
       })
 
-      // FIXME
-      // especificar o tipo de retorno no responseEntity
       @CacheEvict(value = "BookList", allEntries = true)
       @PutMapping("/{id}")
-      public ResponseEntity<Object> update(@PathVariable Long id, @RequestBody @Valid BookUpdateDTO bookUpdateDTO) {
+      public ResponseEntity<BookResponseDTO> update(@PathVariable Long id,
+                  @RequestBody @Valid BookUpdateDTO bookUpdateDTO) {
             Book book = this.bookService.findById(id);
 
             book = this.bookService.updateBook(bookUpdateDTO.toBook(id),
