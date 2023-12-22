@@ -17,6 +17,8 @@ import jakarta.transaction.Transactional;
 public class StorehouseService {
       private final StorehouseRepository storehouseRepository;
 
+      // FIXME
+      // retirar anotação
       @Autowired
       public StorehouseService(StorehouseRepository storehouseRepository) {
             this.storehouseRepository = storehouseRepository;
@@ -24,6 +26,8 @@ public class StorehouseService {
 
       public Storehouse save(Storehouse storehouse) {
 
+            // FIXME
+            // substituir essa validação pelo metodo do repository: existsByCode
             if (this.existsByCode(storehouse.getCode())) {
                   throw new ConflictException("Storehouse code is already in use.");
             }
@@ -40,21 +44,21 @@ public class StorehouseService {
             return this.storehouseRepository.findAll(pageable);
       }
 
-      public Storehouse searchByID(Long id) {
+      public Storehouse searchById(Long id) {
             return this.storehouseRepository.findById(id)
                         .orElseThrow(() -> new ResourceNotFoundException("Storehouse not found with the given id"));
       }
 
       @Transactional
       public void delete(Long id) {
-            Storehouse storehouse = this.searchByID(id);
+            Storehouse storehouse = this.searchById(id);
 
             this.storehouseRepository.delete(storehouse);
 
       }
 
       public Storehouse update(Storehouse newstorehouse) {
-            Storehouse oldStorehouse = this.searchByID(newstorehouse.getId());
+            Storehouse oldStorehouse = this.searchById(newstorehouse.getId());
 
             return this.storehouseRepository.save(this.fillUpdateStorehouse(oldStorehouse, newstorehouse));
       }

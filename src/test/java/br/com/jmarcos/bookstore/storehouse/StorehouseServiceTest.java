@@ -29,166 +29,163 @@ import br.com.jmarcos.bookstore.service.exceptions.ResourceNotFoundException;
 
 @ExtendWith(MockitoExtension.class)
 public class StorehouseServiceTest {
-    @InjectMocks
-    private StorehouseService storehouseService;
+      @InjectMocks
+      private StorehouseService storehouseService;
 
-    @Mock
-    private StorehouseRepository storehouseRepository;
+      @Mock
+      private StorehouseRepository storehouseRepository;
 
-    @Test
-    void save_returns_ASavedStorehouse_WhenSuccessful() {
-        Storehouse storehouse = createStorehouse();
-        when(storehouseRepository.save(any(Storehouse.class))).thenReturn(storehouse);
+      @Test
+      void save_returns_ASavedStorehouse_WhenSuccessful() {
+            Storehouse storehouse = createStorehouse();
+            when(storehouseRepository.save(any(Storehouse.class))).thenReturn(storehouse);
 
-        Storehouse savedStorehouse = storehouseService.save(storehouse);
+            Storehouse savedStorehouse = storehouseService.save(storehouse);
 
-        Assertions.assertNotNull(savedStorehouse);
-        Assertions.assertNotNull(savedStorehouse.getId());
-        Assertions.assertEquals(storehouse.getCode(), savedStorehouse.getCode());
-        Assertions.assertEquals(storehouse.getPhone(), savedStorehouse.getPhone());
-        Assertions.assertEquals(storehouse.getAddress(), savedStorehouse.getAddress());
-        Assertions.assertTrue(storehouse.getBookList().isEmpty());
-        verify(storehouseRepository).save(storehouse);
+            Assertions.assertNotNull(savedStorehouse);
+            Assertions.assertNotNull(savedStorehouse.getId());
+            Assertions.assertEquals(storehouse.getCode(), savedStorehouse.getCode());
+            Assertions.assertEquals(storehouse.getPhone(), savedStorehouse.getPhone());
+            Assertions.assertEquals(storehouse.getAddress(), savedStorehouse.getAddress());
+            Assertions.assertTrue(storehouse.getBookList().isEmpty());
+            verify(storehouseRepository).save(storehouse);
 
-    }
+      }
 
-    @Test
-    void save_Throws_ConflictException_WhenStorehouseCodeIsAlreadyInUse() {
-        Storehouse storehouse = createStorehouse();
-        Storehouse newStorehouse = createStorehouse();
-        when(storehouseRepository.findByCode(anyInt())).thenReturn(Optional.of(storehouse));
+      @Test
+      void save_Throws_ConflictException_WhenStorehouseCodeIsAlreadyInUse() {
+            Storehouse storehouse = createStorehouse();
+            Storehouse newStorehouse = createStorehouse();
+            when(storehouseRepository.findByCode(anyInt())).thenReturn(Optional.of(storehouse));
 
-        ConflictException conflictException = Assertions
-                .assertThrows(ConflictException.class,
-                        () -> storehouseService.save(newStorehouse));
+            ConflictException conflictException = Assertions
+                        .assertThrows(ConflictException.class,
+                                    () -> storehouseService.save(newStorehouse));
 
-        Assertions.assertTrue(conflictException.getMessage()
-                .contains("Storehouse code is already in use."));
+            Assertions.assertTrue(conflictException.getMessage()
+                        .contains("Storehouse code is already in use."));
 
-    }
+      }
 
-    @Test
-    void search_returns_AllStorehouses_WhenSuccessful() {
-        PageRequest pageable = PageRequest.of(0, 5);
-        List<Storehouse> storehouseList = List.of(createStorehouse());
-        PageImpl<Storehouse> storehousePage = new PageImpl<>(storehouseList);
+      @Test
+      void search_returns_AllStorehouses_WhenSuccessful() {
+            PageRequest pageable = PageRequest.of(0, 5);
+            List<Storehouse> storehouseList = List.of(createStorehouse());
+            PageImpl<Storehouse> storehousePage = new PageImpl<>(storehouseList);
 
-        when(storehouseRepository.findAll(pageable)).thenReturn(storehousePage);
+            when(storehouseRepository.findAll(pageable)).thenReturn(storehousePage);
 
-        Page<Storehouse> all = storehouseService.search(pageable);
-        List<Storehouse> storehousesSavedList = all.stream().toList();
+            Page<Storehouse> all = storehouseService.search(pageable);
+            List<Storehouse> storehousesSavedList = all.stream().toList();
 
-        Assertions.assertFalse(storehousesSavedList.isEmpty());
-        Assertions.assertEquals(storehouseList.get(0).getCode(), storehousesSavedList.get(0).getCode());
-        Assertions.assertEquals(storehouseList.get(0).getPhone(), storehousesSavedList.get(0).getPhone());
-        Assertions.assertEquals(storehouseList.get(0).getAddress(), storehousesSavedList.get(0).getAddress());
-        Assertions.assertTrue(storehousesSavedList.get(0).getBookList().isEmpty());
-        Assertions.assertNotNull(storehousesSavedList.get(0).getId());
+            Assertions.assertFalse(storehousesSavedList.isEmpty());
+            Assertions.assertEquals(storehouseList.get(0).getCode(), storehousesSavedList.get(0).getCode());
+            Assertions.assertEquals(storehouseList.get(0).getPhone(), storehousesSavedList.get(0).getPhone());
+            Assertions.assertEquals(storehouseList.get(0).getAddress(), storehousesSavedList.get(0).getAddress());
+            Assertions.assertTrue(storehousesSavedList.get(0).getBookList().isEmpty());
+            Assertions.assertNotNull(storehousesSavedList.get(0).getId());
 
-        verify(storehouseRepository).findAll(pageable);
+            verify(storehouseRepository).findAll(pageable);
 
-    }
+      }
 
-    @Test
-    void searchByID_returns_AStorehouseTheGivenId_WhenSuccessful() {
-        Storehouse storehouse = createStorehouse();
-        when(storehouseRepository.findById(storehouse.getId())).thenReturn(Optional.of(storehouse));
+      @Test
+      void searchByID_returns_AStorehouseTheGivenId_WhenSuccessful() {
+            Storehouse storehouse = createStorehouse();
+            when(storehouseRepository.findById(storehouse.getId())).thenReturn(Optional.of(storehouse));
 
-        Storehouse returnedStorehouse = this.storehouseService.searchByID(storehouse.getId());
+            Storehouse returnedStorehouse = this.storehouseService.searchById(storehouse.getId());
 
-        Assertions.assertNotNull(returnedStorehouse);
-        Assertions.assertEquals(storehouse.getId(), returnedStorehouse.getId());
-        Assertions.assertEquals(storehouse.getCode(), returnedStorehouse.getCode());
-        Assertions.assertEquals(storehouse.getPhone(), returnedStorehouse.getPhone());
-        Assertions.assertEquals(storehouse.getAddress(), returnedStorehouse.getAddress());
-        Assertions.assertTrue(storehouse.getBookList().isEmpty());
-        verify(storehouseRepository).findById(storehouse.getId());
-    }
+            Assertions.assertNotNull(returnedStorehouse);
+            Assertions.assertEquals(storehouse.getId(), returnedStorehouse.getId());
+            Assertions.assertEquals(storehouse.getCode(), returnedStorehouse.getCode());
+            Assertions.assertEquals(storehouse.getPhone(), returnedStorehouse.getPhone());
+            Assertions.assertEquals(storehouse.getAddress(), returnedStorehouse.getAddress());
+            Assertions.assertTrue(storehouse.getBookList().isEmpty());
+            verify(storehouseRepository).findById(storehouse.getId());
+      }
 
-    @Test
-    void searchByID_Throws_ResourceNotFoundException_WhenStorehouseNotFound() {
-        when(storehouseRepository.findById(anyLong())).thenReturn(Optional.empty());
+      @Test
+      void searchByID_Throws_ResourceNotFoundException_WhenStorehouseNotFound() {
+            when(storehouseRepository.findById(anyLong())).thenReturn(Optional.empty());
 
-        ResourceNotFoundException resourceNotFoundException = Assertions
-                .assertThrows(ResourceNotFoundException.class,
-                        () -> storehouseService.searchByID(1L));
-
-
-            Assertions.assertTrue(resourceNotFoundException.getMessage()
-                .contains("Storehouse not found with the given id"));
-        
-    }
-
-    @Test
-    void searchByCode_Throws_ResourceNotFoundException_WhenStorehouseNotFound() {
-        when(storehouseRepository.findByCode(anyInt())).thenReturn(Optional.empty());
-
-        ResourceNotFoundException resourceNotFoundException = Assertions
-                .assertThrows(ResourceNotFoundException.class,
-                        () -> storehouseService.searchByCode(1));
-
+            ResourceNotFoundException resourceNotFoundException = Assertions
+                        .assertThrows(ResourceNotFoundException.class,
+                                    () -> storehouseService.searchById(1L));
 
             Assertions.assertTrue(resourceNotFoundException.getMessage()
-                .contains("Storehouse not found with the given code"));
-        
-    }
+                        .contains("Storehouse not found with the given id"));
 
-    @Test
-    void delete_deletesAStorehouse_WhenSuccessful() {
-        Storehouse storehouse = createStorehouse();
-        when(storehouseRepository.findById(anyLong())).thenReturn(Optional.of(storehouse));
+      }
 
-        this.storehouseService.delete(storehouse.getId());
+      @Test
+      void searchByCode_Throws_ResourceNotFoundException_WhenStorehouseNotFound() {
+            when(storehouseRepository.findByCode(anyInt())).thenReturn(Optional.empty());
 
-        verify(storehouseRepository).delete(storehouse);
-        verify(storehouseRepository).findById(storehouse.getId());
-    }
-
-    @Test
-    void delete_Throws_ResourceNotFoundException_WhenPublishingCompanyNotFound() {
-        when(storehouseRepository.findById(anyLong())).thenReturn(Optional.empty());
-
-        ResourceNotFoundException resourceNotFoundException = Assertions
-                .assertThrows(ResourceNotFoundException.class,
-                        () -> storehouseService.delete(anyLong()));
-
+            ResourceNotFoundException resourceNotFoundException = Assertions
+                        .assertThrows(ResourceNotFoundException.class,
+                                    () -> storehouseService.searchByCode(1));
 
             Assertions.assertTrue(resourceNotFoundException.getMessage()
-                .contains("Storehouse not found with the given id"));
-        
-    }
+                        .contains("Storehouse not found with the given code"));
 
-    @Test
-    void update_returns_AUpdatedStorehouse_WhenSuccessful() {
-        Storehouse storehouse = createStorehouse();
-        StorehouseUpdateDTO storehouseUpdateDTO = createStorehouseUpdateDTO();
-        when(storehouseRepository.save(storehouse)).thenReturn(storehouse);
-        when(storehouseRepository.findById(anyLong())).thenReturn(Optional.of(storehouse));
+      }
 
-        Storehouse updatedStorehouse = storehouseService.update(storehouseUpdateDTO.toStorehouse(1L));
+      @Test
+      void delete_deletesAStorehouse_WhenSuccessful() {
+            Storehouse storehouse = createStorehouse();
+            when(storehouseRepository.findById(anyLong())).thenReturn(Optional.of(storehouse));
 
-        Assertions.assertNotNull(updatedStorehouse);
-        Assertions.assertEquals(storehouse.getId(), updatedStorehouse.getId());
-        Assertions.assertEquals(storehouseUpdateDTO.getPhone(), updatedStorehouse.getPhone());
-        verify(storehouseRepository).save(storehouse);
+            this.storehouseService.delete(storehouse.getId());
 
-    }
+            verify(storehouseRepository).delete(storehouse);
+            verify(storehouseRepository).findById(storehouse.getId());
+      }
 
-    Storehouse createStorehouse() {
-        Storehouse storehouse = new Storehouse();
-        storehouse.setCode(1);
-        storehouse.setPhone("999999");
-        storehouse.setAddress(new Address("rua a", 111, "caninde", "CE", "627000000"));
-        storehouse.getAddress().setId(1L);
-        storehouse.setId(1L);
-        return storehouse;
-    }
+      @Test
+      void delete_Throws_ResourceNotFoundException_WhenPublishingCompanyNotFound() {
+            when(storehouseRepository.findById(anyLong())).thenReturn(Optional.empty());
 
-    private StorehouseUpdateDTO createStorehouseUpdateDTO() {
-        StorehouseUpdateDTO storehouseUpdateDTO = new StorehouseUpdateDTO();
+            ResourceNotFoundException resourceNotFoundException = Assertions
+                        .assertThrows(ResourceNotFoundException.class,
+                                    () -> storehouseService.delete(anyLong()));
 
-        storehouseUpdateDTO.setPhone("11111111");
+            Assertions.assertTrue(resourceNotFoundException.getMessage()
+                        .contains("Storehouse not found with the given id"));
 
-        return storehouseUpdateDTO;
-    }
+      }
+
+      @Test
+      void update_returns_AUpdatedStorehouse_WhenSuccessful() {
+            Storehouse storehouse = createStorehouse();
+            StorehouseUpdateDTO storehouseUpdateDTO = createStorehouseUpdateDTO();
+            when(storehouseRepository.save(storehouse)).thenReturn(storehouse);
+            when(storehouseRepository.findById(anyLong())).thenReturn(Optional.of(storehouse));
+
+            Storehouse updatedStorehouse = storehouseService.update(storehouseUpdateDTO.toStorehouse(1L));
+
+            Assertions.assertNotNull(updatedStorehouse);
+            Assertions.assertEquals(storehouse.getId(), updatedStorehouse.getId());
+            Assertions.assertEquals(storehouseUpdateDTO.getPhone(), updatedStorehouse.getPhone());
+            verify(storehouseRepository).save(storehouse);
+
+      }
+
+      Storehouse createStorehouse() {
+            Storehouse storehouse = new Storehouse();
+            storehouse.setCode(1);
+            storehouse.setPhone("999999");
+            storehouse.setAddress(new Address("rua a", 111, "caninde", "CE", "627000000"));
+            storehouse.getAddress().setId(1L);
+            storehouse.setId(1L);
+            return storehouse;
+      }
+
+      private StorehouseUpdateDTO createStorehouseUpdateDTO() {
+            StorehouseUpdateDTO storehouseUpdateDTO = new StorehouseUpdateDTO();
+
+            storehouseUpdateDTO.setPhone("11111111");
+
+            return storehouseUpdateDTO;
+      }
 }

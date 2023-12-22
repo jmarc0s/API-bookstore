@@ -89,7 +89,7 @@ public class StorehouseController {
       // especificar o tipo de retorno no responseEntity
       @GetMapping("/{id}")
       public ResponseEntity<Object> searchById(@PathVariable Long id) {
-            Storehouse storehouse = this.storehouseService.searchByID(id);
+            Storehouse storehouse = this.storehouseService.searchById(id);
             return ResponseEntity.ok(new StorehouseResponseDTO(storehouse));
       }
 
@@ -123,7 +123,7 @@ public class StorehouseController {
       @PutMapping("/{id}")
       public ResponseEntity<Object> update(@PathVariable Long id,
                   @RequestBody @Valid StorehouseUpdateDTO storehouseUpdateDTO) {
-            Storehouse storehouse = this.storehouseService.searchByID(id);
+            Storehouse storehouse = this.storehouseService.searchById(id);
 
             storehouse = this.storehouseService.update(storehouseUpdateDTO.toStorehouse(id));
 

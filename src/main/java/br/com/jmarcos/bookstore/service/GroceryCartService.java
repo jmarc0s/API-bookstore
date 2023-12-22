@@ -129,7 +129,7 @@ public class GroceryCartService {
       }
 
       public GroceryCart addBooks(GroceryCart groceryCart, List<GroceryCartBook> books) {
-            List<Book> bookList = this.searchBooks(books);
+            this.searchBooks(books);
 
             for (GroceryCartBook orderBook : books) {
                   Optional<GroceryCartBook> groceryCartBook = this.groceryCartBookRepository

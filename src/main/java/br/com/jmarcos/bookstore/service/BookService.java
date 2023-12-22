@@ -151,7 +151,7 @@ public class BookService {
 
             for (StorehouseBook storehouseBook : storehouseBooks) {
                   Storehouse storehouseExist = this.storehouseService
-                              .searchByID(storehouseBook.getStorehouse().getId());
+                              .searchById(storehouseBook.getStorehouse().getId());
                   storehouseBook.setStorehouse(storehouseExist);
                   storehouses.add(storehouseExist);
 
