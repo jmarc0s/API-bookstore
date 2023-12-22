@@ -18,23 +18,23 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class GroceryCartRequestDTO {
+public class OrderRequestDTO {
 
-    @Valid
-    @NotEmpty
-    private Set<GroceryCartBookDTO> books = new HashSet<>();
+      @Valid
+      @NotEmpty
+      private Set<GroceryCartBookDTO> books = new HashSet<>();
 
-    public GroceryCart toGroceryCart(Long personId) {
-        GroceryCart groceryCart = new GroceryCart();
+      public GroceryCart toGroceryCart(Long personId) {
+            GroceryCart order = new GroceryCart();
 
-        for (GroceryCartBookDTO groceryCartBookDTO : books) {
-            Book book = BookRequestDTO.toBook(groceryCartBookDTO.getBookId());
-            groceryCart.getBooks().add(book);
-        }
-        groceryCart.setPerson(new Person(personId));
-        groceryCart.setOrderSTatus(OrderStatusEnum.OPEN);
+            for (GroceryCartBookDTO groceryCartBookDTO : books) {
+                  Book book = BookRequestDTO.toBook(groceryCartBookDTO.getBookId());
+                  order.getBooks().add(book);
+            }
+            order.setPerson(new Person(personId));
+            order.setOrderSTatus(OrderStatusEnum.OPEN);
 
-        return groceryCart;
-    }
+            return order;
+      }
 
 }

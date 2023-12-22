@@ -51,7 +51,16 @@ public class GroceryCartService {
                         .orElseThrow(() -> new ResourceNotFoundException("GroceryCart not found with the given id"));
       }
 
+      public List<GroceryCartBook> searchInfoOrderByIdAndPersonId(Long id, Long personId) {
+            GroceryCart order = this.searchByIdAndPersonId(id, personId);
+
+            return this.listGroceryCartBook(order);
+      }
+
       public GroceryCart save(GroceryCart groceryCart, List<GroceryCartBook> groceryCartBooks) {
+
+            Optional<GroceryCart> openOrder = this.findOpenOrder(groceryCart.getPerson().getId());
+
             List<Book> books = this.searchBooks(groceryCartBooks);
             Person person = this.personService.searchById(groceryCart.getPerson().getId());
 
@@ -143,6 +152,10 @@ public class GroceryCartService {
             }
             this.groceryCartBookRepository.saveAll(books);
             return this.groceryCartRepository.save(groceryCart);
+      }
+
+      public List<GroceryCartBook> searchGroceryCartInfor(Long personId) {
+            return this.groceryCartBookRepository.findAllByGroceryCartPersonId(personId);
       }
 
 }

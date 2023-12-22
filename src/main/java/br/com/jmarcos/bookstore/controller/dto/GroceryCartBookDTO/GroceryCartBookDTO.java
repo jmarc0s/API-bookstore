@@ -12,38 +12,38 @@ import lombok.Setter;
 @Getter
 @Setter
 public class GroceryCartBookDTO {
-    
-    @NotNull (message = "must not be null")
-    private Long bookId;
 
-    @NotNull (message = "must not be null")
-    @Positive (message = "must be greater than 0")
-    private Integer quantity;
+      @NotNull(message = "must not be null")
+      private Long bookId;
 
-    public GroceryCartBook toGroceryCart(){
-        GroceryCartBook groceryCartBook = new GroceryCartBook();
-        groceryCartBook.setBook(BookRequestDTO.toBook(bookId));
-        groceryCartBook.setQuantity(this.quantity);
+      @NotNull(message = "must not be null")
+      @Positive(message = "must be greater than 0")
+      private Integer quantity;
 
-        return groceryCartBook;
-    }
+      public GroceryCartBook toGroceryCartBook() {
+            GroceryCartBook groceryCartBook = new GroceryCartBook();
+            groceryCartBook.setBook(BookRequestDTO.toBook(bookId));
+            groceryCartBook.setQuantity(this.quantity);
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(bookId);
-    }
+            return groceryCartBook;
+      }
 
-    @Override
-    public boolean equals(Object obj) {
-        if(this == obj){
-            return true;
-        }
-        if(obj == null || this.getClass() != obj.getClass()){
-            return false;
-        }
+      @Override
+      public int hashCode() {
+            return Objects.hash(bookId);
+      }
 
-        GroceryCartBookDTO otherGroceryCartBookDTO = (GroceryCartBookDTO) obj;
-        return Objects.equals(bookId, otherGroceryCartBookDTO.getBookId());
-        
-    }
+      @Override
+      public boolean equals(Object obj) {
+            if (this == obj) {
+                  return true;
+            }
+            if (obj == null || this.getClass() != obj.getClass()) {
+                  return false;
+            }
+
+            GroceryCartBookDTO otherGroceryCartBookDTO = (GroceryCartBookDTO) obj;
+            return Objects.equals(bookId, otherGroceryCartBookDTO.getBookId());
+
+      }
 }

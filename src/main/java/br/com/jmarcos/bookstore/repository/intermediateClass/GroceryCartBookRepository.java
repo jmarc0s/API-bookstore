@@ -19,4 +19,6 @@ public interface GroceryCartBookRepository extends JpaRepository<GroceryCartBook
 
       List<GroceryCartBook> findAllByGroceryCartId(Long id);
 
+      List<GroceryCartBook> findAllByGroceryCartPersonId(Long personId);
+
 }
