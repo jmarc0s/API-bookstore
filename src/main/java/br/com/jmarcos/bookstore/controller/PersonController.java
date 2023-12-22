@@ -30,7 +30,6 @@ import br.com.jmarcos.bookstore.model.Person;
 import br.com.jmarcos.bookstore.service.PersonService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 
 @RestController
@@ -89,7 +88,6 @@ public class PersonController {
             return ResponseEntity.ok(this.personService.changeEmailAndResendConfirmationCode(oldEmail, newEmail));
       }
 
-      @SecurityRequirement(name = "Authorization")
       @Operation(summary = "update your profile data", description = "update data like email, name ", responses = {
                   @ApiResponse(responseCode = "200", ref = "ok"),
                   @ApiResponse(responseCode = "400", ref = "badRequest"),
@@ -107,7 +105,6 @@ public class PersonController {
             return ResponseEntity.ok(new PersonResponseDTO(person));
       }
 
-      @SecurityRequirement(name = "Authorization")
       @Operation(summary = "delete your profile", description = "delete all your profile data", responses = {
                   @ApiResponse(responseCode = "200", ref = "ok"),
                   @ApiResponse(responseCode = "400", ref = "badRequest"),
@@ -123,7 +120,6 @@ public class PersonController {
 
       }
 
-      @SecurityRequirement(name = "Authorization")
       @Operation(summary = "get your profile data", description = "show your profile data", responses = {
                   @ApiResponse(responseCode = "200", ref = "ok"),
                   @ApiResponse(responseCode = "400", ref = "badRequest"),
@@ -136,7 +132,6 @@ public class PersonController {
             return ResponseEntity.ok(new PersonResponseDTO(user));
       }
 
-      @SecurityRequirement(name = "Authorization")
       @Operation(summary = "list all profiles in database", description = "returns a list of all pessoal data in database", responses = {
                   @ApiResponse(responseCode = "200", ref = "ok"),
                   @ApiResponse(responseCode = "403", ref = "permissionDenied")
@@ -151,7 +146,6 @@ public class PersonController {
                         .map(PersonResponseDTO::new);
       }
 
-      @SecurityRequirement(name = "Authorization")
       @Operation(summary = "Returns a profile by id", description = "Returns a profile with the  specified id", responses = {
                   @ApiResponse(responseCode = "200", ref = "ok"),
                   @ApiResponse(responseCode = "400", ref = "badRequest"),
@@ -168,7 +162,6 @@ public class PersonController {
 
       }
 
-      @SecurityRequirement(name = "Authorization")
       @Operation(summary = "Returns a profile by email", description = "Returns a profile with the specified email", responses = {
                   @ApiResponse(responseCode = "200", ref = "ok"),
                   @ApiResponse(responseCode = "400", ref = "badRequest"),
@@ -185,7 +178,6 @@ public class PersonController {
 
       }
 
-      @SecurityRequirement(name = "Authorization")
       @Operation(summary = "delete a profile by id", description = "delete any profile by the specified id", responses = {
                   @ApiResponse(responseCode = "200", ref = "ok"),
                   @ApiResponse(responseCode = "400", ref = "badRequest"),
@@ -201,7 +193,6 @@ public class PersonController {
             return ResponseEntity.status(HttpStatus.OK).body("Person was deleted");
       }
 
-      @SecurityRequirement(name = "Authorization")
       @Operation(summary = "set profile permission", description = "add a permission to a profile", responses = {
                   @ApiResponse(responseCode = "200", ref = "ok"),
                   @ApiResponse(responseCode = "400", ref = "badRequest"),

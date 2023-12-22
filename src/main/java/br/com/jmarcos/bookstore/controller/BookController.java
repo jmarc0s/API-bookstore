@@ -28,7 +28,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import br.com.jmarcos.bookstore.controller.dto.book.BookRequestDTO;
 import br.com.jmarcos.bookstore.controller.dto.book.BookResponseDTO;
 import br.com.jmarcos.bookstore.controller.dto.book.BookUpdateDTO;
@@ -115,7 +114,6 @@ public class BookController {
                         .collect(Collectors.toList());
       }
 
-      @SecurityRequirement(name = "Authorization")
       @Operation(summary = "record a new book", description = "save a new book in database", responses = {
                   @ApiResponse(responseCode = "200", ref = "ok"),
                   @ApiResponse(responseCode = "400", ref = "badRequest"),
@@ -141,7 +139,6 @@ public class BookController {
 
       }
 
-      @SecurityRequirement(name = "Authorization")
       @Operation(summary = "delete a book by id", description = "delete a book by the specified id from database", responses = {
                   @ApiResponse(responseCode = "200", ref = "ok"),
                   @ApiResponse(responseCode = "400", ref = "badRequest"),
@@ -158,7 +155,6 @@ public class BookController {
             return ResponseEntity.status(HttpStatus.OK).body("Book was deleted");
       }
 
-      @SecurityRequirement(name = "Authorization")
       @Operation(summary = "updates a book", description = "updates data like title, author, year, etc", responses = {
                   @ApiResponse(responseCode = "200", ref = "ok"),
                   @ApiResponse(responseCode = "400", ref = "badRequest"),

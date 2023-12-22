@@ -23,7 +23,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import br.com.jmarcos.bookstore.controller.dto.author.AuthorRequestDTO;
 import br.com.jmarcos.bookstore.controller.dto.author.AuthorResponseDTO;
 import br.com.jmarcos.bookstore.controller.dto.author.AuthorUpdateDTO;
@@ -41,7 +40,6 @@ public class AuthorController {
             this.authorService = authorService;
       }
 
-      @SecurityRequirement(name = "Authorization")
       @Operation(summary = "Returns a list of Authors", description = "Returns a list of all authors in database", responses = {
                   @ApiResponse(responseCode = "200", ref = "ok"),
                   @ApiResponse(responseCode = "403", ref = "permissionDenied"),
@@ -57,7 +55,6 @@ public class AuthorController {
                         .map(AuthorResponseDTO::new);
       }
 
-      @SecurityRequirement(name = "Authorization")
       @Operation(summary = "record a new Author", description = "save a author in database", responses = {
                   @ApiResponse(responseCode = "200", ref = "ok"),
                   @ApiResponse(responseCode = "400", ref = "badRequest"),
@@ -78,7 +75,6 @@ public class AuthorController {
             return ResponseEntity.created(uri).body(new AuthorResponseDTO(author));
       }
 
-      @SecurityRequirement(name = "Authorization")
       @Operation(summary = "returns an author by id", description = "returns an author by the specified id", responses = {
                   @ApiResponse(responseCode = "200", ref = "ok"),
                   @ApiResponse(responseCode = "400", ref = "badRequest"),
@@ -95,7 +91,6 @@ public class AuthorController {
             return ResponseEntity.ok(new AuthorResponseDTO(author));
       }
 
-      @SecurityRequirement(name = "Authorization")
       @Operation(summary = "returns an author by name", description = "returns an author by the specified name", responses = {
                   @ApiResponse(responseCode = "200", ref = "ok"),
                   @ApiResponse(responseCode = "400", ref = "badRequest"),
@@ -113,7 +108,6 @@ public class AuthorController {
 
       }
 
-      @SecurityRequirement(name = "Authorization")
       @Operation(summary = "delete an author by id", description = "delete a author by the specified id from database", responses = {
                   @ApiResponse(responseCode = "200", ref = "ok"),
                   @ApiResponse(responseCode = "400", ref = "badRequest"),
@@ -130,7 +124,6 @@ public class AuthorController {
             return ResponseEntity.status(HttpStatus.OK).body("Author was deleted");
       }
 
-      @SecurityRequirement(name = "Authorization")
       @Operation(summary = "update an author", description = "update data like name, url, etc", responses = {
                   @ApiResponse(responseCode = "200", ref = "ok"),
                   @ApiResponse(responseCode = "400", ref = "badRequest"),

@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -46,7 +45,6 @@ public class GroceryCartController {
             this.groceryCartService = groceryCartService;
       }
 
-      @SecurityRequirement(name = "Authorization")
       @Operation(summary = "Returns a list of Grocery carts", description = "Returns a list of all of your Grocery Carts  in database", responses = {
                   @ApiResponse(responseCode = "200", ref = "ok"),
                   @ApiResponse(responseCode = "403", ref = "permissionDenied")
@@ -70,7 +68,6 @@ public class GroceryCartController {
             return groceryCartsResponse.stream().collect(Collectors.toList());
       }
 
-      @SecurityRequirement(name = "Authorization")
       @Operation(summary = "returns a grocery cart by id", description = "returns grocery cart by the specified id", responses = {
                   @ApiResponse(responseCode = "200", ref = "ok"),
                   @ApiResponse(responseCode = "400", ref = "badRequest"),
@@ -90,7 +87,6 @@ public class GroceryCartController {
 
       }
 
-      @SecurityRequirement(name = "Authorization")
       @Operation(summary = "delete a grocery cart by id", description = "delete a grocery cart by the specified id from database", responses = {
                   @ApiResponse(responseCode = "200", ref = "ok"),
                   @ApiResponse(responseCode = "400", ref = "badRequest"),
@@ -108,7 +104,6 @@ public class GroceryCartController {
 
       }
 
-      @SecurityRequirement(name = "Authorization")
       @Operation(summary = "create a new grocery cart", description = "add a new grocery cart in database", responses = {
                   @ApiResponse(responseCode = "200", ref = "ok"),
                   @ApiResponse(responseCode = "400", ref = "badRequest"),
@@ -157,7 +152,6 @@ public class GroceryCartController {
 
       }
 
-      @SecurityRequirement(name = "Authorization")
       @Operation(summary = "delete a book by book id", description = "delete a book of your grocery cart by book id", responses = {
                   @ApiResponse(responseCode = "200", ref = "ok"),
                   @ApiResponse(responseCode = "400", ref = "badRequest"),
@@ -178,7 +172,6 @@ public class GroceryCartController {
 
       }
 
-      @SecurityRequirement(name = "Authorization")
       @Operation(summary = "update a book by id", description = "update data like book quantity on your grocery cart", responses = {
                   @ApiResponse(responseCode = "200", ref = "ok"),
                   @ApiResponse(responseCode = "400", ref = "badRequest"),

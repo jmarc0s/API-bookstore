@@ -23,7 +23,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import br.com.jmarcos.bookstore.controller.dto.storehouse.StorehouseRequestDTO;
 import br.com.jmarcos.bookstore.controller.dto.storehouse.StorehouseResponseDTO;
 import br.com.jmarcos.bookstore.controller.dto.storehouse.StorehouseUpdateDTO;
@@ -42,7 +41,6 @@ public class StorehouseController {
             this.storehouseService = storehouseService;
       }
 
-      @SecurityRequirement(name = "Authorization")
       @Operation(summary = "record a new Storehouse", description = "save a storehouse in database", responses = {
                   @ApiResponse(responseCode = "200", ref = "ok"),
                   @ApiResponse(responseCode = "400", ref = "badRequest"),
@@ -61,7 +59,6 @@ public class StorehouseController {
             return ResponseEntity.created(uri).body(new StorehouseResponseDTO(storehouse));
       }
 
-      @SecurityRequirement(name = "Authorization")
       @Operation(summary = "Returns a list of Storehouses", description = "Returns a list of all storehouses in database", responses = {
                   @ApiResponse(responseCode = "200", ref = "ok"),
                   @ApiResponse(responseCode = "403", ref = "permissionDenied"),
@@ -77,7 +74,6 @@ public class StorehouseController {
                         .map(StorehouseResponseDTO::new);
       }
 
-      @SecurityRequirement(name = "Authorization")
       @Operation(summary = "Returns a Storehouse by id", description = "returns a storehouse by the specified id", responses = {
                   @ApiResponse(responseCode = "200", ref = "ok"),
                   @ApiResponse(responseCode = "400", ref = "badRequest"),
@@ -93,7 +89,6 @@ public class StorehouseController {
             return ResponseEntity.ok(new StorehouseResponseDTO(storehouse));
       }
 
-      @SecurityRequirement(name = "Authorization")
       @Operation(summary = "delete a storehouse by id", description = "delete a storehouse by the specified id from database", responses = {
                   @ApiResponse(responseCode = "200", ref = "ok"),
                   @ApiResponse(responseCode = "400", ref = "badRequest"),
@@ -110,7 +105,6 @@ public class StorehouseController {
             return ResponseEntity.status(HttpStatus.OK).body("storehouse was deleted");
       }
 
-      @SecurityRequirement(name = "Authorization")
       @Operation(summary = "updates a storehouse", description = "update data like code, address etc", responses = {
                   @ApiResponse(responseCode = "200", ref = "ok"),
                   @ApiResponse(responseCode = "400", ref = "badRequest"),
@@ -130,7 +124,6 @@ public class StorehouseController {
             return ResponseEntity.ok(new StorehouseResponseDTO(storehouse));
       }
 
-      @SecurityRequirement(name = "Authorization")
       @Operation(summary = "Returns a Storehouse by code", description = "returns a storehouse by the specified code", responses = {
                   @ApiResponse(responseCode = "200", ref = "ok"),
                   @ApiResponse(responseCode = "400", ref = "badRequest"),

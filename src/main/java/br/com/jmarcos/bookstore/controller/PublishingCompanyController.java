@@ -23,7 +23,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import br.com.jmarcos.bookstore.controller.dto.publishinCompany.PublishingCompanyRequestDTO;
 import br.com.jmarcos.bookstore.controller.dto.publishinCompany.PublishingCompanyResponseDTO;
 import br.com.jmarcos.bookstore.controller.dto.publishinCompany.PublishingCompanyUpdateDTO;
@@ -41,7 +40,6 @@ public class PublishingCompanyController {
             this.publishingCompanyService = publishingCompanyService;
       }
 
-      @SecurityRequirement(name = "Authorization")
       @Operation(summary = "Returns a list of Publishing Companies", description = "Returns a list of all Publishing Company in database", responses = {
                   @ApiResponse(responseCode = "200", ref = "ok"),
                   @ApiResponse(responseCode = "403", ref = "permissionDenied"),
@@ -56,7 +54,6 @@ public class PublishingCompanyController {
                         .map(PublishingCompanyResponseDTO::new);
       }
 
-      @SecurityRequirement(name = "Authorization")
       @Operation(summary = "record a new publishing Company", description = "save a new Publishing Company in database", responses = {
                   @ApiResponse(responseCode = "200", ref = "ok"),
                   @ApiResponse(responseCode = "400", ref = "badRequest"),
@@ -77,7 +74,6 @@ public class PublishingCompanyController {
             return ResponseEntity.created(uri).body(new PublishingCompanyResponseDTO(publishingCompany));
       }
 
-      @SecurityRequirement(name = "Authorization")
       @Operation(summary = "Returns a publishing Company by id", description = "returns a publishing company by the specified id", responses = {
                   @ApiResponse(responseCode = "200", ref = "ok"),
                   @ApiResponse(responseCode = "400", ref = "badRequest"),
@@ -94,7 +90,6 @@ public class PublishingCompanyController {
             return ResponseEntity.ok(new PublishingCompanyResponseDTO(publishingCompany));
       }
 
-      @SecurityRequirement(name = "Authorization")
       @Operation(summary = "Returns a publishing Company by name", description = "returns a publishing company by the specified name", responses = {
                   @ApiResponse(responseCode = "200", ref = "ok"),
                   @ApiResponse(responseCode = "400", ref = "badRequest"),
@@ -112,7 +107,6 @@ public class PublishingCompanyController {
 
       }
 
-      @SecurityRequirement(name = "Authorization")
       @Operation(summary = "delete a publishing Company by id", description = "delete a publishing company by the specified id from database", responses = {
                   @ApiResponse(responseCode = "200", ref = "ok"),
                   @ApiResponse(responseCode = "400", ref = "badRequest"),
@@ -130,7 +124,6 @@ public class PublishingCompanyController {
 
       }
 
-      @SecurityRequirement(name = "Authorization")
       @Operation(summary = "updates a publishing", description = "update data like, name, url, address etc", responses = {
                   @ApiResponse(responseCode = "200", ref = "ok"),
                   @ApiResponse(responseCode = "400", ref = "badRequest"),

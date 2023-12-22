@@ -21,7 +21,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import br.com.jmarcos.bookstore.controller.dto.permission.PermissionRequestDTO;
 import br.com.jmarcos.bookstore.controller.dto.permission.PermissionResponseDTO;
 import br.com.jmarcos.bookstore.model.Permission;
@@ -38,7 +37,6 @@ public class PermissionController {
             this.permissionService = permissionService;
       }
 
-      @SecurityRequirement(name = "Authorization")
       @Operation(summary = "record a new permission", description = "save a new book in database", responses = {
                   @ApiResponse(responseCode = "200", ref = "ok"),
                   @ApiResponse(responseCode = "400", ref = "badRequest"),
@@ -60,7 +58,6 @@ public class PermissionController {
 
       }
 
-      @SecurityRequirement(name = "Authorization")
       @Operation(summary = "Returns a list of permissions", description = "Returns a list of all permissions in database", responses = {
                   @ApiResponse(responseCode = "500", ref = "InternalServerError"),
                   @ApiResponse(responseCode = "200", ref = "ok"),
@@ -75,7 +72,6 @@ public class PermissionController {
                         .collect(Collectors.toList());
       }
 
-      @SecurityRequirement(name = "Authorization")
       @Operation(summary = "returns a permission by id", description = "returns permission by the specified id", responses = {
                   @ApiResponse(responseCode = "200", ref = "ok"),
                   @ApiResponse(responseCode = "400", ref = "badRequest"),
@@ -93,7 +89,6 @@ public class PermissionController {
 
       }
 
-      @SecurityRequirement(name = "Authorization")
       @Operation(summary = "returns a permission by name", description = "returns permission by the specified name", responses = {
                   @ApiResponse(responseCode = "200", ref = "ok"),
                   @ApiResponse(responseCode = "400", ref = "badRequest"),
@@ -110,7 +105,6 @@ public class PermissionController {
 
       }
 
-      @SecurityRequirement(name = "Authorization")
       @Operation(summary = "delete a permision by id", description = "delete a permision by the specified id from database", responses = {
                   @ApiResponse(responseCode = "200", ref = "ok"),
                   @ApiResponse(responseCode = "400", ref = "badRequest"),
@@ -127,7 +121,6 @@ public class PermissionController {
 
       }
 
-      @SecurityRequirement(name = "Authorization")
       @Operation(summary = "update a permission", description = "update a permission name", responses = {
                   @ApiResponse(responseCode = "200", ref = "ok"),
                   @ApiResponse(responseCode = "400", ref = "badRequest"),
