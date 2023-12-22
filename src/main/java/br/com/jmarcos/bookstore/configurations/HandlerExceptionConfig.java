@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -70,6 +71,13 @@ public class HandlerExceptionConfig {
             ExceptionDetails details = new ExceptionDetails("Bad Request Exception. Please, Submit a Valid Request",
                         exception.getMessage(), HttpStatus.BAD_REQUEST.value());
             return new ResponseEntity<>(details, HttpStatus.BAD_REQUEST);
+      }
+
+      @ExceptionHandler(AuthenticationException.class)
+      public ResponseEntity<ExceptionDetails> handlerAuthenticationException(AuthenticationException exception) {
+            ExceptionDetails details = new ExceptionDetails("UNAUTHORIZED! you submmited invalid parameters",
+                        exception.getMessage(), HttpStatus.UNAUTHORIZED.value());
+            return new ResponseEntity<>(details, HttpStatus.UNAUTHORIZED);
       }
 
 }

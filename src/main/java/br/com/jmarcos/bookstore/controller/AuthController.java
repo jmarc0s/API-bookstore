@@ -1,12 +1,9 @@
 package br.com.jmarcos.bookstore.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,13 +23,14 @@ import jakarta.validation.Valid;
 @RequestMapping("/auth")
 public class AuthController {
 
-      // FIXME
-      // retirar essas anotações. (utlizar o construtor para a injeção das
-      // dependencias)
-      @Autowired
-      private AuthenticationManager authenticationManager;
-      @Autowired
-      private TokenService tokenService;
+      private final AuthenticationManager authenticationManager;
+
+      private final TokenService tokenService;
+
+      public AuthController(AuthenticationManager authenticationManager, TokenService tokenService) {
+            this.authenticationManager = authenticationManager;
+            this.tokenService = tokenService;
+      }
 
       @Operation(summary = "Login in the system", description = "login to access more features", responses = {
                   @ApiResponse(responseCode = "200", ref = "ok"),
@@ -40,7 +38,7 @@ public class AuthController {
                   @ApiResponse(responseCode = "401", description = "invalid user")
       })
       @PostMapping
-      public ResponseEntity<Object> Login(
+      public ResponseEntity<TokenDTO> Login(
                   @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(mediaType = "application/json", examples = {
                               @ExampleObject(value = "{"
                                           + "\"login\": \"user@gmail.com\","
@@ -50,18 +48,11 @@ public class AuthController {
 
             UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = personLoginDTO.convert();
 
-            // FIXME
-            // RETIRAR ESSE TRY CATCH E ADICIONAR UM METODO QUE CAPTURA ESSA EXPTION NO
-            // HANDLEREXCEPTION
-            try {
-                  Authentication authentication = authenticationManager
-                              .authenticate(usernamePasswordAuthenticationToken);
-                  String token = tokenService.createToken(authentication);
+            Authentication authentication = authenticationManager
+                        .authenticate(usernamePasswordAuthenticationToken);
+            String token = tokenService.createToken(authentication);
 
-                  return ResponseEntity.ok(new TokenDTO(token, "Bearer"));
-            } catch (AuthenticationException e) {
-                  return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid parameters");
-            }
+            return ResponseEntity.ok(new TokenDTO(token, "Bearer"));
 
       }
 }
