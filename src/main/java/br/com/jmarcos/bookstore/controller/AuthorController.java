@@ -1,11 +1,11 @@
 package br.com.jmarcos.bookstore.controller;
 
 import java.net.URI;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -46,13 +46,11 @@ public class AuthorController {
 
       })
       @Cacheable(value = "AuthorList")
-      @GetMapping
-      // FIXME
-      // retornar uma lista ao inves de page
-      public Page<AuthorResponseDTO> search(Pageable pageable) {
+      public List<AuthorResponseDTO> search(Pageable pageable) {
             return this.authorService
                         .search(pageable)
-                        .map(AuthorResponseDTO::new);
+                        .map(AuthorResponseDTO::new)
+                        .toList();
       }
 
       @Operation(summary = "record a new Author", description = "save a author in database", responses = {
@@ -64,9 +62,7 @@ public class AuthorController {
 
       @CacheEvict(value = "AuthorList", allEntries = true)
       @PostMapping
-      // FIXME
-      // especificar o tipo de retorno no responseEntity
-      public ResponseEntity<Object> save(@RequestBody @Valid AuthorRequestDTO authorRequestDTO,
+      public ResponseEntity<AuthorResponseDTO> save(@RequestBody @Valid AuthorRequestDTO authorRequestDTO,
                   UriComponentsBuilder uriBuilder) {
 
             Author author = this.authorService.save(authorRequestDTO.toAuthor());
@@ -83,9 +79,7 @@ public class AuthorController {
       })
 
       @GetMapping("/{id}")
-      // FIXME
-      // especificar o tipo de retorno no responseEntity
-      public ResponseEntity<Object> searchById(@PathVariable Long id) {
+      public ResponseEntity<AuthorResponseDTO> searchById(@PathVariable Long id) {
             Author author = this.authorService.searchById(id);
 
             return ResponseEntity.ok(new AuthorResponseDTO(author));
@@ -98,10 +92,8 @@ public class AuthorController {
                   @ApiResponse(responseCode = "404", ref = "ResourceNotFound")
       })
 
-      // FIXME
-      // especificar o tipo de retorno no responseEntity
       @RequestMapping(value = "/search_by_name", method = RequestMethod.GET)
-      public ResponseEntity<Object> searchByName(@RequestParam String name) {
+      public ResponseEntity<AuthorResponseDTO> searchByName(@RequestParam String name) {
             Author author = this.authorService.searchByName(name);
 
             return ResponseEntity.ok(new AuthorResponseDTO(author));
@@ -109,19 +101,17 @@ public class AuthorController {
       }
 
       @Operation(summary = "delete an author by id", description = "delete a author by the specified id from database", responses = {
-                  @ApiResponse(responseCode = "200", ref = "ok"),
+                  @ApiResponse(responseCode = "204", description = "author was deleted"),
                   @ApiResponse(responseCode = "400", ref = "badRequest"),
                   @ApiResponse(responseCode = "403", ref = "permissionDenied"),
                   @ApiResponse(responseCode = "404", ref = "ResourceNotFound")
       })
 
-      // FIXME
-      // especificar o tipo de retorno no responseEntity
       @DeleteMapping("/{id}")
-      public ResponseEntity<Object> deleteById(@PathVariable Long id) {
+      public ResponseEntity<Void> deleteById(@PathVariable Long id) {
             this.authorService.deleteById(id);
 
-            return ResponseEntity.status(HttpStatus.OK).body("Author was deleted");
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
       }
 
       @Operation(summary = "update an author", description = "update data like name, url, etc", responses = {
@@ -132,11 +122,9 @@ public class AuthorController {
                   @ApiResponse(responseCode = "409", ref = "conflict")
       })
 
-      // FIXME
-      // especificar o tipo de retorno no responseEntity
       @CacheEvict(value = "AuthorList", allEntries = true)
       @PutMapping("/{id}")
-      public ResponseEntity<Object> update(@RequestBody @Valid AuthorUpdateDTO authorUpdateDTO,
+      public ResponseEntity<AuthorResponseDTO> update(@RequestBody @Valid AuthorUpdateDTO authorUpdateDTO,
                   @PathVariable Long id) {
 
             Author author = this.authorService.update(authorUpdateDTO.toAuthor(id));
