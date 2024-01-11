@@ -44,5 +44,5 @@ public class GroceryCart {
 
       @Enumerated(EnumType.STRING)
       @Column(name = "order_status")
-      private OrderStatusEnum orderSTatus;
+      private OrderStatusEnum orderStatus;
 }

@@ -16,17 +16,20 @@ import lombok.Setter;
 public class OrderResponseDTO {
       private Long id;
       private Long person_id;
-      private List<GroceryCartListBookDTO> books = new ArrayList<>();
+      private String status;
+      private List<OrderListBookDTO> books = new ArrayList<>();
 
       public OrderResponseDTO(List<GroceryCartBook> groceryCartBooks) {
 
             if (!groceryCartBooks.isEmpty()) {
+
                   this.id = groceryCartBooks.get(0).getGroceryCart().getId();
                   this.person_id = groceryCartBooks.get(0).getGroceryCart().getPerson().getId();
+                  this.status = groceryCartBooks.get(0).getGroceryCart().getOrderStatus().toString();
 
                   for (GroceryCartBook groceryCartBook : groceryCartBooks) {
 
-                        GroceryCartListBookDTO groceryCartListBookDTO = new GroceryCartListBookDTO(groceryCartBook);
+                        OrderListBookDTO groceryCartListBookDTO = new OrderListBookDTO(groceryCartBook);
                         this.books.add(groceryCartListBookDTO);
                   }
             }

@@ -32,7 +32,7 @@ public class OrderRequestDTO {
                   order.getBooks().add(book);
             }
             order.setPerson(new Person(personId));
-            order.setOrderSTatus(OrderStatusEnum.OPEN);
+            order.setOrderStatus(OrderStatusEnum.OPEN);
 
             return order;
       }

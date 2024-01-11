@@ -13,6 +13,7 @@ import br.com.jmarcos.bookstore.model.Person;
 import br.com.jmarcos.bookstore.model.intermediateClass.GroceryCartBook;
 import br.com.jmarcos.bookstore.repository.GroceryCartRepository;
 import br.com.jmarcos.bookstore.repository.intermediateClass.GroceryCartBookRepository;
+import br.com.jmarcos.bookstore.service.exceptions.BadRequestException;
 import br.com.jmarcos.bookstore.service.exceptions.ConflictException;
 import br.com.jmarcos.bookstore.service.exceptions.ResourceNotFoundException;
 import jakarta.transaction.Transactional;
@@ -77,19 +78,25 @@ public class GroceryCartService {
       }
 
       public Optional<GroceryCart> findOpenOrder(Long personId) {
-            Optional<GroceryCart> openOder = this.groceryCartRepository.findOpenOrder(personId);
+            Optional<GroceryCart> openOrder = this.groceryCartRepository.findOpenOrder(personId);
 
-            return openOder;
+            return openOrder;
       }
 
       @Transactional
-      public GroceryCart deleteBook(GroceryCart groceryCart, Long bookId) {
+      public GroceryCart deleteBookFromOpenOrder(Long bookId, Long personId) {
+            GroceryCart order = this.findOpenOrder(personId)
+                        .orElseThrow(() -> new BadRequestException("There is no open order"));
             Book book = this.bookService.findById(bookId);
 
-            this.groceryCartBookRepository.deleteByGroceryCartIdAndBookId(groceryCart.getId(), book.getId());
-            groceryCart.getBooks().remove(book);
+            GroceryCartBook orderBookToDelete = this.groceryCartBookRepository
+                        .findByGroceryCartIdAndBookId(order.getId(), book.getId())
+                        .orElseThrow(() -> new BadRequestException("There is no open order"));
 
-            return this.groceryCartRepository.save(groceryCart);
+            this.groceryCartBookRepository.delete(orderBookToDelete);
+            order.getBooks().remove(book);
+
+            return this.groceryCartRepository.save(order);
       }
 
       public GroceryCart updateBook(GroceryCart groceryCart, Long bookId, int quantity) {

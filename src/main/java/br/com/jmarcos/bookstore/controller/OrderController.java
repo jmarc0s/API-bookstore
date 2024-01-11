@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -38,7 +37,6 @@ import jakarta.validation.Valid;
 public class OrderController {
       private final GroceryCartService groceryCartService;
 
-      @Autowired
       public OrderController(GroceryCartService groceryCartService) {
             this.groceryCartService = groceryCartService;
       }
@@ -115,7 +113,8 @@ public class OrderController {
       })
 
       // FIXME
-      // retirar logica do controller
+      // retirar logica do controller (SUGESTÃO: retirar apenas quando o mapper for
+      // implementado, para fazer a retirada para ele)
       @PostMapping
       public ResponseEntity<OrderResponseDTO> save(
                   @RequestBody @Valid OrderRequestDTO orderRequestDTO,
@@ -158,14 +157,12 @@ public class OrderController {
                   @ApiResponse(responseCode = "403", ref = "permissionDenied"),
                   @ApiResponse(responseCode = "404", ref = "ResourceNotFound")
       })
-      // FIXME
-      // consertar os parametros na url
-      @DeleteMapping("/{id}/books/{bookId}")
-      public ResponseEntity<OrderResponseDTO> deleteBook(@PathVariable Long id, @PathVariable Long bookId,
-                  @AuthenticationPrincipal Person person) {
-            GroceryCart order = this.groceryCartService.searchByIdAndPersonId(id, person.getId());
 
-            order = this.groceryCartService.deleteBook(order, bookId);
+      @DeleteMapping("remove_book/{book_id}")
+      public ResponseEntity<OrderResponseDTO> deleteBook(@PathVariable(name = "book_id") Long bookId,
+                  @AuthenticationPrincipal Person person) {
+
+            GroceryCart order = this.groceryCartService.deleteBookFromOpenOrder(bookId, person.getId());
             List<GroceryCartBook> orderBook = this.groceryCartService.listGroceryCartBook(order);
 
             return ResponseEntity.ok(new OrderResponseDTO(orderBook));
