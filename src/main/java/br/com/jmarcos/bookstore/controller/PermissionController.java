@@ -45,10 +45,8 @@ public class PermissionController {
                   @ApiResponse(responseCode = "409", ref = "conflict")
       })
 
-      // FIXME
-      // especificar o tipo de retorno no responseEntity
       @PostMapping
-      public ResponseEntity<Object> save(@RequestBody @Valid PermissionRequestDTO permissionRequestDTO,
+      public ResponseEntity<PermissionResponseDTO> save(@RequestBody @Valid PermissionRequestDTO permissionRequestDTO,
                   UriComponentsBuilder uriBuilder) {
 
             Permission permission = this.permissionService.save(permissionRequestDTO.toPermission());
@@ -80,9 +78,7 @@ public class PermissionController {
       })
 
       @GetMapping("/{id}")
-      // FIXME
-      // especificar o tipo de retorno no responseEntity
-      public ResponseEntity<Object> searchById(@PathVariable Long id) {
+      public ResponseEntity<PermissionResponseDTO> searchById(@PathVariable Long id) {
             Permission permission = this.permissionService.searchById(id);
 
             return ResponseEntity.ok(new PermissionResponseDTO(permission));
@@ -95,10 +91,8 @@ public class PermissionController {
                   @ApiResponse(responseCode = "403", ref = "permissionDenied"),
                   @ApiResponse(responseCode = "404", ref = "ResourceNotFound")
       })
-      // FIXME
-      // especificar o tipo de retorno no responseEntity
       @RequestMapping(value = "/search_by_name", method = RequestMethod.GET)
-      public ResponseEntity<Object> searchByName(@RequestParam String name) {
+      public ResponseEntity<PermissionResponseDTO> searchByName(@RequestParam String name) {
             Permission permission = this.permissionService.searchByName(name);
 
             return ResponseEntity.ok(new PermissionResponseDTO(permission));
@@ -106,18 +100,17 @@ public class PermissionController {
       }
 
       @Operation(summary = "delete a permision by id", description = "delete a permision by the specified id from database", responses = {
-                  @ApiResponse(responseCode = "200", ref = "ok"),
+                  @ApiResponse(responseCode = "204", ref = "ok"),
                   @ApiResponse(responseCode = "400", ref = "badRequest"),
                   @ApiResponse(responseCode = "403", ref = "permissionDenied"),
                   @ApiResponse(responseCode = "404", ref = "ResourceNotFound")
       })
-      // FIXME
-      // especificar o tipo de retorno no responseEntity
+
       @DeleteMapping("/{id}")
-      public ResponseEntity<Object> delete(@PathVariable Long id) {
+      public ResponseEntity<Void> delete(@PathVariable Long id) {
             this.permissionService.delete(id);
 
-            return ResponseEntity.status(HttpStatus.OK).body("Permission deleted");
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 
       }
 
@@ -130,7 +123,7 @@ public class PermissionController {
       })
 
       @PutMapping("/{id}")
-      public ResponseEntity<Object> update(@PathVariable Long id,
+      public ResponseEntity<PermissionResponseDTO> update(@PathVariable Long id,
                   @RequestBody @Valid PermissionRequestDTO permissionRequestDTO) {
 
             Permission upatedPermission = this.permissionService.update(permissionRequestDTO.toPermission(id));
